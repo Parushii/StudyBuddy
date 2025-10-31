@@ -1,0 +1,564 @@
+[
+  {
+    "text": "Reinforcement Learning (RL) is a paradigm of machine learning distinct from supervised or unsupervised learning. It involves an 'agent' that learns to make decisions by interacting with an 'environment.' The agent learns to achieve a goal in this environment through a system of trial and error. For every action it takes, the agent receives feedback in the form of a 'reward' (a positive signal) or a 'penalty' (a negative signal). The agent's sole objective is to learn a 'policy'—a strategy for choosing actions—that maximizes its total cumulative reward over time. This approach, which models a Markov Decision Process, is the foundation for training AI to play games (like AlphaGo) and controlling robotic systems.",
+    "subject": "AI",
+    "chapter": "Reinforcement Learning"
+  },
+  {
+    "text": "Computer Vision is a field of AI that trains computers to interpret and understand the visual world. Using digital images from cameras and videos, models can be trained to accurately identify, classify, and react to objects. This field is powered by **Convolutional Neural Networks (CNNs)**, a type of deep learning model specifically designed to process grid-like data (like pixels in an image). CNNs automatically learn a hierarchy of features—from simple edges and textures in the first layers, to complex patterns and object parts in deeper layers. This enables computers to perform tasks like facial recognition, autonomous vehicle navigation (by identifying pedestrians and lane lines), and medical image analysis (by detecting tumors in X-rays).",
+    "subject": "AI",
+    "chapter": "Computer Vision (CNNs)"
+  },
+  {
+    "text": "Ethical AI refers to the development and deployment of artificial intelligence systems in a way that aligns with human values, ethics, and legal principles. As AI models become more powerful and integrated into society (in areas like hiring, loan applications, and criminal justice), their potential for harm becomes a major concern. The key challenges in this field are: **Bias**, where models trained on historical data learn and amplify human prejudices; **Transparency**, or the 'black box problem,' where it is impossible to explain *why* a complex model made a certain decision; and **Accountability**, which addresses the question of who is responsible when an autonomous AI system causes harm.",
+    "subject": "AI",
+    "chapter": "Ethical AI (Bias and Transparency)"
+  },
+  {
+    "text": "Decision Trees are a highly interpretable supervised learning algorithm used for both classification and regression. The model works by splitting the data into subsets based on the value of a feature, creating a tree-like structure of 'if-then-else' rules. The 'root' node represents the entire dataset, which is then split at 'decision nodes' based on features that best separate the data (e.g., using Gini impurity or entropy). This process continues until 'leaf nodes' are reached, which represent the final class prediction. While a single decision tree is easy to understand, it is highly prone to overfitting. This weakness is typically overcome by using an 'ensemble' method, such as a Random Forest, which builds many trees and aggregates their votes.",
+    "subject": "ML",
+    "chapter": "Decision Trees and Ensembles"
+  },
+  {
+    "text": "The core challenge in machine learning is **generalization**, which is the model's ability to make accurate predictions on new, unseen data. This leads to the 'bias-variance tradeoff.' **Bias** is the error from a model being too simple and making incorrect assumptions (e.g., assuming a complex relationship is linear); this leads to **underfitting**. **Variance** is the error from a model being too complex and sensitive to the noise in the training data; this leads to **overfitting**. A model with high variance performs exceptionally well on the data it was trained on but fails on new data. The goal is to find the 'sweet spot': a model complex enough to capture the underlying pattern (low bias) but not so complex that it memorizes the noise (low variance).",
+    "subject": "ML",
+    "chapter": "Bias-Variance Tradeoff (Overfitting)"
+  },
+  {
+    "text": "Principal Component Analysis (PCA) is the most widely used algorithm for **dimensionality reduction**, an unsupervised learning technique. In many datasets, features are highly correlated (e.g., 'house size' and 'number of bedrooms'). PCA works by finding a new set of 'principal components,' which are new, uncorrelated axes that represent the data. The first principal component is the direction in the data that captures the *most* variance. The second component captures the *second* most variance, and so on. By keeping only the first few principal components, we can reduce a high-dimensional dataset (e.g., 100 features) to a low-dimensional one (e.g., 2 features) while preserving the maximum amount of information. This is used for data visualization and to speed up other ML models.",
+    "subject": "ML",
+    "chapter": "Dimensionality Reduction (PCA)"
+  },
+  {
+    "text": "Sentiment Analysis, also known as opinion mining, is an NLP task that uses machine learning to identify and extract the emotional tone or subjective opinion from text. Businesses use this to analyze social media posts, customer reviews, and survey responses to understand public perception of their brand or products. At its simplest, it's a classification task that labels a piece of text as **positive, negative, or neutral**. More advanced models can perform 'aspect-based' sentiment analysis, which can attribute a sentiment to a specific feature (e.g., 'The *camera* on this phone is **amazing**, but the *battery life* is **terrible**'). This provides much more granular and actionable insights.",
+    "subject": "NLP",
+    "chapter": "Sentiment Analysis"
+  },
+  {
+    "text": "Named Entity Recognition (NER) is a fundamental information extraction task in NLP. Its goal is to locate and classify 'named entities' within unstructured text into predefined categories. These entities are typically real-world objects, such as person names ('Elon Musk'), organizations ('SpaceX'), locations ('Mars'), dates ('2026'), and monetary values ('$1 billion'). NER systems are essential for 'making sense' of text. They are a critical first step for powering search engines, building knowledge graphs, summarizing articles by identifying the key actors, and enabling chatbots to understand the 'who, what, and where' of a user's request. Modern NER models use deep learning (like LSTMs or Transformers) to achieve high accuracy by considering the context of a word in a sentence.",
+    "subject": "NLP",
+    "chapter": "Named Entity Recognition (NER)"
+  },
+  {
+    "text": "Feature Engineering is the art and science of transforming raw data into a format that a machine learning algorithm can understand and leverage. It is often the most time-consuming and critical part of a predictive modelling project, as the quality of the features directly impacts the quality of the model. This process involves creating new input variables ('features') from the existing data. Examples include: **imputation** (filling in missing values), **binning** (turning a continuous number like 'age' into categories like 'child', 'teen', 'adult'), **one-hot encoding** (converting categorical text data into binary flags), or **combining features** (e.g., creating a 'Body Mass Index' feature from 'height' and 'weight'). A well-engineered feature can make a simple model outperform a complex one.",
+    "subject": "Predictive Modelling",
+    "chapter": "Feature Engineering"
+  },
+  {
+    "text": "Model evaluation is a critical step in predictive modelling to ensure the model is not only accurate but also reliable and useful. For **classification** tasks, accuracy alone can be misleading, especially with imbalanced data (e.g., a 99% accurate fraud model that never catches any fraud). Therefore, metrics like **Precision** (what percentage of positive predictions were correct?) and **Recall** (what percentage of actual positives did the model find?) are used. These are often combined into an **F1-Score**. For **regression** tasks, where the model predicts a number, common metrics include **Mean Absolute Error (MAE)**, which is the average error, and **Root Mean Square Error (RMSE)**, which heavily penalizes large errors.",
+    "subject": "Predictive Modelling",
+    "chapter": "Model Evaluation Metrics (Precision/Recall)"
+  },
+  {
+    "text": "Social Engineering is a non-technical attack vector that relies on psychological manipulation to trick people into breaching security protocols. It is an attack on the 'human firewall.' The most common form is **Phishing**, where attackers send fraudulent emails, texts ('smishing'), or calls ('vishing') that create a sense of urgency, fear, or authority. These messages impersonate a trusted entity (like a bank, an IT department, or a CEO) to lure a victim into revealing sensitive information (like passwords or credit card numbers), clicking a malicious link, or opening an attachment that installs malware. This remains one of the most effective methods for an attacker to gain an initial foothold in a secure network.",
+    "subject": "Information Security",
+    "chapter": "Social Engineering and Phishing"
+  },
+  {
+    "text": "The **Zero Trust** security model is a modern paradigm that fundamentally shifts away from the traditional 'castle-and-moat' approach. The old model trusted anyone and anything 'inside' the network firewall. Zero Trust operates on the principle of **'never trust, always verify.'** It assumes that the network is always hostile and that attackers may already be present. In this model, every single access request is rigorously authenticated and authorized, regardless of whether it originates from inside or outside the network. It enforces 'micro-segmentation' and 'least-privilege access,' meaning users and devices are only given the absolute minimum permissions necessary to perform their job, thus dramatically limiting an attacker's ability to move laterally within the network after a breach.",
+    "subject": "Information Security",
+    "chapter": "Zero Trust Architecture"
+  },
+  {
+    "text": "Malware, short for 'malicious software,' is an umbrella term for any software designed to cause disruption or gain unauthorized access to a computer system. A **Virus** is a piece of malicious code that attaches itself to a legitimate program or file. It requires human action (like opening the file) to spread and execute. A **Worm** is a more dangerous, standalone program that can self-replicate and propagate across networks by exploiting security vulnerabilities, without any human intervention. **Ransomware** is a particularly nasty form of malware that encrypts a victim's personal files, making them completely inaccessible. The attacker then demands a ransom payment (usually in cryptocurrency) in exchange for the decryption key.",
+    "subject": "Information Security",
+    "chapter": "Malware (Virus, Worm, Ransomware)"
+  },
+  {
+    "text": "The **Shared Responsibility Model** is a foundational concept in cloud security that defines the division of security obligations between the cloud provider (like AWS or Azure) and the customer. The provider is responsible for the security *OF* the cloud—this includes the physical data centers, the hardware (servers, storage), and the core virtualization software. The customer is responsible for security *IN* the cloud. This includes configuring their own network (virtual firewalls), managing user access and identities (IAM), patching their own guest operating systems (on IaaS), and encrypting their application data. This division is not static; the customer's responsibility decreases as they move from IaaS (most responsibility) to PaaS, and finally to SaaS (least responsibility).",
+    "subject": "Cloud Computing",
+    "chapter": "Shared Responsibility Model"
+  },
+  {
+    "text": "Serverless Computing, or **Functions as a Service (FaaS)**, is a cloud execution model that abstracts away all infrastructure management. Despite the name, there are still servers, but the cloud provider is responsible for provisioning, managing, and scaling them. The developer simply writes and uploads small, event-driven 'functions' (e.g., an API endpoint, an image processing task). This function is 'stateless' and only runs when it is triggered, scaling to thousands of parallel instances if needed. The primary benefit is cost: customers pay *only* for the compute time they actually consume (often measured in milliseconds), rather than paying for an idle server 24/7. This makes it ideal for bursty or unpredictable workloads.",
+    "subject": "Cloud Computing",
+    "chapter": "Serverless (Functions as a Service)"
+  },
+  {
+    "text": "A **Virtual Private Cloud (VPC)** is a secure, isolated private cloud hosted within a public cloud provider's infrastructure. It gives an organization a logically isolated section of the cloud where they can launch resources in a virtual network that they define. A VPC provides complete control over the virtual networking environment, including the selection of its own IP address range, the creation of subnets (public-facing for web servers, private for backend databases), and the configuration of route tables and network gateways (like an Internet Gateway or VPN Gateway). This allows organizations to get the scalability benefits of the public cloud while maintaining the security and isolation of a traditional private data center.",
+    "subject": "Cloud Computing",
+    "chapter": "Virtual Private Cloud (VPC)"
+  },
+  {
+    "text": "The **P vs. NP** problem is one of the most profound, unsolved problems in computer science and mathematics. It asks: can every problem whose solution can be *quickly verified* also be *quickly solved*? **P** stands for 'Polynomial time,' and it's a class of problems that are 'easy' to solve—an algorithm exists that can find the solution in a reasonable, polynomial amount of time. **NP** stands for 'Nondeterministic Polynomial time,' and it's a class of problems where, if you are given a potential solution, it is 'easy' to *verify* if it's correct. The core question is whether these two classes are the same. If $P = NP$, it would mean that many \"hard\" problems, like factoring large numbers (which underpins modern cryptography) or solving the Traveling Salesman Problem, could be solved efficiently.",
+    "subject": "Mathematics",
+    "chapter": "P vs. NP Problem"
+  },
+  {
+    "text": "Graph Theory is a branch of mathematics that studies 'graphs,' which are structures used to model pairwise relationships between objects. A graph consists of **vertices** (or nodes) and **edges** that connect them. This simple concept is incredibly powerful for modeling real-world systems, such as social networks (vertices are people, edges are friendships), the internet (vertices are routers, edges are connections), or chemical molecules (vertices are atoms, edges are bonds). Graph theory is used to solve problems like finding the shortest path between two nodes (Dijkstra's algorithm), determining the most 'central' or 'influential' node in a network, or finding the optimal route for a delivery truck (the Traveling Salesman Problem).",
+    "subject": "Mathematics",
+    "chapter": "Graph Theory"
+  },
+  {
+    "text": "The Standard Model of particle physics is the most successful scientific theory in history. It describes the fundamental 'building blocks' of the universe and three of the four fundamental forces that govern them. The model classifies all known elementary particles into two groups: **fermions** and **bosons**. Fermions are the 'matter' particles (like electrons, and the quarks that make up protons and neutrons). Bosons are the 'force-carrying' particles (like the photon, which carries the electromagnetic force). The model was triumphantly completed in 2012 with the discovery of the Higgs boson, the particle associated with the Higgs field, which is the mechanism that gives all other particles their mass. Its only major gap is that it does not include a description of gravity.",
+    "subject": "Physics",
+    "chapter": "The Standard Model"
+  },
+  {
+    "text": "Einstein's theory of **General Relativity** (1915) is our modern theory of gravity. It is a profound conceptual shift from Newton's idea of gravity as a 'force' acting between two objects. Instead, General Relativity describes gravity as a consequence of the *curvature of spacetime*. According to the theory, mass and energy 'warp' or 'bend' the four-dimensional fabric of spacetime around them. Objects moving through this warped spacetime, including light, follow the straightest possible path (called a geodesic), which we observe as a curved trajectory (i.e., an orbit). This theory accurately predicts the bending of starlight by the sun, the existence of black holes, and the recently detected gravitational waves—ripples in spacetime itself.",
+    "subject": "Physics",
+    "chapter": "General Relativity"
+  },
+  {
+    "text": "Quantum Entanglement is one of the most bizarre and non-intuitive phenomena in physics, famously described by Einstein as 'spooky action at a distance.' It occurs when two or more particles are generated in such a way that their quantum states are linked, regardless of the distance separating them. For example, two 'entangled' electrons might have opposite 'spins.' If you measure one electron and find its spin is 'up,' you will instantly know that the other electron's spin is 'down,' even if it is on the other side of the galaxy. This apparent faster-than-light communication doesn't violate relativity (as you can't control the outcome of the first measurement), but it is a cornerstone of quantum mechanics and the basis for emerging technologies like quantum computing.",
+    "subject": "Physics",
+    "chapter": "Quantum Entanglement"
+  },
+  {
+    "text": "Database **Normalization** is a formal process in relational database design (SQL) to eliminate data redundancy and improve data integrity. It involves structuring a database into tables and applying a series of 'Normal Forms' (like 1NF, 2NF, 3NF). The primary goal is to ensure that every piece of non-key information (like a customer's name) is stored in *only one place*. This prevents 'update anomalies,' where changing a customer's address in one row might leave it unchanged in another, leading to an inconsistent and corrupt database. 3NF (Third Normal Form) is the standard for most transactional (OLTP) databases, striking a balance between data integrity and the complexity of joining many tables for a query.",
+    "subject": "ADBMS",
+    "chapter": "Database Normalization (1NF, 2NF, 3NF)"
+  },
+  {
+    "text": "A database **index** is a separate data structure (most commonly a B-Tree) that provides a 'lookup' for a database table, much like the index in the back of a book. Without an index, a query (e.g., `SELECT * FROM users WHERE last_name = 'Smith'`) would force the database to perform a 'full table scan,' reading every single row to find the matches. An index on the `last_name` column allows the database to instantly find the exact disk location of all 'Smith' records. While indexes dramatically accelerate `SELECT` queries, they come at a cost: they consume storage space and slightly slow down `INSERT` and `UPDATE` operations, because the index must be updated in addition to the table itself.",
+    "subject": "ADBMS",
+    "chapter": "Database Indexing (B-Trees)"
+  },
+  {
+    "text": "The **CAP Theorem**, formulated by Eric Brewer, is a fundamental principle in distributed database systems (ADBMS). It states that it is impossible for a distributed data store to simultaneously provide more than two of the following three guarantees: **Consistency** (every read receives the most recent write or an error), **Availability** (every request receives a non-error response, without guarantee that it's the most recent write), and **Partition Tolerance** (the system continues to operate despite network failures that split the system into partitions). In the real world, network partitions are inevitable, so a distributed system must *always* have Partition Tolerance. Therefore, the real choice is between Consistency (CP) and Availability (AP).",
+    "subject": "ADBMS",
+    "chapter": "The CAP Theorem"
+  },
+  {
+    "text": "OLTP (Online Transaction Processing) and OLAP (Online Analytical Processing) represent two fundamentally different database workloads. **OLTP** systems are the 'day-to-day' databases that power applications (e.g., e-commerce, banking). They are optimized for a high volume of small, fast, concurrent *transactions* (e.g., `INSERT`, `UPDATE`, `DELETE`). They are highly normalized to ensure data integrity (ACID). **OLAP** systems, or 'data warehouses,' are designed for business intelligence and complex *analysis*. They are optimized for a low volume of complex, 'read-heavy' queries that aggregate vast amounts of historical data (e.g., 'What were the total sales by product line, per region, for the past five years?'). OLAP data is 'denormalized' (e.g., into a Star Schema) to make these analytical queries run fast.",
+    "subject": "ADBMS",
+    "chapter": "OLTP vs. OLAP"
+  }
+,
+  {
+    "text": "Artificial Intelligence (AI) encompasses the broad discipline of creating systems that can perceive their environment, reason about it, and take appropriate actions to achieve a specific goal. AI is not a single technology but a constellation of fields, including machine learning, natural language processing, computer vision, and robotics. It is often categorized into two types: Narrow AI, which is designed and trained for a specific task (e.g., virtual assistants, facial recognition), and Artificial General Intelligence (AGI), a hypothetical future AI that would possess the ability to understand, learn, and apply its intelligence to solve any problem, mirroring human cognitive abilities. Modern AI heavily relies on neural networks and deep learning to find patterns in vast amounts of data.",
+    "subject": "AI",
+    "chapter": "Foundations of AI"
+  },
+  {
+    "text": "Search algorithms are foundational to many AI problems, from finding the best route on a map (like in GPS) to solving complex puzzles and playing games like chess. These algorithms explore a 'state space' of possible solutions. Uninformed search algorithms, such as Breadth-First Search (BFS) or Depth-First Search (DFS), explore this space systematically without any knowledge of how 'close' a state is to the goal. In contrast, informed search algorithms, like A* (A-star), are far more efficient. A* uses a heuristic function ($h(n)$) to estimate the cost from the current state to the goal, combining it with the actual cost incurred so far ($g(n)$). This allows it to prioritize exploring paths that are not only cheap but also appear to be leading in the right direction, guaranteeing an optimal solution if the heuristic is admissible.",
+    "subject": "AI",
+    "chapter": "Search Algorithms"
+  },
+  {
+    "text": "Knowledge Representation and Reasoning (KRR) is a field of AI dedicated to representing information about the world in a form that a computer system can use to solve complex tasks. It involves creating a formal 'ontology' or knowledge base, which uses logic-based systems (like propositional or first-order logic) and semantic networks to store facts, rules, and relationships. The 'reasoning' part involves using an inference engine to automatically deduce new, implicit knowledge from the explicit knowledge already stored. For example, if the system knows 'Socrates is a man' and 'All men are mortal,' it can infer the new fact 'Socrates is mortal' without being explicitly told.",
+    "subject": "AI",
+    "chapter": "Knowledge Representation"
+  },
+  {
+    "text": "Machine Learning (ML) is a subfield of artificial intelligence where, instead of being explicitly programmed with rules, a system 'learns' directly from data. The process involves feeding a large amount of data into an algorithm, which then uses statistical techniques to identify patterns and build a mathematical model. This model can then be used to make predictions or decisions on new, unseen data. The three main paradigms of machine learning are: Supervised Learning (using labeled data), Unsupervised Learning (finding patterns in unlabeled data), and Reinforcement Learning (learning through trial and error with rewards and penalties).",
+    "subject": "ML",
+    "chapter": "Introduction to Machine Learning"
+  },
+  {
+    "text": "Supervised Learning is a machine learning paradigm where the algorithm learns from a dataset that is fully labeled. This means every data point in the training set has both an input 'feature' and a corresponding 'label' or output. The goal is to learn a mapping function that can predict the output for new, unseen inputs. Supervised learning is divided into two main categories: Classification and Regression. In classification, the label is a discrete category (e.g., 'spam' or 'not spam', 'dog' or 'cat'). In regression, the label is a continuous value (e.g., predicting the price of a house or the temperature tomorrow). Common algorithms include Linear Regression, Logistic Regression, Support Vector Machines, and Decision Trees.",
+    "subject": "ML",
+    "chapter": "Supervised Learning"
+  },
+  {
+    "text": "Unsupervised Learning is a machine learning paradigm used when the data is not labeled, meaning there are no predefined outputs or correct answers. The goal of the algorithm is to explore the data and find hidden structures or patterns on its own. The most common unsupervised task is clustering, where the algorithm groups data points into 'clusters' such that items in the same cluster are more similar to each other than to those in other clusters. A popular example is $k$-Means clustering. Another major task is dimensionality reduction, like Principal Component Analysis (PCA), which reduces the number of variables in a dataset while preserving its important underlying structure, making it easier to visualize and analyze.",
+    "subject": "ML",
+    "chapter": "Unsupervised Learning"
+  },
+  {
+    "text": "Natural Language Processing (NLP) is an interdisciplinary field of AI and linguistics that focuses on the interaction between computers and human language. The ultimate goal of NLP is to enable computers to 'understand', interpret, and generate human text and speech in a way that is both meaningful and useful. NLP is an incredibly challenging field because human language is full of ambiguity, context, sarcasm, and cultural nuance. Early NLP relied on complex, hand-crafted rules. However, the modern approach is dominated by machine learning and deep learning models, such as Transformers, which can learn the statistical patterns and context of language from massive text corpora, enabling tasks like machine translation, sentiment analysis, and question-answering.",
+    "subject": "NLP",
+    "chapter": "Foundations of NLP"
+  },
+  {
+    "text": "Vectorization, or word embeddings, is the foundational process in modern NLP for converting text into a numerical form that machine learning models can understand. Traditional methods like Bag-of-Words (BoW) or TF-IDF represent documents as large, sparse vectors based on word counts but fail to capture semantic meaning; for example, 'king' and 'queen' are treated as completely unrelated. Modern embeddings like Word2Vec and GloVe solve this by representing each word as a dense, low-dimensional vector in a continuous space. These vectors are learned from a large corpus, and their positions in the space capture semantic relationships. For instance, the vector operation $\text{vector('king')} - \text{vector('man')} + \text{vector('woman')}$ results in a vector that is very close to $\text{vector('queen')}$.",
+    "subject": "NLP",
+    "chapter": "Word Embeddings"
+  },
+  {
+    "text": "The Transformer architecture, introduced in the 2017 paper 'Attention Is All You Need,' has completely revolutionized the field of NLP. It replaced the Recurrent Neural Networks (RNNs) that were previously state-of-the-art for sequence tasks. Unlike RNNs, which process words one by one in sequence, the Transformer uses a mechanism called 'self-attention' to process all words in a sentence simultaneously. This self-attention mechanism allows the model to weigh the importance of all other words in the sequence when processing a single word, giving it a deep contextual understanding and an unparalleled ability to handle long-range dependencies. This parallelizable design allowed for training much larger models (LLMs) like BERT and GPT.",
+    "subject": "NLP",
+    "chapter": "The Transformer Architecture"
+  },
+  {
+    "text": "Predictive Modelling is a statistical process that uses data mining and machine learning to create, test, and validate a model intended to forecast future outcomes. The process involves collecting historical data, cleaning and preparing that data (feature engineering), and then training a model to find patterns that correlate with a specific target. For example, a credit card company might build a predictive model to identify which transactions are most likely to be fraudulent based on past fraudulent activity. The reliability of the model is highly dependent on the quality of the input data and the validation techniques used, such as cross-validation, to ensure the model generalizes well to new, unseen data and is not just 'memorizing' the training set (overfitting).",
+    "subject": "Predictive Modelling",
+    "chapter": "Introduction to Predictive Modelling"
+  },
+  {
+    "text": "Time Series Forecasting is a specialized branch of predictive modelling that deals with data points collected in chronological order, such as daily stock prices, monthly sales, or hourly website traffic. Unlike other predictive models, time series data has an inherent temporal dependency, meaning that past values have a direct influence on future values (a concept known as autocorrelation). Classic models like ARIMA (Autoregressive Integrated Moving Average) are designed to explicitly model this temporal structure, including trends and seasonality. Modern deep learning approaches, using Recurrent Neural Networks (RNNs) or LSTMs, can capture even more complex, non-linear patterns in sequential data, often leading to more accurate long-range forecasts.",
+    "subject": "Predictive Modelling",
+    "chapter": "Time Series Forecasting"
+  },
+  {
+    "text": "Information Security is the practice of defending information from unauthorized access, use, disclosure, disruption, modification, or destruction. The entire field is built upon the foundational 'CIA Triad'. **Confidentiality** ensures that sensitive information is not disclosed to unauthorized individuals; this is often enforced using encryption and access controls. **Integrity** ensures that data is accurate and trustworthy by protecting it from unauthorized modification; this is verified using techniques like hashing. **Availability** ensures that systems and data are accessible to authorized users when they are needed; this is protected against threats like Denial-of-Service (DoS) attacks and hardware failures through redundancy and disaster recovery planning. A breach of any of these three principles constitutes a security failure.",
+    "subject": "Information Security",
+    "chapter": "The CIA Triad"
+  },
+  {
+    "text": "Cryptography is the cornerstone of modern information security, providing the tools for ensuring confidentiality and integrity. It is broadly divided into two types: symmetric and asymmetric. Symmetric-key cryptography (e.g., AES) uses a single, shared secret key to both encrypt and decrypt data. It is extremely fast and ideal for encrypting large volumes of data. Its primary weakness is key distribution. Asymmetric-key cryptography (e.g., RSA) solves this by using a pair of keys: a public key (for encryption) and a private key (for decryption). This system is slower but allows two parties to communicate securely without a pre-shared secret. In practice, systems often use a hybrid approach: asymmetric crypto is used to securely exchange a symmetric key, which is then used for the bulk data encryption.",
+    "subject": "Information Security",
+    "chapter": "Cryptography"
+  },
+  {
+    "text": "A Denial-of-Service (DoS) attack is an attempt to make a machine or network resource unavailable to its intended users by flooding it with superfluous requests, overwhelming its capacity to respond. A Distributed Denial-of-Service (DDoS) attack is a more potent version of this, where the attack traffic originates from many different sources (often a 'botnet' of thousands of compromised computers), making it impossible to block a single source. The goal is not to steal data but to disrupt service, causing financial and reputational damage. Defenses against DDoS attacks involve traffic scrubbing (filtering malicious traffic), rate limiting, and deploying services across a globally distributed content delivery network (CDN) to absorb the massive volume of traffic.",
+    "subject": "Information Security",
+    "chapter": "Denial-of-Service (DDoS) Attacks"
+  },
+  {
+    "text": "Cloud Computing refers to the on-demand delivery of IT resources over the internet with pay-as-you-go pricing. Instead of buying, owning, and maintaining their own data centers and servers, organizations can access technology services, such as computing power, storage, and databases, from a cloud provider like Amazon Web Services (AWS) or Microsoft Azure. The three main service models are **IaaS (Infrastructure as a Service)**, which provides basic computing and storage; **PaaS (Platform as a Service)**, which offers a platform for developing and deploying applications without managing the underlying infrastructure; and **SaaS (Software as a Service)**, which delivers complete software applications over the internet, like Gmail or Salesforce.",
+    "subject": "Cloud Computing",
+    "chapter": "Cloud Service Models (IaaS, PaaS, SaaS)"
+  },
+  {
+    "text": "Virtualization is the core technology that powers cloud computing. It is the process of creating a virtual, software-based representation of a compute resource, such as a server, storage, or network. The most common form is server virtualization, where a piece of software called a 'hypervisor' (like VMware or Hyper-V) runs on a physical server and allows multiple, independent virtual machines (VMs) to run on that single piece of hardware. Each VM has its own operating system and applications but shares the underlying physical resources. This enables massive economies of scale by improving resource utilization, allowing for rapid provisioning of new servers, and isolating workloads from one another for security.",
+    "subject": "Cloud Computing",
+    "chapter": "Virtualization and Hypervisors"
+  },
+  {
+    "text": "Containers, popularized by Docker, are a lightweight, more agile form of virtualization. Unlike a virtual machine (VM) which virtualizes the entire hardware stack and includes a full guest operating system, a container virtualizes only the operating system. It packages an application and all its dependencies (libraries, code, configuration) into a single, isolated 'container' that runs on the host OS. This makes containers extremely small, fast to start (milliseconds vs. minutes for a VM), and highly portable. This technology is the foundation of a microservices architecture, where a large application is broken into many small, independent services, each running in its own container and managed by an orchestration tool like Kubernetes.",
+    "subject": "Cloud Computing",
+    "chapter": "Containers and Orchestration (Docker/Kubernetes)"
+  },
+  {
+    "text": "The Fundamental Theorem of Calculus is a profound statement that connects the two main branches of calculus: differential calculus (the study of rates of change) and integral calculus (the study of the accumulation of quantities). The theorem, which has two parts, essentially states that differentiation and integration are inverse operations. The first part allows one to compute the antiderivative of a function as an integral. The second, and more widely used part, provides a method for calculating a definite integral. It states that if $F$ is an antiderivative of a function $f$ (meaning $F' = f$), then the definite integral of $f$ from $a$ to $b$, $\\int_{a}^{b} f(x) dx$, is simply the change in $F$ from $a$ to $b$, or $F(b) - F(a)$.",
+    "subject": "Mathematics",
+    "chapter": "The Fundamental Theorem of Calculus"
+  },
+  {
+    "text": "The Riemann Hypothesis is arguably the most important unsolved problem in pure mathematics. Proposed by Bernhard Riemann in 1859, it is a conjecture about the zeros of the Riemann zeta function, $\\zeta(s)$. The zeta function is deeply connected to the distribution of prime numbers. The 'trivial' zeros are all negative even integers. The hypothesis conjectures that all 'non-trivial' zeros lie on a specific vertical line in the complex plane, known as the 'critical line,' where the real part of the complex number $s$ is $1/2$. A proof of this hypothesis would have profound consequences, providing a much stronger and more precise understanding of how prime numbers are distributed, and would also validate many other mathematical theorems that have been proven on the condition that the hypothesis is true.",
+    "subject": "Mathematics",
+    "chapter": "The Riemann Hypothesis"
+  },
+  {
+    "text": "Newton's Law of Universal Gravitation states that every particle in the universe attracts every other particle with a force that is directly proportional to the product of their masses and inversely proportional to the square of the distance between their centers. This is famously expressed in the equation $F = G \frac{m_1m_2}{r^2}$, where $F$ is the gravitational force, $G$ is the gravitational constant, $m_1$ and $m_2$ are the masses of the two objects, and $r$ is the distance between them. This elegant law was a revolutionary achievement, as it was the first to unify terrestrial and celestial mechanics—it described both why an apple falls from a tree and why the planets orbit the Sun, all with a single mathematical principle.",
+    "subject": "Physics",
+    "chapter": "Universal Gravitation"
+  },
+  {
+    "text": "The Second Law of Thermodynamics is a fundamental principle of physics that describes the 'arrow of time' and the concept of entropy. It states that in an isolated system, the total entropy (a measure of disorder or randomness) will either remain constant or, more commonly, increase over time; it will never decrease. This law explains why heat naturally flows from a hot object to a cold object and not the other way, and why processes tend to move towards a state of equilibrium. It also implies that no energy conversion is 100% efficient; in any real-world process, such as in a car engine or a power plant, some 'useful' energy is inevitably lost and dissipated as waste heat, increasing the overall entropy of the universe.",
+    "subject": "Physics",
+    "chapter": "Thermodynamics"
+  },
+  {
+    "text": "An Advanced Database Management System (ADBMS) must be ableA to handle transactions with absolute reliability. This is ensured by adherence to the **ACID** properties. **Atomicity** dictates that a transaction is an 'all or nothing' event; if any part of the transaction fails, the entire operation is rolled back as if it never happened. **Consistency** ensures that any transaction brings the database from one valid state to another, upholding all predefined rules and constraints. **Isolation** is critical in concurrent systems, ensuring that one transaction's operations are invisible to other, simultaneous transactions until the first transaction is complete, preventing race conditions. Finally, **Durable** means that once a transaction has been 'committed' (i.e., successfully completed), its changes are permanent and will survive any subsequent system failure, such as a power outage.",
+    "subject": "ADBMS",
+    "chapter": "Transaction Management (ACID Properties)"
+  },
+  {
+    "text": "A distributed database is a database that is not stored on a single central server but is partitioned and/or replicated across multiple computers (or 'nodes'), often in different geographical locations. This design provides high availability (if one node fails, others can take over) and scalability (new nodes can be added to handle more load). However, this architecture introduces a fundamental trade-off described by the **CAP Theorem**. The theorem states that a distributed system can only provide two of the following three guarantees at any given time: **C**onsistency (all nodes see the same data at the same time), **A**vailability (every request receives a response), and **P**artition Tolerance (the system continues to operate despite network failures). In a real-world network failure (a partition), a system must choose between being consistent (CP) or available (AP).",
+    "subject": "ADBMS",
+    "chapter": "Distributed Databases and CAP Theorem"
+  },
+  {
+    "text": "NoSQL databases emerged to handle the '3 V's' of Big Data: high Volume, high Velocity, and high Variety. Unlike traditional relational (SQL) databases with their rigid, predefined schemas, NoSQL databases offer flexible data models. There are four main types: **Document Stores** (like MongoDB) store data in flexible, JSON-like documents, which is very intuitive for developers. **Key-Value Stores** (like Redis) are the simplest, using a giant dictionary to store data, and are incredibly fast for caching. **Column-Family Stores** (like Cassandra) are optimized for write-heavy, large-scale analytical queries. **Graph Databases** (like Neo4j) are designed specifically to store and navigate complex, interconnected relationships, such as social networks.",
+    "subject": "ADBMS",
+    "chapter": "NoSQL Database Models"
+  },
+  {
+    "text": "Data warehousing is a core component of Business Intelligence and advanced database systems. A data warehouse is a large, centralized repository that consolidates data from multiple, disparate sources (e.g., sales, marketing, finance databases) for the purpose of reporting and analysis. The data is transformed from its raw, transactional format (OLTP) into a query-friendly, historical format (OLAP - Online Analytical Processing) using an **ETL** (Extract, Transform, Load) process. This involves extracting the data from its source, transforming it to be clean and consistent (e.g., standardizing date formats), and loading it into the warehouse. The resulting structure, often a 'star schema', is optimized for complex analytical queries that help businesses discover trends and make informed decisions.",
+    "subject": "ADBMS",
+    "chapter": "Data Warehousing and ETL"
+  }
+,
+  {
+    "text": "Special Relativity, a theory proposed by Albert Einstein in 1905, fundamentally altered our understanding of space and time. It is built on two postulates: first, that the laws of physics are identical in all inertial (non-accelerating) frames of reference, and second, that the speed of light in a vacuum ($c$) is the same for all observers, regardless of the motion of the light source or the observer. These seemingly simple ideas lead to profound consequences, including time dilation (moving clocks tick slower), length contraction (moving objects are shorter in their direction of motion), and the relativity of simultaneity. The theory culminates in the famous mass-energy equivalence formula, $E=mc^2$, which demonstrates that mass and energy are interchangeable and that a small amount of mass can be converted into a tremendous amount of energy.",
+    "subject": "Physics",
+    "chapter": "Special Relativity"
+  },
+  {
+    "text": "Quantum Mechanics is the foundational theory of physics at the atomic and subatomic scales. It describes the properties of nature using a mathematical framework where physical quantities are quantized, meaning they can only take on discrete values. A central concept is wave-particle duality, where particles like electrons and photons exhibit both wave-like (interference) and particle-like (discrete position) properties. The behavior of these systems is described by the Schrödinger equation, whose solution, the wave function ($\\Psi$), provides a probability distribution for the possible outcomes of measurements, such as the position or momentum of a particle. This probabilistic nature is encapsulated in Heisenberg's Uncertainty Principle, which states that it is impossible to simultaneously know the exact position and momentum of a particle.",
+    "subject": "Physics",
+    "chapter": "Quantum Mechanics"
+  },
+  {
+    "text": "Maxwell's Equations are a set of four partial differential equations that, combined with the Lorentz force law, form the complete foundation of classical electromagnetism. These equations describe how electric and magnetic fields are generated and altered by each other and by charges and currents. They are: Gauss's law for electricity (relating electric fields to electric charge), Gauss's law for magnetism (stating there are no magnetic monopoles), Faraday's law of induction (describing how a changing magnetic field creates an electric field), and the Ampère-Maxwell law (describing how a current or a changing electric field creates a magnetic field). A monumental achievement of these equations was the unification of electricity, magnetism, and optics, as they demonstrated that light is an electromagnetic wave propagating at the speed $c$.",
+    "subject": "Physics",
+    "chapter": "Electromagnetism"
+  },
+  {
+    "text": "Chemical thermodynamics is the study of the interplay between energy, heat, work, and chemical reactions or physical changes of state. It is governed by three fundamental laws. The first law deals with the conservation of energy ($\\Delta U = Q - W$). The second law introduces the concept of entropy ($S$), a measure of disorder, stating that the total entropy of an isolated system always increases over time for a spontaneous process. The third law defines the absolute zero of entropy. A key concept for chemists is Gibbs free energy ($\\Delta G$), which combines enthalpy ($\\Delta H$) and entropy ($T\\Delta S$) into a single value: $\\Delta G = \\Delta H - T\\Delta S$. This value determines the spontaneity of a chemical reaction at constant temperature and pressure: a negative $\\Delta G$ indicates a spontaneous process.",
+    "subject": "Chemistry",
+    "chapter": "Chemical Thermodynamics"
+  },
+  {
+    "text": "Spectroscopy is a broad field of analytical chemistry that uses the interaction of electromagnetic radiation with matter to determine its structure and composition. Different regions of the electromagnetic spectrum provide different types of information. For instance, Infrared (IR) spectroscopy measures the vibrations of bonds, allowing chemists to identify functional groups present in a molecule (like $C=O$ or $O-H$). Nuclear Magnetic Resonance (NMR) spectroscopy probes the magnetic properties of atomic nuclei (especially $^1H$ and $^{13}C$), providing detailed information about the connectivity and chemical environment of atoms in a molecule. Ultraviolet-Visible (UV-Vis) spectroscopy examines electronic transitions and is often used to determine the concentration of solutions containing conjugated systems or transition metal ions.",
+    "subject": "Chemistry",
+    "chapter": "Spectroscopy"
+  },
+  {
+    "text": "The Central Dogma of molecular biology describes the two-step process by which the information in genes flows into proteins: DNA $\\rightarrow$ RNA $\\rightarrow$ Protein. The first step is transcription, where a specific segment of DNA (a gene) is 'read' and copied into a messenger RNA (mRNA) molecule by the enzyme RNA polymerase. This process occurs in the nucleus of eukaryotic cells. The mRNA then travels out of the nucleus to the cytoplasm. The second step is translation, which occurs on the ribosome. Here, the genetic code on the mRNA is read in three-letter 'codons'. Transfer RNA (tRNA) molecules, each carrying a specific amino acid, match their anticodons to the mRNA codons. As the ribosome moves along the mRNA, it links these amino acids together in a specific sequence, building a polypeptide chain that folds into a functional protein.",
+    "subject": "Biology",
+    "chapter": "Central Dogma"
+  },
+  {
+    "text": "Cellular respiration is the metabolic process by which organisms obtain energy by converting biochemical energy from nutrients (like glucose) into adenosine triphosphate (ATP), the primary 'energy currency' of the cell. This process has three main stages. First, glycolysis occurs in the cytoplasm, breaking down one glucose molecule into two pyruvate molecules and generating a small net gain of ATP and NADH. Second, in the presence of oxygen, the pyruvate enters the mitochondrion and is processed in the Krebs Cycle (or Citric Acid Cycle), which produces more NADH and FADH$_2$, electron carriers. Third, these carriers donate their electrons to the Electron Transport Chain (ETC) on the inner mitochondrial membrane. As electrons move down the chain, they pump protons, creating a gradient that drives an enzyme called ATP synthase to produce a large amount of ATP in a process called oxidative phosphorylation. Oxygen acts as the final electron acceptor, forming water.",
+    "subject": "Biology",
+    "chapter": "Cellular Respiration"
+  },
+  {
+    "text": "CRISPR-Cas9 is a revolutionary gene-editing technology adapted from a natural defense mechanism found in bacteria. It allows for precise and targeted modification of DNA in living cells. The system has two main components: the Cas9 enzyme, which acts like a pair of 'molecular scissors' that can cut DNA, and a guide RNA (gRNA), which is a short piece of RNA designed to match a specific target DNA sequence. The gRNA 'guides' the Cas9 enzyme to the correct location in the genome. Once there, Cas9 cuts both strands of the DNA. The cell's natural DNA repair mechanisms then take over. Scientists can exploit this repair process to either disable a gene (by letting the cell repair the break imprecisely, causing mutations) or insert a new, desired piece of DNA at the site of the cut, effectively 'editing' the genetic code.",
+    "subject": "Biology",
+    "chapter": "CRISPR-Cas9"
+  },
+  {
+    "text": "The immune system is a complex network of cells, tissues, and organs that work together to defend the body against pathogens, such as bacteria, viruses, and fungi. It is broadly divided into two subsystems: the innate and the adaptive immune systems. The innate immune system provides a rapid, non-specific response. It includes physical barriers like the skin, chemical barriers like stomach acid, and specialized cells like phagocytes (e.g., macrophages) that engulf invaders. The adaptive immune system, in contrast, is highly specific and has 'memory.' It is mediated by lymphocytes, specifically B-cells and T-cells. B-cells produce antibodies that target specific antigens on pathogens, while T-cells can directly kill infected cells (cytotoxic T-cells) or help coordinate the immune response (helper T-cells). This memory is the basis for immunity and vaccination.",
+    "subject": "Biology",
+    "chapter": "Immunology"
+  },
+  {
+    "text": "Differential equations are mathematical equations that relate a function with its derivatives. They are fundamental to science and engineering because they describe the relationship between a quantity and its rate of change. Equations involving only one independent variable are called Ordinary Differential Equations (ODEs), which are common for modeling problems like population dynamics, radioactive decay, or the motion of a simple pendulum. Equations involving partial derivatives with respect to multiple independent variables are called Partial Differential Equations (PDEs). PDEs are used to model more complex, multidimensional phenomena, such as heat flow (the Heat Equation), wave propagation (the Wave Equation), and fluid dynamics (the Navier-Stokes equations). Finding solutions to these equations allows us to predict the behavior of a system over time.",
+    "subject": "Mathematics",
+    "chapter": "Differential Equations"
+  },
+  {
+    "text": "The Fourier Transform is a powerful mathematical tool that decomposes a function or a signal into its constituent frequencies, much like a musical chord can be broken down into its individual notes. It transforms a function from the time domain (representing signal amplitude over time) to the frequency domain (representing the amplitude of each frequency present in the signal). This transformation is invaluable in many fields. In signal processing, it is used to filter noise, analyze audio, and modulate radio signals. In image processing, the 2D Fourier transform is used for image compression (like in the JPEG format), filtering, and analysis. The underlying principle, Fourier's theorem, states that any periodic function can be represented as a sum of sines and cosines (a Fourier series). The transform extends this idea to non-periodic functions.",
+    "subject": "Mathematics",
+    "chapter": "Fourier Transform"
+  },
+  {
+    "text": "In linear algebra, an eigenvector of a linear transformation is a non-zero vector that changes at most by a scalar factor when that linear transformation is applied to it. The corresponding scalar factor is known as the eigenvalue. The relationship is defined by the fundamental equation $A\\mathbf{v} = \\lambda\\mathbf{v}$, where $A$ is the transformation matrix, $\\mathbf{v}$ is the eigenvector, and $\\lambda$ is the eigenvalue. Eigenvectors and eigenvalues provide critical insights into the properties of a transformation. They represent the 'axes of stretch' or the invariant directions of the transformation. They have widespread applications, such as finding the principal axes of rotation of a rigid body, performing Principal Component Analysis (PCA) in data science to reduce dimensionality, and determining the stable frequencies of a vibrating system.",
+    "subject": "Mathematics",
+    "chapter": "Eigenvectors and Eigenvalues"
+  },
+  {
+    "text": "Artificial Neural Networks (ANNs) are a core component of deep learning, inspired by the structure of the human brain. They are composed of interconnected layers of nodes, or 'neurons.' A simple network consists of an input layer, one or more hidden layers, and an output layer. Each connection between neurons has an associated 'weight,' which is a tunable parameter that determines the strength of the connection. During a forward pass, data flows from the input layer, through the hidden layers, where it undergoes a linear transformation (multiplication by weights and addition of a bias) followed by a non-linear activation function (like ReLU or sigmoid). The network's 'learning' occurs through a process called backpropagation. This process calculates the gradient of a loss function (which measures the error in the network's prediction) with respect to the weights, and then uses an optimization algorithm, like stochastic gradient descent (SGD), to adjust the weights to minimize the error.",
+    "subject": "Computer Science",
+    "chapter": "Neural Networks"
+  },
+  {
+    "text": "Computational complexity theory is a branch of computer science that seeks to classify computational problems according to their inherent difficulty and the resources (like time and memory) required to solve them. A central concept is the distinction between the complexity classes P and NP. Class P (Polynomial time) consists of problems that can be *solved* by a deterministic algorithm in polynomial time. Class NP (Nondeterministic Polynomial time) consists of problems whose solutions can be *verified* in polynomial time. The most famous unsolved question in computer science is whether $P = NP$. NP-Complete problems are the 'hardest' problems in NP; if a polynomial-time algorithm could be found for any single NP-Complete problem (like the Traveling Salesman Problem or SAT), it would imply that $P = NP$.",
+    "subject": "Computer Science",
+    "chapter": "Complexity Theory (P vs NP)"
+  },
+  {
+    "text": "Public-key cryptography, also known as asymmetric cryptography, is a foundational concept in modern digital security. It uses a pair of mathematically related keys: a public key, which can be shared with anyone, and a private key, which must be kept secret. This system solves the problem of key distribution. If Alice wants to send an encrypted message to Bob, she encrypts it using Bob's public key. The message can *only* be decrypted using Bob's corresponding private key, which only he possesses. This ensures confidentiality. The system is also used for digital signatures. If Alice wants to 'sign' a document, she encrypts a hash of the document with her own private key. Anyone can then use her public key to decrypt it. If it decrypts successfully and the hash matches, it proves that the message came from Alice (authenticity) and has not been altered (integrity). The RSA algorithm is a classic example.",
+    "subject": "Computer Science",
+    "chapter": "Asymmetric Cryptography"
+  },
+  {
+    "text": "A database management system (DBMS) is the software that interacts with end users, applications, and the database itself to capture and analyze data. A general-purpose DBMS is a complex software system that performs many functions, including data definition (defining the schema and structure), data manipulation (inserting, updating, querying, and deleting data, often via a language like SQL), concurrency control, and recovery. Concurrency control is vital, as it ensures that when multiple users access the database simultaneously, their transactions do not interfere with each other, maintaining data consistency. This is often managed using locking mechanisms. Recovery management ensures that the database can be restored to a consistent state after a failure (like a power outage or system crash), typically by using logs to 'undo' or 'redo' transactions.",
+    "subject": "Computer Science",
+    "chapter": "Database Management Systems (DBMS)"
+  },
+  {
+    "text": "The Renaissance, a French word meaning 'rebirth,' was a transformative period in European history from roughly the 14th to the 17th century, marking the transition from the Middle Ages to modernity. Originating in Florence, Italy, it was characterized by a profound resurgence of interest in the classical art, literature, and philosophy of ancient Greece and Rome. This period championed the philosophy of Humanism, which emphasized human potential, reason, and individualism over medieval religious dogma. This intellectual shift fueled unprecedented achievements in the arts, with figures like Leonardo da Vinci, Michelangelo, and Raphael creating masterpieces of painting and sculpture. In science, figures like Copernicus and Galileo challenged the geocentric model of the universe, laying the groundwork for the Scientific Revolution. The invention of the printing press by Gutenberg amplified the spread of these new ideas across the continent.",
+    "subject": "History",
+    "chapter": "The Renaissance"
+  },
+  {
+    "text": "The Industrial Revolution, beginning in Great Britain in the late 18th century, was a period of profound technological, economic, and social change. It was characterized by the transition from agrarian, handicraft-based economies to economies dominated by machine manufacturing and industry. Key innovations, such as the steam engine (perfected by James Watt), the spinning jenny, and the power loom, mechanized textile production and created the factory system. This new system, powered by coal and steam, led to mass production and a significant increase in the availability of goods. This revolution also triggered massive social shifts, including rapid urbanization as large populations moved from rural areas to new industrial cities. While it brought economic growth and new technologies, it also created new social problems, including poor working conditions, child labor, and overcrowded, unsanitary urban environments.",
+    "subject": "History",
+    "chapter": "The Industrial Revolution"
+  },
+  {
+    "text": "The Cold War (approx. 1947–1991) was a sustained period of geopolitical tension between the two global superpowers, the United States (leading the capitalist Western Bloc) and the Soviet Union (leading the communist Eastern Bloc). It was a 'cold' war because there was no large-scale, direct military conflict between the two main adversaries. Instead, the conflict was waged through ideological propaganda, an arms race (particularly of nuclear weapons), a space race, and numerous proxy wars in regions like Korea, Vietnam, and Afghanistan, where each side supported an opposing faction. The world was split into two spheres of influence, symbolized by the 'Iron Curtain' that divided Europe. The period was marked by several high-stakes crises, such as the Berlin Blockade, the Cuban Missile Crisis, and eventually ended with the collapse of the Berlin Wall in 1989 and the dissolution of the Soviet Union in 1991.",
+    "subject": "History",
+    "chapter": "The Cold War"
+  },
+  {
+    "text": "Literary Modernism was a sweeping artistic and cultural movement that emerged in the late 19th and early 20th centuries, particularly in the years following World War I. This period was defined by a profound sense of disillusionment with the traditions, values, and certainties of the Victorian era, which were seen as inadequate to describe the new, fragmented, and often chaotic modern world. Modernist writers rejected traditional linear narratives, realist depictions, and authoritative authorial voices. Instead, they experimented radically with form, employing techniques like stream of consciousness (to capture the complex, inner workings of the human mind), fragmented timelines, multiple, unreliable narrators, and dense, allusive language. Key figures like James Joyce, Virginia Woolf, T.S. Eliot, and William Faulkner sought to 'make it new' and capture the subjective, alienated experience of modern life.",
+    "subject": "Literature",
+    "chapter": "Modernism"
+  },
+  {
+    "text": "A Shakespearean tragedy is a specific genre of play written by William Shakespeare that follows a distinct narrative and thematic structure. The plays, such as *Hamlet*, *Macbeth*, *Othello*, and *King Lear*, focus on a protagonist of high social standing (like a king or general) known as the tragic hero. This hero is not inherently evil but possesses a 'tragic flaw,' or *hamartia*—such as ambition (Macbeth), jealousy (Othello), or indecision (Hamlet). This flaw is the catalyst for a series of events that inevitably lead to the hero's downfall and death, often accompanied by the deaths of many other characters. The plays explore deep themes of fate, human nature, and the disruption of natural order. The ultimate goal is to evoke a sense of *catharsis*—a purging of pity and fear—in the audience as they witness the hero's tragic end.",
+    "subject": "Literature",
+    "chapter": "Shakespearean Tragedy"
+  },
+  {
+    "text": "Keynesian economics is a macroeconomic theory developed by John Maynard Keynes in the 1930s, primarily in response to the Great Depression. It fundamentally challenges the classical economic view that free markets will automatically and quickly return to full employment. Keynes argued that aggregate demand—the total spending in an economy—is the primary driver of economic activity and that in a recession, aggregate demand can be insufficient, leading to prolonged periods of high unemployment. The central tenet of Keynesianism is that to stabilize the economy and combat recessions, active government intervention is necessary. This intervention typically takes the form of fiscal policy: the government should increase spending (on public works, for example) or cut taxes to boost aggregate demand, even if it means running a budget deficit in the short term.",
+    "subject": "Economics",
+    "chapter": "Keynesian Economics"
+  },
+  {
+    "text": "According to Newton’s second law of motion, the acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.",
+    "subject": "Physics",
+    "chapter": "Laws of Motion"
+  },
+  {
+    "text": "Every object in the universe attracts every other object with a force called gravitation. This force depends on their masses and the distance between them.",
+    "subject": "Physics",
+    "chapter": "Gravitation"
+  },
+  {
+    "text": "Electric current is the rate of flow of electric charge through a conductor. It is measured in amperes and depends on the potential difference applied across the circuit.",
+    "subject": "Physics",
+    "chapter": "Electricity"
+  },
+  {
+    "text": "Light reflects off smooth surfaces at equal angles. According to the laws of reflection, the angle of incidence equals the angle of reflection.",
+    "subject": "Physics",
+    "chapter": "Light"
+  },
+  {
+    "text": "Sound is a form of energy that travels in the form of vibrations through a medium like air or water. Its speed depends on the nature of the medium.",
+    "subject": "Physics",
+    "chapter": "Sound"
+  },
+  {
+    "text": "Work is done when a force causes a displacement of an object in the direction of the force. Energy is the capacity to do work, and power is the rate at which work is done.",
+    "subject": "Physics",
+    "chapter": "Work and Energy"
+  },
+  {
+    "text": "The first law of thermodynamics, or the law of conservation of energy, states that energy cannot be created or destroyed, only transferred or changed from one form to another.",
+    "subject": "Physics",
+    "chapter": "Thermodynamics"
+  },
+  {
+    "text": "Electromagnetic induction is the production of an electromotive force (voltage) across an electrical conductor in a changing magnetic field. This principle is used in generators and transformers.",
+    "subject": "Physics",
+    "chapter": "Electromagnetism"
+  },
+  {
+    "text": "Refraction is the bending of light as it passes from one medium to another due to a change in speed. Snell's law describes the relationship between the angles of incidence and refraction.",
+    "subject": "Physics",
+    "chapter": "Optics"
+  },
+  {
+    "text": "Acids are substances that produce hydrogen ions (H+) in solution, while bases produce hydroxide ions (OH-). The strength of an acid or base is measured by its pH value.",
+    "subject": "Chemistry",
+    "chapter": "Acids and Bases"
+  },
+  {
+    "text": "The periodic table arranges elements in increasing order of atomic number. Elements with similar chemical properties are placed in the same group or column.",
+    "subject": "Chemistry",
+    "chapter": "Periodic Table"
+  },
+  {
+    "text": "During a chemical reaction, new substances are formed with different properties. The mass of the reactants equals the mass of the products, following the law of conservation of mass.",
+    "subject": "Chemistry",
+    "chapter": "Chemical Reactions"
+  },
+  {
+    "text": "In a solution, a solute dissolves in a solvent to form a homogeneous mixture. The concentration of a solution indicates how much solute is present in a given amount of solvent.",
+    "subject": "Chemistry",
+    "chapter": "Solutions"
+  },
+  {
+    "text": "Metals are good conductors of heat and electricity, whereas non-metals are poor conductors. Metals are malleable and ductile, while non-metals are brittle.",
+    "subject": "Chemistry",
+    "chapter": "Metals and Non-Metals"
+  },
+  {
+    "text": "An atom consists of a central nucleus, containing protons and neutrons, surrounded by electrons in energy levels or orbitals. The number of protons defines the atomic number.",
+    "subject": "Chemistry",
+    "chapter": "Atomic Structure"
+  },
+  {
+    "text": "Chemical bonds are attractions between atoms. Ionic bonds involve the transfer of electrons, while covalent bonds involve the sharing of electrons.",
+    "subject": "Chemistry",
+    "chapter": "Chemical Bonding"
+  },
+  {
+    "text": "Redox reactions involve the transfer of electrons. Oxidation is the loss of electrons from a substance, while reduction is the gain of electrons.",
+    "subject": "Chemistry",
+    "chapter": "Redox Reactions"
+  },
+  {
+    "text": "Organic chemistry is the study of carbon-containing compounds. Hydrocarbons are the simplest organic compounds, consisting only of carbon and hydrogen.",
+    "subject": "Chemistry",
+    "chapter": "Organic Chemistry"
+  },
+  {
+    "text": "Photosynthesis is the process by which green plants use sunlight to synthesize food from carbon dioxide and water. Oxygen is released as a byproduct.",
+    "subject": "Biology",
+    "chapter": "Photosynthesis"
+  },
+  {
+    "text": "The human digestive system consists of organs like the mouth, stomach, and intestines. It breaks down food, absorbs nutrients, and eliminates waste.",
+    "subject": "Biology",
+    "chapter": "Digestive System"
+  },
+  {
+    "text": "The cell is the basic structural and functional unit of life. All living organisms are composed of one or more cells, as stated by the cell theory.",
+    "subject": "Biology",
+    "chapter": "Cell Structure"
+  },
+  {
+    "text": "In the human respiratory system, oxygen is inhaled and carbon dioxide is exhaled. The exchange of these gases occurs in the alveoli of the lungs.",
+    "subject": "Biology",
+    "chapter": "Respiration"
+  },
+  {
+    "text": "The circulatory system consists of the heart, blood, and blood vessels. It transports nutrients, oxygen, and hormones to cells throughout the body.",
+    "subject": "Biology",
+    "chapter": "Circulatory System"
+  },
+  {
+    "text": "Genetics is the study of genes, heredity, and variation in living organisms. DNA (deoxyribonucleic acid) carries the genetic instructions for development and function.",
+    "subject": "Biology",
+    "chapter": "Genetics"
+  },
+  {
+    "text": "Evolution by natural selection is the process where organisms better adapted to their environment tend to survive and produce more offspring. This concept was introduced by Charles Darwin.",
+    "subject": "Biology",
+    "chapter": "Evolution"
+  },
+  {
+    "text": "The nervous system coordinates the body's actions and transmits signals. It is composed of the central nervous system (brain and spinal cord) and the peripheral nervous system.",
+    "subject": "Biology",
+    "chapter": "Nervous System"
+  },
+  {
+    "text": "Ecology is the study of interactions among organisms and their environment. An ecosystem includes all the living (biotic) and non-living (abiotic) factors in an area.",
+    "subject": "Biology",
+    "chapter": "Ecology"
+  },
+  {
+    "text": "A right triangle follows the Pythagoras theorem, which states that the square of the hypotenuse (the side opposite the right angle) equals the sum of the squares of the other two sides.",
+    "subject": "Mathematics",
+    "chapter": "Pythagoras Theorem"
+  },
+  {
+    "text": "Trigonometry deals with the relationships between the sides and angles of a triangle. The basic trigonometric ratios are sine, cosine, and tangent.",
+    "subject": "Mathematics",
+    "chapter": "Trigonometry"
+  },
+  {
+    "text": "In probability, the likelihood of an event occurring is measured between 0 and 1. An event with probability 0 cannot occur, while probability 1 means it is certain to occur.",
+    "subject": "Mathematics",
+    "chapter": "Probability"
+  },
+  {
+    "text": "A quadratic equation is a polynomial equation of the second degree, typically in the form ax² + bx + c = 0. The solutions, or roots, can be found using the quadratic formula.",
+    "subject": "Mathematics",
+    "chapter": "Quadratic Equations"
+  },
+  {
+    "text": "Statistics involves the collection, organization, analysis, interpretation, and presentation of data. The mean, median, and mode are common measures of central tendency.",
+    "subject": "Mathematics",
+    "chapter": "Statistics"
+  },
+  {
+    "text": "Differential calculus is concerned with rates of change and slopes of curves. The derivative of a function measures the instantaneous rate of change.",
+    "subject": "Mathematics",
+    "chapter": "Calculus"
+  },
+  {
+    "text": "Linear algebra is the branch of mathematics concerning vector spaces and linear mappings between such spaces. It includes the study of lines, planes, and systems of linear equations using matrices.",
+    "subject": "Mathematics",
+    "chapter": "Linear Algebra"
+  },
+  {
+    "text": "An algorithm is a finite sequence of well-defined, computer-implementable instructions, typically to solve a class of problems or to perform a computation.",
+    "subject": "Computer Science",
+    "chapter": "Algorithms"
+  },
+  {
+    "text": "A data structure is a way of organizing, managing, and storing data in a computer so that it can be accessed and modified efficiently. Examples include arrays, linked lists, stacks, and trees.",
+    "subject": "Computer Science",
+    "chapter": "Data Structures"
+  },
+  {
+    "text": "An operating system (OS) is system software that manages computer hardware and software resources and provides common services for computer programs, acting as an intermediary.",
+    "subject": "Computer Science",
+    "chapter": "Operating Systems"
+  },
+  {
+    "text": "A database is an organized collection of data, generally stored and accessed electronically from a computer system. SQL (Structured Query Language) is often used to manage them.",
+    "subject": "Computer Science",
+    "chapter": "Databases"
+  },
+  {
+    "text": "Object-Oriented Programming (OOP) is a programming paradigm based on the concept of 'objects', which can contain data (attributes) and code (methods). Key principles are encapsulation, inheritance, and polymorphism.",
+    "subject": "Computer Science",
+    "chapter": "OOP"
+  },
+  {
+    "text": "Computer networking refers to the practice of connecting computing devices together to share resources. The TCP/IP model is the foundational protocol suite for the internet.",
+    "subject": "Computer Science",
+    "chapter": "Networking"
+  }
+]
