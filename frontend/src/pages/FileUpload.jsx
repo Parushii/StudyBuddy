@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
@@ -9,7 +9,7 @@ const FileUpload = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
-      setMessage("⚠️ Please fill all fields and select a file.");
+      setMessage("Please fill all fields and select a file.");
       return;
     }
 
@@ -24,11 +24,11 @@ const FileUpload = () => {
 
       const data = await res.json();
       if (res.ok)
-        setMessage(`✅ File uploaded successfully! Link: ${data.link}`);
-      else setMessage(`❌ Upload failed: ${data.error}`);
+        setMessage(`File uploaded successfully! Link: ${data.link}`);
+      else setMessage(`Upload failed: ${data.error}`);
     } catch (err) {
       console.error(err);
-      setMessage("🚫 Upload failed. Check console.");
+      setMessage("Upload failed. Check console.");
     }
   };
 

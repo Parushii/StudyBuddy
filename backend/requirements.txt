@@ -1,0 +1,5 @@
+sentence-transformers
+numpy
+flask
+PyPDF2
+python-docx
