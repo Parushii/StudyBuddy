@@ -3,3 +3,5 @@ node_modules
 uploads/
 subject_model/
 results/
+__pycache__/
+*.safetensors

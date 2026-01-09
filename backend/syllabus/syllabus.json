@@ -1,0 +1,170 @@
+{
+  "Natural Language Processing": {
+    "units": [
+      {
+        "unit": 1,
+        "title": "Introduction",
+        "description": "History of NLP, Generic NLP System, Levels of NLP, Knowledge in Speech and Language Processing, Ambiguity in Natural Language, Challenges of NLP, Applications of NLP"
+      },
+      {
+        "unit": 2,
+        "title": "Word Level Analysis",
+        "description": "Regular Expressions, Finite Automata, Finite State Transducers (FST), Morphology Analysis, Survey of English Morphology, Inflectional Morphology, Derivational Morphology, Lemmatization, Morphological Parsing with FST, Lexicon Free FST, Porter Stemmer, Word Tokenization, Sentence Tokenization, Detection and Correction of Errors, Minimum Edit Distance with Backtracing, N-Grams, Unigrams and Bigrams Language Models, Corpora, Computing Probability of Word Sequences, Training and Testing, Perplexity and Entropy, Zipf’s Law, Add-One Smoothing, Witten-Bell Discounting, Good-Turing Discounting, Back-Off Methods, Class-Based Models, Google N-Gram Release"
+      },
+      {
+        "unit": 3,
+        "title": "Syntax Analysis",
+        "description": "Part-of-Speech Tagging (POS), Open and Closed Words, Penn Treebank Tagset, Rule-Based POS Tagging, Transformation-Based Tagging, Stochastic POS Tagging, Multiple Tags and Unknown Words, Hidden Markov Model (HMM), Maximum Entropy, Conditional Random Field (CRF), Context-Free Grammars, Grammar Rules for English, Treebanks, Normal Forms for Grammar, Top-Down Parsing, Bottom-Up Parsing, Basic Top-Down Parser, Left Recursion, Ambiguity, Earley Parser, Probabilistic CFG, Probabilistic CYK Parsing"
+      },
+      {
+        "unit": 4,
+        "title": "Semantic Analysis",
+        "description": "Lexical Semantics, Sentence Attachment, Noun Phrases, Verb Phrases, Prepositional Phrases, Relations among Lexemes, Homonymy, Polysemy, Synonymy, Hyponymy, WordNet, Feature Extraction, Vector Semantics, TF-IDF, Word Embeddings, Word2Vec, CBOW, Skip-Gram, GloVe, Word Sense Disambiguation, Selectional Restriction-Based WSD, Selectional Association-Based WSD, Supervised Methods, Unsupervised Methods, Bootstrapping, Lesk Algorithm, Walker’s Algorithm, Word Sense Similarity"
+      },
+      {
+        "unit": 5,
+        "title": "Pragmatics and Discourse Segmentation",
+        "description": "Introduction to Discourse, Cohesion and Coherence in Discourse, Discourse Connectives, Reference Resolution, Reference Phenomena, Pronominal Anaphora Resolution, Hobbs Algorithm, Centering Algorithm, Log-Linear Model, Co-Reference Resolution, Evaluation of Co-Reference Resolution"
+      },
+      {
+        "unit": 6,
+        "title": "Large Language Models and NLP Applications",
+        "description": "Introduction to Large Language Models, Auto-Regressive Language Models, GPT-3, Transformer-Based Models, BERT, RoBERTa, Encoder-Decoder Models, MarianMT, T5, Pre-Trained and Fine-Tuned Models, ELECTRA, Multilingual Models, XLM, Machine Translation, Information Retrieval, Question Answering Systems, Text Categorization, Summarization, Sentiment Analysis, Named Entity Recognition"
+      }
+    ]
+  },
+
+  "Internet of Everything": {
+    "units": [
+      {
+        "unit": 1,
+        "title": "Internet Evolution",
+        "description": "Overview of IoT, IoT Evolution, Characteristics of IoT, IoT Stack, Application Areas of IoT, IoT Challenges, M2M Technology, Understanding IoE, IoE Pyramids, IoT 2.0, IoE Benefits, Difference between IoT, IoE, M2M and Related Technologies"
+      },
+      {
+        "unit": 2,
+        "title": "IoE Devices",
+        "description": "IoT Devices, IoT Software, IoT Device Management Platform and Software, IoT System Architecture, IoT Connectivity Technologies, Physical Design of IoT, Logical Design of IoT, IoT Communication Model, IoT Levels, IoT Deployment Templates"
+      },
+      {
+        "unit": 3,
+        "title": "Pillars of IoE",
+        "description": "IoE Devices, Common Devices, Connecting Devices, Sensors, RFID in IoT, Data as a Pillar of IoE, Structured and Unstructured Data, Cloud Data, Virtualization, Data Centers, Big Data Integration, IoT Analytics, Data Collection to Deployment and Operationalization"
+      },
+      {
+        "unit": 4,
+        "title": "Elements of IoT",
+        "description": "Sensors, Actuators, Transducers and Their Types, Arduino Architecture, Arduino Pin Configuration, Digital and Analog Ports, Arduino Interfacing Boards, Raspberry Pi Introduction, Comparison of Raspberry Pi Models, Pin Description of Raspberry Pi, On-Board Components of Raspberry Pi"
+      },
+      {
+        "unit": 5,
+        "title": "IoT Communication Protocols",
+        "description": "MQTT, XMPP, DDS, AMQP, CoAP, REST, IPv6, 6LoWPAN, IoT Routing Protocols, Data-Centric Protocols, Flat Architecture Protocols, Flooding, Gossiping, SPIN Protocol, SPIN PP, SPIN EC, SPIN BC, SPIN RL, LEACH Protocol"
+      },
+      {
+        "unit": 6,
+        "title": "IoT Case Studies",
+        "description": "Home Automation, Smart Cities, Environment Monitoring, Transportation, Retail, Logistics, Agriculture, Industrial IoT, Healthcare IoT"
+      }
+    ]
+  },
+  
+  "Predictive Modelling": {
+    "units": [
+      {
+        "unit": 1,
+        "title": "Introduction",
+        "description": "Identifying the business problem, Designing the model, Preparing the data, Selecting features, Choosing an appropriate model, Interpreting model output, Sharing and communicating results"
+      },
+      {
+        "unit": 2,
+        "title": "Working with Data",
+        "description": "Understanding and preparing data, Retrieving data from different sources, Data visualization, Identifying relationships among variables, Handling missing data, Applying distributions, Summary statistics, Segmentation, Sampling techniques, Outlier analysis, Aggregating data"
+      },
+      {
+        "unit": 3,
+        "title": "Prediction Methods and Models",
+        "description": "Mathematical methods, Distance-based methods, Logic-based methods, Modern heuristic methods, Model evaluation techniques, Hybrid prediction systems, CRISP-DM methodology, Applications in marketing campaigns, Manufacturing, Investment strategies, Emergency response services, Credit card fraud detection, Model selection, Model development, Validation, Comparing and combining models, Model deployment, Performance assessment, Model updating"
+      },
+      {
+        "unit": 4,
+        "title": "Decision Tree Models",
+        "description": "Overview of decision trees, Decision tree development, Building trees to predict response and risk, Cultivating decision trees, Optimizing tree complexity, Pruning techniques, Diagnostic tools for decision trees"
+      },
+      {
+        "unit": 5,
+        "title": "Neural Networks and Regression",
+        "description": "Introduction to neural network models, Neural networks for predicting loss frequency in auto insurance, Comparison of neural network architectures, Regression using exploratory data analysis, Correlation analysis, Multiple regression concepts, Building and interpreting regression models, Regression techniques, Stepwise selection methods, Logistic regression for predictive response in mail campaigns, Regression for continuous targets"
+      },
+      {
+        "unit": 6,
+        "title": "Comparing and Combining Models",
+        "description": "Models for binary targets, Models for ordinal targets, Comparison of accident risk models, Boosting techniques, Combining predictive models, Model comparison strategies"
+      }
+    ]
+  },
+
+  "Big Data and Cloud Infrastructure Laboratory": {
+    "units": [
+      {
+        "unit": 1,
+        "title": "Cloud Fundamentals and Storage",
+        "description": "Introduction to big data concepts, Cloud computing platforms, Setting up cloud environments using AWS Azure and GCP, Cloud storage solutions such as S3 Blob Storage and GCS, Data transfer protocols, Storage management techniques, Storage optimization, Security and access control, Cost monitoring tools, Budgeting strategies"
+      },
+      {
+        "unit": 2,
+        "title": "Virtualization and Container Orchestration",
+        "description": "Virtual machine deployment and management, Docker containerization for big data applications, Container orchestration fundamentals, HDFS architecture, HDFS implementation, MapReduce paradigm and applications"
+      },
+      {
+        "unit": 3,
+        "title": "Distributed Processing Frameworks",
+        "description": "Advanced Hadoop ecosystem components, YARN resource management, Apache Spark architecture, Spark programming model, RDD operations, Spark SQL, Stream processing with Kafka and Kinesis, Spark Streaming, Building end-to-end data pipelines"
+      },
+      {
+        "unit": 4,
+        "title": "Cloud-Based Data Management",
+        "description": "NoSQL database deployment using MongoDB and Cassandra, Data modeling for distributed systems, Cloud data warehousing solutions, ETL processes in cloud environments, Analytics and visualization platforms"
+      },
+      {
+        "unit": 5,
+        "title": "Advanced Cloud Technologies",
+        "description": "Machine learning on distributed systems, Model training at scale, Model deployment at scale, Infrastructure as Code using Terraform, Configuration management using Ansible, CI CD pipelines for infrastructure and applications"
+      },
+      {
+        "unit": 6,
+        "title": "Security Monitoring and Project Implementation",
+        "description": "Identity and access management, Network security configuration, Monitoring and logging solutions, Performance optimization techniques, End-to-end project implementation"
+      }
+    ]
+  },
+  "Personal Finance Management": {
+    "units": [
+      {
+        "unit": 1,
+        "title": "Introduction to Personal Finance",
+        "description": "Overview of Indian Financial System, Characteristics components and functions of financial system, Financial instruments and financial markets, Financial inclusion, Introduction to personal finance, Personal financial planning in action, Money management skills, Taxes in personal financial planning, Savings and payment services, Consumer credit, Advantages and disadvantages of credit, Sources and cost of credit"
+      },
+      {
+        "unit": 2,
+        "title": "Personal Financial Management",
+        "description": "Loans including home loan car loan education loan personal loan loan against property and jewel loan, Insurance concepts, Types of insurance including ULIP and term insurance, Health insurance and disability income insurance, Life insurance, Investment basics, Evaluating bonds, Investing in stocks, Investing in mutual funds, Financial planning for the future"
+      },
+      {
+        "unit": 3,
+        "title": "Income Tax",
+        "description": "Basics of Income Tax Act 1961, Introduction to income tax law in India, Heads of income, Computation of total income, Computation of tax liability, Clubbing provisions, Set off and carry forward of losses, Deductions under income tax, Assessment of income, Tax liability of different persons, Tax management, Administrative procedures, Income Computation and Disclosure Standards, TDS TCS and advance tax"
+      },
+      {
+        "unit": 4,
+        "title": "Goods and Services Tax",
+        "description": "GST constitutional framework, Indirect taxes before GST, Taxation powers of union and state governments, Concept of VAT meaning variants and methods, Defects in pre GST indirect tax structure, Rationale for GST, Structure of GST including SGST CGST UTGST and IGST, GST council, GST network, State compensation mechanism, GST registration, Levy and collection of GST, Taxable event supply of goods and services, Place of supply within state interstate import and export, Time of supply, Valuation under GST, Valuation rules, Taxability of reimbursement of expenses, GST exemptions, Small suppliers exemption, Composition scheme, Classification of goods and services"
+      },
+      {
+        "unit": 5,
+        "title": "Introduction to Microfinance",
+        "description": "Microfinance definitions scope and assumptions, Types of microfinance, Customers of microfinance, Credit delivery methodologies, Self Help Group concept origin formation and operation, Joint Liability Group model, SHG bank linkage model, Grameen model achievements and challenges, Institutional mechanisms in microfinance, Current challenges in microfinance, Microfinance institutions constraints and governance issues, Institutional structure of microfinance in India including NGO MFIs NBFC MFIs cooperatives banks microfinance networks and associations, Demand and supply of microfinance services in India, Impact assessment and social assessment of microfinance institutions"
+      }
+    ]
+  }
+}
