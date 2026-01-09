@@ -4,8 +4,8 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { NotesContext } from "./NotesContext";
 import VoiceToText from "./VoiceToText";  
-
-
+import DownloadFile from "./DownloadFile";
+import SummarizeNotes from "./SummarizeNotes";
 
 function TextEditor() {
   const { notes, setNotes, quillRef, clearNotes, lastSaved, saveNotes } = useContext(NotesContext);
@@ -33,6 +33,8 @@ function TextEditor() {
           >
             Clear
           </button>
+
+          <DownloadFile notes={notes} quillRef={quillRef} />
         </div>
       </div>
 
@@ -46,6 +48,8 @@ function TextEditor() {
       />
 
       <VoiceToText/>
+      
+      <SummarizeNotes notes={notes} />
     </div>
   );
 }

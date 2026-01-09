@@ -6,11 +6,15 @@ const { google } = require("googleapis");
 const axios = require("axios");
 const FormData = require("form-data");
 
+
 const app = express();
 const upload = multer({ dest: "uploads/" });
 
 const cors = require("cors");
 app.use(cors({ origin: ["http://localhost:5173", "http://localhost:8000"] }));
+app.use(express.json());
+
+const PORT = process.env.PORT || 5000;
 
 // Setup OAuth2 client
 const oAuth2Client = new google.auth.OAuth2(
@@ -150,7 +154,28 @@ app.get("/drive-structure", async (req, res) => {
 });
 
 
+//Summarize notes
+app.post('/summarize', async (req, res) => {
+  const { notes } = req.body;
 
-app.listen(process.env.PORT, () =>
-  console.log(`🚀 Server running on http://localhost:${process.env.PORT}`)
+  if (!notes || notes.trim() === "") {
+    return res.status(400).json({ error: "No notes provided" });
+  }
+
+  try {
+    // Sending the notes to the Python server for summarization
+    const response = await axios.post('http://localhost:8000/api/summarize', { text : notes });
+
+    // Return the summarized text to the React frontend
+    return res.json({ summary: response.data.summary });
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).json({ error: 'Failed to summarize text' });
+  }
+});
+
+
+
+app.listen(PORT, () =>
+  console.log(`🚀 Server running on http://localhost:${PORT}`)
 );
