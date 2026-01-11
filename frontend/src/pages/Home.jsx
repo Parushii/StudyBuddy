@@ -23,6 +23,20 @@ function Home() {
         >
           View Files
         </Link>
+
+        <Link
+          to="/editor"
+          className="bg-green-700 px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-yellow-800 transition"
+        >
+          Editor
+        </Link>
+
+        <Link
+          to="/youtubelink"
+          className="bg-red-700 px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-yellow-800 transition"
+        >
+          YouTube search
+        </Link>
       </div>
     </div>
   );

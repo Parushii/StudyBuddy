@@ -7,6 +7,9 @@ import heapq
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 import os
+nltk.download('punkt', quiet=True)
+nltk.download('punkt_tab', quiet=True)
+nltk.download('stopwords')
 
 app = Flask(__name__)
 CORS(app)
@@ -91,5 +94,5 @@ def health_check():
     return jsonify({'status': 'OK', 'service': 'Text Summarization API'})
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PYTHON_PORT', 8000))
+    port = int(os.environ.get('PYTHON_PORT', 5001))
     app.run(host='0.0.0.0', port=port, debug=False)
