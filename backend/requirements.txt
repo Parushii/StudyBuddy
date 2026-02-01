@@ -3,3 +3,15 @@ numpy
 flask
 PyPDF2
 python-docx
+python-pptx
+pytesseract 
+pillow 
+opencv-python
+
+torch 
+torchvision 
+torchaudio
+transformers 
+pillow
+textblob
+# sentencepiece pip install einops timm
