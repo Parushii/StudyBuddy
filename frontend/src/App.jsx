@@ -7,6 +7,9 @@ import VoiceToText from "./pages/VoiceToText";
 import { NotesProvider } from "./pages/NotesProvider";
 import Editor from "./pages/Editor";
 import YoutubeLink from "./pages/YoutubeLink";
+import NotebookView from "./pages/NotebookView";
+import SchedulePlanner from "./pages/SchedulePlanner";
+
 
 
 function App() {
@@ -20,6 +23,8 @@ function App() {
           <Route path="/editor" element={<Editor />} />
           <Route path="/voicetotext" element={<VoiceToText />} />
           <Route path="/youtubelink" element={<YoutubeLink />} />
+          <Route path="/notebookview" element={<NotebookView />} />
+          <Route path="/scheduleplanner" element={<SchedulePlanner />} />
         </Routes>
       </Router>
     </NotesProvider>

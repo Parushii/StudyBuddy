@@ -38,6 +38,20 @@ function Home() {
         >
           YouTube search
         </Link>
+
+        <Link
+          to="/notebookview"
+          className="bg-red-700 px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-yellow-800 transition"
+        >
+          New Notebook
+        </Link>
+
+        <Link
+          to="/scheduleplanner"
+          className="bg-red-700 px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-yellow-800 transition"
+        >
+          Schedule Planner
+        </Link>
         
       </div>
       <div className="m-40 flex justify-center text-center">
