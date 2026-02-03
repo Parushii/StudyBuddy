@@ -2,7 +2,7 @@
 import React, { useContext } from "react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import { NotesContext } from "./NotesContext";
+import { NotesContext } from "../context/NotesContext";
 import VoiceToText from "./VoiceToText";  
 import DownloadFile from "./DownloadFile";
 import SummarizeNotes from "./SummarizeNotes";

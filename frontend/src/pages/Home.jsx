@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
+import ThemeToggle from "./ThemeToggle";
 
 function Home() {
   return (
@@ -52,6 +53,15 @@ function Home() {
         >
           Schedule Planner
         </Link>
+
+        <Link
+          to="/whiteboard"
+          className="bg-red-700 px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-yellow-800 transition"
+        >
+          White Board
+        </Link>
+
+        <ThemeToggle/>
         
       </div>
       <div className="m-40 flex justify-center text-center">

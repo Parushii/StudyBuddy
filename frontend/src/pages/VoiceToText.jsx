@@ -1,6 +1,6 @@
 import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 import { useState, useContext, useEffect } from "react";
-import { NotesContext } from "./NotesContext";
+import { NotesContext } from "../context/NotesContext";
 
 const VoiceToText = () => {
   const [isListening, setIsListening] = useState(false);
