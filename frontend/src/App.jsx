@@ -12,6 +12,7 @@ import SchedulePlanner from "./pages/SchedulePlanner";
 import ThemeToggle from "./pages/ThemeToggle";
 import { ThemeProvider } from "./context/ThemeProvider"; 
 import Whiteboard from "./pages/WhiteBoard";
+import HighlightedTopicsView from "./pages/HighlightedTopicsView";
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
             <Route path="/notebookview" element={<NotebookView />} />
             <Route path="/scheduleplanner" element={<SchedulePlanner />} />    
             <Route path="/whiteboard" element={<Whiteboard />} />
+            <Route path="/highlightedtopics" element={<HighlightedTopicsView />} />
           </Routes>
         </Router>
       </NotesProvider>
