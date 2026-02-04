@@ -15,6 +15,7 @@ import Whiteboard from "./pages/WhiteBoard";
 import HighlightedTopicsView from "./pages/HighlightedTopicsView";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
             <Route path="/highlightedtopics" element={<HighlightedTopicsView />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/homepage" element={<HomePage />} />
           </Routes>
         </Router>
       </NotesProvider>
