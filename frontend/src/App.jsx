@@ -13,7 +13,8 @@ import ThemeToggle from "./pages/ThemeToggle";
 import { ThemeProvider } from "./context/ThemeProvider"; 
 import Whiteboard from "./pages/WhiteBoard";
 import HighlightedTopicsView from "./pages/HighlightedTopicsView";
-
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 function App() {
   return (
@@ -31,6 +32,8 @@ function App() {
             <Route path="/scheduleplanner" element={<SchedulePlanner />} />    
             <Route path="/whiteboard" element={<Whiteboard />} />
             <Route path="/highlightedtopics" element={<HighlightedTopicsView />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
           </Routes>
         </Router>
       </NotesProvider>
