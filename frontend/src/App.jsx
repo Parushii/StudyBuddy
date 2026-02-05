@@ -16,6 +16,7 @@ import HighlightedTopicsView from "./pages/HighlightedTopicsView";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import HomePage from "./pages/HomePage";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/homepage" element={<HomePage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </Router>
       </NotesProvider>
