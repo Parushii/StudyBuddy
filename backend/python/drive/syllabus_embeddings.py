@@ -1,5 +1,5 @@
 import json
-from utils import embed
+from StudyBuddy.backend.python.drive.utils import embed
 
 with open("syllabus/syllabus.json", "r", encoding="utf-8") as f:
     syllabus = json.load(f)

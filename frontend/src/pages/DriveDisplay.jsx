@@ -19,7 +19,7 @@ export default function DriveDisplay() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/drive-structure")
+      .get("http://localhost:5000/api/drive/drive-structure")
       .then((res) => setSubjects(res.data || []))
       .catch(console.error);
   }, []);

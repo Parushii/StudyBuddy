@@ -17,11 +17,14 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import HomePage from "./pages/HomePage";
 import Dashboard from "./pages/Dashboard";
+import { SelectedFilesProvider } from "./context/SelectedFilesContext";
+import Quiz from "./pages/Quiz";
 
 function App() {
   return (
     <ThemeProvider>
       <NotesProvider>
+        <SelectedFilesProvider>
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -38,8 +41,10 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/homepage" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/quiz" element={<Quiz />} />
           </Routes>
         </Router>
+        </SelectedFilesProvider>
       </NotesProvider>
     </ThemeProvider>
 

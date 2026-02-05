@@ -158,7 +158,7 @@ def classify_subject(chunks):
     avg = {k: np.mean(v) for k, v in scores.items()}
     best = max(avg, key=avg.get)
 
-    print("Subject scores:", avg)
+    # print("Subject scores:", avg)
 
     return best if avg[best] > 0.15 else None
 
