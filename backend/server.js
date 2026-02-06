@@ -14,6 +14,7 @@ const driveRoutes = require("./routes/driveRoutes");
 const generateNotesRoute = require("./routes/generateNotes");
 const youtubeSummarizerRoutes = require("./routes/youtubeSummarizer"); //
 const flashcardsRoutes = require("./routes/flashcards"); //
+const quizRoutes = require("./routes/quiz");
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -31,6 +32,7 @@ app.use("/api", generateNotesRoute);
 //
 app.use(youtubeSummarizerRoutes);
 app.use(flashcardsRoutes);
+app.use(quizRoutes);
 
 app.get("/version", (req, res) => {
   let pkg = {};
