@@ -1,122 +1,162 @@
-import React, { useState } from "react";
-import { Calendar, BookOpen, Sparkles } from "lucide-react";
+import { useState } from "react";
+import axios from "axios";
+import { Calendar } from "lucide-react";
 
 export default function SchedulePlanner() {
   const [examDate, setExamDate] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [scheduleData, setScheduleData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // 📅 Calculate preparation days
+  const calculateDays = () => {
+    if (!startDate || !examDate) return null;
+    const start = new Date(startDate);
+    const exam = new Date(examDate);
+    const diff = Math.ceil((exam - start) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 0;
+  };
+
+  // 📤 Upload + generate schedule
+  const handleGenerateSchedule = async (e) => {
+    const files = e.target.files;
+    if (!files.length) return;
+
+    const formData = new FormData();
+    for (let file of files) {
+      formData.append("files", file);
+    }
+    formData.append("startDate", startDate);
+    formData.append("examDate", examDate);
+
+    try {
+      setLoading(true);
+
+      const res = await axios.post(
+        "http://localhost:5000/generate-schedule",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      console.log("Full response from backend:", res.data); // ✅ Print raw response
+      setScheduleData(res.data);
+    } catch (err) {
+      console.error("Schedule generation error:", err);
+      alert("Failed to generate schedule");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 💾 Save schedule locally
+  const handleSave = () => {
+    if (!scheduleData) return;
+    localStorage.setItem("savedStudyPlan", JSON.stringify(scheduleData));
+    alert("Study plan saved successfully!");
+  };
 
   return (
-    <div className="min-h-screen w-full bg-white text-black dark:bg-black dark:text-white relative">
-      
-      {/* Aceternity grid */}
-      <div
-        className="
-          absolute inset-0 pointer-events-none
-          bg-[linear-gradient(to_right,#00000014_1px,transparent_1px),linear-gradient(to_bottom,#00000014_1px,transparent_1px)]
-          dark:bg-[linear-gradient(to_right,#ffffff0d_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0d_1px,transparent_1px)]
-          bg-[size:40px_40px]
-        "
-      />
+    <div className="h-screen w-full bg-white dark:bg-black text-black dark:text-white flex">
+      {/* Left Pane */}
+      <aside className="w-[28%] border-r border-black/20 dark:border-white/20 p-6 overflow-y-auto">
+        <h2 className="text-lg font-semibold mb-4 text-cyan-500">
+          📅 Study Schedule
+        </h2>
 
-      <div className="relative z-10 p-8 h-screen">
-        <div className="flex h-full gap-8">
-
-          {/* LEFT HALF */}
-          <div className="w-1/2 flex flex-col gap-6">
-
-            {/* Subject */}
-            <div className="rounded-2xl p-5 bg-white dark:bg-black border border-black/10 dark:border-white/10">
-              <label className="text-sm text-black/70 dark:text-white/70 mb-2 flex items-center gap-2">
-                <BookOpen size={14} className="text-cyan-400" />
-                Select Notebook / Subject
-              </label>
-              <select className="w-full bg-white dark:bg-black border border-black/20 dark:border-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-400">
-                <option>Select subject</option>
-                <option>Operating Systems</option>
-                <option>DSA</option>
-                <option>Maths</option>
-              </select>
-            </div>
-
-            {/* Exam date */}
-            <div className="rounded-2xl p-5 bg-white dark:bg-black border border-black/10 dark:border-white/10">
-              <label className="text-sm text-black/70 dark:text-white/70 mb-2 flex items-center gap-2">
-                <Calendar size={14} className="text-purple-400" />
-                Exam Date
-              </label>
-              <input
-                type="date"
-                value={examDate}
-                onChange={(e) => setExamDate(e.target.value)}
-                className="w-full bg-white dark:bg-black border border-black/20 dark:border-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-400"
-              />
-            </div>
-
-            {/* Start date */}
-            <div className="rounded-2xl p-5 bg-white dark:bg-black border border-black/10 dark:border-white/10">
-              <label className="text-sm text-black/70 dark:text-white/70 mb-2 flex items-center gap-2">
-                <Calendar size={14} className="text-indigo-400" />
-                Study Start Date
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full bg-white dark:bg-black border border-black/20 dark:border-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-400"
-              />
-            </div>
-
-            {/* Countdown */}
-            <div className="rounded-2xl p-8 bg-white dark:bg-black border border-black/10 dark:border-white/10 text-center">
-              <p className="text-sm text-black/60 dark:text-white/60 mb-2">
-                Countdown to Exam
-              </p>
-              <h1 className="text-5xl font-semibold tracking-tight text-cyan-400">
-                5 Days
-              </h1>
-              <p className="text-xs text-black/40 dark:text-white/40 mt-2">
-                (auto-calculated)
-              </p>
-            </div>
-
-            {/* Generate */}
-            <button className="mt-auto rounded-2xl py-4 flex items-center justify-center gap-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-cyan-400/50 transition">
-              <Sparkles size={18} className="text-cyan-400" />
-              Generate Day-wise Schedule
-            </button>
+        {/* Date Inputs */}
+        <div className="mb-4 space-y-3">
+          <div>
+            <label className="text-sm mb-1 flex items-center gap-2 text-black/70 dark:text-white/70">
+              <Calendar size={14} className="text-purple-400" />
+              Exam Date
+            </label>
+            <input
+              type="date"
+              value={examDate}
+              onChange={(e) => setExamDate(e.target.value)}
+              className="w-full rounded-xl px-4 py-2 text-sm border border-black/20 dark:border-white/20 bg-white dark:bg-black"
+            />
           </div>
 
-          {/* RIGHT HALF */}
-          <div className="w-1/2 rounded-2xl bg-white dark:bg-black border border-black/10 dark:border-white/10 p-6 overflow-y-auto">
-            <h2 className="text-sm text-black/70 dark:text-white/70 mb-4">
-              AI Generated Study Plan
-            </h2>
-
-            <div className="space-y-4 text-sm">
-              {[
-                { day: "Day 1", content: "Introduction, OS Structure, Types of OS" },
-                { day: "Day 2", content: "Process Concept, Process Scheduling" },
-                { day: "Day 3", content: "Threads, CPU Scheduling Algorithms" },
-                { day: "Day 4", content: "Deadlocks – Detection & Prevention" },
-                { day: "Day 5", content: "Memory Management & Page Replacement" },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl p-4 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-cyan-400/40 transition"
-                >
-                  <p className="text-cyan-400 font-medium mb-1">
-                    {item.day}
-                  </p>
-                  <p className="text-black/80 dark:text-white/80">
-                    {item.content}
-                  </p>
-                </div>
-              ))}
-            </div>
+          <div>
+            <label className="text-sm mb-1 flex items-center gap-2 text-black/70 dark:text-white/70">
+              <Calendar size={14} className="text-indigo-400" />
+              Start Date
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full rounded-xl px-4 py-2 text-sm border border-black/20 dark:border-white/20 bg-white dark:bg-black"
+            />
           </div>
 
+          {/* Countdown */}
+          <div className="text-center p-4 bg-black/5 dark:bg-white/5 rounded-xl">
+            <p className="text-sm text-black/60 dark:text-white/60 mb-1">
+              Days for Preparation
+            </p>
+            <h1 className="text-3xl font-semibold text-cyan-400">
+              {calculateDays() !== null ? `${calculateDays()} Days` : "--"}
+            </h1>
+          </div>
         </div>
-      </div>
+
+        {/* Upload Notes */}
+        <div className="mb-4">
+          <input type="file" multiple onChange={handleGenerateSchedule} className="text-sm" />
+          {loading && <p className="text-sm text-black/60 dark:text-white/60 mt-2">Generating schedule...</p>}
+        </div>
+      </aside>
+
+
+      {/* Center Pane */}
+<main className="flex-1 p-8 flex flex-col">
+  <h1 className="text-2xl font-bold mb-6 text-cyan-400">
+    📖 Study Timeline
+  </h1>
+
+  {scheduleData ? (
+    <div className="relative">
+      {/* Timeline vertical line */}
+      <div className="absolute left-12 top-0 w-1 bg-cyan-300 h-full z-0"></div>
+
+      {Object.entries(scheduleData).map(([date, topic], idx) => (
+        <div key={date} className="relative flex items-start mb-10">
+          {/* Date card */}
+          <div className="bg-black text-white px-3 py-1 rounded-md z-10 shadow-md w-28 text-center">
+            {date}
+          </div>
+
+          {/* Topic content */}
+          <div className="ml-10 flex-1">
+            <h2 className="text-md font-semibold text-black dark:text-white mb-1">
+              {topic.split(":")[0]}
+            </h2>
+            <p className="text-sm text-black/70 dark:text-white/70">
+              {topic.split(":").slice(1).join(":")}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-black/60 dark:text-white/60">
+      Upload notes to generate your schedule...
+    </p>
+  )}
+
+  <div className="mt-6 flex gap-4">
+    <button
+      onClick={handleSave}
+      className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition text-white"
+    >
+      💾 Save Schedule
+    </button>
+  </div>
+</main>
+
+
     </div>
   );
 }

@@ -9,11 +9,13 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const mongoose = require("mongoose");
 const { extractTextFromFiles } = require("./fileParser");
-const { generateIndexFromText } = require("./gemini");
 const driveRoutes = require("./routes/driveRoutes");
 const generateNotesRoute = require("./routes/generateNotes");
+const generateScheduleRoute = require("./routes/generateSchedule");
 const youtubeSummarizerRoutes = require("./routes/youtubeSummarizer"); //
 const flashcardsRoutes = require("./routes/flashcards"); //
+const { generateIndexFromText, generateScheduleFromText } = require("./gemini");
+
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -28,6 +30,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/drive", driveRoutes); 
 app.use("/api", generateNotesRoute);
+app.use("/api", generateScheduleRoute);
 //
 app.use(youtubeSummarizerRoutes);
 app.use(flashcardsRoutes);
@@ -86,6 +89,40 @@ app.post("/generate-index", upload.array("files"), async (req, res) => {
 
     // 2️⃣ Send to Gemini
     const structuredContent = await generateIndexFromText(combinedText);
+
+    // 3️⃣ Send structured JSON back to frontend
+    res.json(structuredContent);
+
+  } catch (error) {
+    console.error("🔥 FULL ERROR:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/generate-schedule", upload.array("files"), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "No files uploaded" });
+    }
+    
+    console.log("📂 Files received:", req.files.length);
+
+    // 1️⃣ Extract text from uploaded files
+    const combinedText = await extractTextFromFiles(req.files);
+
+    if (!combinedText || combinedText.trim() === "") {
+      return res.status(400).json({ error: "No readable text found in files" });
+    }
+
+    // 2️⃣ Send to Gemini
+    const { startDate, examDate, subject } = req.body;
+
+    const structuredContent = await generateScheduleFromText(
+      combinedText,
+      startDate,
+      examDate,
+      subject
+    );
 
     // 3️⃣ Send structured JSON back to frontend
     res.json(structuredContent);

@@ -37,4 +37,18 @@ async function processFile(file) {
   return structuredNotes;
 }
 
-module.exports = { processFile };
+async function extractTextFromFiles(files) {
+  let combinedText = "";
+
+  for (const file of files) {
+    const text = await extractText(file.path, file.mimetype);
+    combinedText += "\n\n" + text;
+
+    fs.unlinkSync(file.path); // delete temp upload
+  }
+
+  return combinedText;
+}
+
+
+module.exports = { processFile, extractTextFromFiles };
