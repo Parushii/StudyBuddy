@@ -17,6 +17,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import HomePage from "./pages/HomePage";
 import Dashboard from "./pages/Dashboard";
+import HighlightTopics from "./pages/HighlightTopics";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/homepage" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/highlighttopics" element={<HighlightTopics />} />
           </Routes>
         </Router>
       </NotesProvider>

@@ -8,10 +8,11 @@ const FormData = require("form-data");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const mongoose = require("mongoose");
-
+const { extractTextFromFiles } = require("./fileParser");
+const { generateIndexFromText } = require("./gemini");
 const app = express();
 const upload = multer({ dest: "uploads/" });
-
+const uploadMultiple = multer({ dest: "uploads/" });
 app.use(cors({ origin: ["http://localhost:5173", "http://localhost:8000"] }));
 app.use(express.json());
 mongoose
@@ -110,5 +111,33 @@ app.post("/summarize", async (req, res) => {
     res.status(500).json({ error: "Failed to summarize text" });
   }
 });
+
+app.post("/generate-index", upload.array("files"), async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "No files uploaded" });
+    }
+
+    console.log("📂 Files received:", req.files.length);
+
+    // 1️⃣ Extract text from uploaded files
+    const combinedText = await extractTextFromFiles(req.files);
+
+    if (!combinedText || combinedText.trim() === "") {
+      return res.status(400).json({ error: "No readable text found in files" });
+    }
+
+    // 2️⃣ Send to Gemini
+    const structuredContent = await generateIndexFromText(combinedText);
+
+    // 3️⃣ Send structured JSON back to frontend
+    res.json(structuredContent);
+
+  } catch (error) {
+    console.error("🔥 FULL ERROR:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 app.listen(process.env.PORT, () => console.log(`🚀 Server running on http://localhost:${process.env.PORT}`));
