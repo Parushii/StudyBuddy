@@ -13,6 +13,7 @@ import {
 import SubjectSidebar from "./SubjectSidebar";
 import { useNavigate } from "react-router-dom";
 import { useSelectedFiles } from "../context/SelectedFilesContext";
+import axios from "axios";
 
 const FeatureCard = ({ icon: Icon, title, description, onClick }) => (
   <div
@@ -74,6 +75,22 @@ export default function NotebookView() {
     }
     action();
   };
+
+  const generateFlashcardsFromFiles = async () => {
+  const formData = new FormData();
+
+  selectedFiles.forEach(f => {
+    formData.append("files", f.localFile);
+  });
+
+  const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
+  const res = await axios.post(`${API}/api/extract-text`, formData);
+
+  navigate("/flashcards", {
+    state: { extractedText: res.data.text }
+  });
+};
 
   return (
     <div className="min-h-screen flex bg-white dark:bg-black">
@@ -195,13 +212,13 @@ export default function NotebookView() {
           icon={Sparkles}
           title="Highlight Key Topics"
           description="Identify important concepts automatically from your notes."
-          onClick={() => navigate("/highlightedtopics")}
+          onClick={() => navigate("/highlighttopics")}
         />
         <FeatureCard
           icon={BookOpen}
           title="Summaries & Flashcards"
           description="Create concise summaries and quick revision flashcards."
-          onClick={() => navigate("/flashcards")}
+          onClick={() => requireFiles(generateFlashcardsFromFiles)}
         />
         <FeatureCard
           icon={Clock}

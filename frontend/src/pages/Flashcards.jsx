@@ -3,6 +3,8 @@ import axios from "axios";
 import { MdFlip } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Flashcards() {
   const navigate = useNavigate();
@@ -32,10 +34,10 @@ export default function Flashcards() {
       return;
     }
 
-    if (paragraph.length > 5000) {
-      setError("Text exceeds 5000 characters");
-      return;
-    }
+    // if (paragraph.length > 5000) {
+    //   setError("Text exceeds 5000 characters");
+    //   return;
+    // }
 
     setError("");
     setFlashcards([]);
@@ -50,6 +52,14 @@ export default function Flashcards() {
       setError("Failed to generate flashcards");
     }
   };
+
+  const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.extractedText) {
+    setParagraph(location.state.extractedText);
+  }
+}, []);
 
   const toggleFlip = (i) =>
     setFlipped((prev) => ({ ...prev, [i]: !prev[i] }));

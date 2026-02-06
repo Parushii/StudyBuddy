@@ -14,6 +14,7 @@ const driveRoutes = require("./routes/driveRoutes");
 const generateNotesRoute = require("./routes/generateNotes");
 const youtubeSummarizerRoutes = require("./routes/youtubeSummarizer"); //
 const flashcardsRoutes = require("./routes/flashcards"); //
+const extracttextRoutes = require("./routes/extracttext"); 
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -28,6 +29,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/drive", driveRoutes); 
 app.use("/api", generateNotesRoute);
+app.use("/api", extracttextRoutes);
+
 //
 app.use(youtubeSummarizerRoutes);
 app.use(flashcardsRoutes);
