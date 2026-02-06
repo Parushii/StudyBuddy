@@ -11,6 +11,7 @@ const mongoose = require("mongoose");
 const { extractTextFromFiles } = require("./fileParser");
 const { generateIndexFromText } = require("./gemini");
 const driveRoutes = require("./routes/driveRoutes");
+const generateNotesRoute = require("./routes/generateNotes");
 
 const app = express();
 const upload = multer({ dest: "uploads/" });
@@ -24,7 +25,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/drive", driveRoutes); 
-
+app.use("/api", generateNotesRoute);
 
 
 app.post("/summarize", async (req, res) => {

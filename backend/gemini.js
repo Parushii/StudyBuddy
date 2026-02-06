@@ -2,7 +2,6 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// ✅ Using the working model from your logs
 const model = genAI.getGenerativeModel({
   model: "gemini-2.5-flash-lite",
 });
@@ -12,19 +11,12 @@ async function generateIndexFromText(textContent) {
     const prompt = `
 You are an expert academic content organizer.
 
-Convert the following study material into a STRICTLY VALID JSON format.
+Return ONLY valid JSON.
+Do NOT add markdown.
+Do NOT add explanations.
+Do NOT add text before or after JSON.
 
-Rules:
-1. Group content into Chapters.
-2. Each Chapter must contain Topics.
-3. Each Topic must contain a detailed explanation.
-4. Keep explanations clear, structured, and exam-ready.
-5. Return ONLY valid JSON.
-6. Do NOT include markdown.
-7. Do NOT include backticks.
-8. Do NOT add any text outside JSON.
-
-Format example:
+Structure strictly like:
 
 {
   "Chapter 1: Chapter Name": {
@@ -38,22 +30,31 @@ ${textContent}
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    let text = response.text();
+    let text = response.text().trim();
 
-    // 🔥 Clean accidental markdown if model adds it
+    // 🔥 Remove accidental markdown
     text = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
-    // ✅ Try parsing
-    const parsed = JSON.parse(text);
+    // 🔥 Extract JSON block safely
+    const firstBrace = text.indexOf("{");
+    const lastBrace = text.lastIndexOf("}");
 
-    return parsed;
-  } catch (error) {
-    console.error("🔥 FULL ERROR:", error.message);
-
-    if (error.response) {
-      console.error("🔥 RESPONSE ERROR:", error.response.data);
+    if (firstBrace === -1 || lastBrace === -1) {
+      throw new Error("No valid JSON found in response");
     }
 
+    let jsonString = text.substring(firstBrace, lastBrace + 1);
+
+    // 🔥 Remove trailing commas (common LLM mistake)
+    jsonString = jsonString.replace(/,\s*}/g, "}");
+    jsonString = jsonString.replace(/,\s*]/g, "]");
+
+    const parsed = JSON.parse(jsonString);
+
+    return parsed;
+
+  } catch (error) {
+    console.error("🔥 FULL RAW ERROR:", error);
     throw new Error("Gemini content generation failed");
   }
 }
