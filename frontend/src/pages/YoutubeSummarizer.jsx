@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle";
 
 export default function YoutubeSummarizer() {
   const navigate = useNavigate();
-  const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+  const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");
@@ -94,10 +94,10 @@ export default function YoutubeSummarizer() {
         </div>
         {/* Home */}
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/notebookview")}
           className="mb-8 px-5 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 transition cursor-pointer"
         >
-          ← Home
+          ← Back
         </button>
 
         <h1 className="text-4xl font-bold mb-2">

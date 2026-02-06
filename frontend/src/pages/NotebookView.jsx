@@ -183,7 +183,7 @@ export default function NotebookView() {
         </div>
 
         <button className="rounded-xl py-3 border border-black/10 dark:border-white/10
-          flex items-center justify-center gap-2">
+          flex items-center justify-center gap-2 cursor-pointer" onClick={()=>navigate("/voicetotext")}>
           <Mic size={16} />
           Record Voice Note
         </button>
@@ -224,6 +224,12 @@ export default function NotebookView() {
           title="Youtube Search"
           description="Find relevant videos based on your notes and topics."
           onClick={() => navigate("/youtubelink")}
+        />
+        <FeatureCard
+          title="Youtube Summarizer"
+          icon={BookOpen}
+          description="Get concise summaries of YouTube videos."
+          onClick={() => navigate("/youtube-summarizer")}
         />
       </div>
     </div>
