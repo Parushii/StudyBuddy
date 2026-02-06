@@ -124,7 +124,6 @@ export default function Dashboard() {
                     <GlassCard><Calendar className="text-indigo-400 mb-1" /><p className="text-xs text-white/60">Next Exam</p><p className="font-semibold">OS · 9d</p></GlassCard>
                 </div>
 
-                {/* ================= BENTO GRID ================= */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 
                     {/* Time Chart */}
@@ -144,22 +143,22 @@ export default function Dashboard() {
                     <GlassCard>
                         <h3 className="mb-3">🧠 Quiz Accuracy</h3>
                         <ResponsiveContainer width="100%" height={240}>
-  <PieChart>
-    <Pie
-      data={quizPie}
-      innerRadius={50}
-      outerRadius={75}
-      dataKey="value"
-    >
-      {quizPie.map((_, i) => (
-        <Cell key={i} fill={PIE_COLORS[i]} />
-      ))}
-    </Pie>
+                            <PieChart>
+                                <Pie
+                                    data={quizPie}
+                                    innerRadius={50}
+                                    outerRadius={75}
+                                    dataKey="value"
+                                >
+                                    {quizPie.map((_, i) => (
+                                        <Cell key={i} fill={PIE_COLORS[i]} />
+                                    ))}
+                                </Pie>
 
-    <Tooltip formatter={(v) => `${v}%`} />
-    <Legend verticalAlign="bottom" />
-  </PieChart>
-</ResponsiveContainer>
+                                <Tooltip formatter={(v) => `${v}%`} />
+                                <Legend verticalAlign="bottom" />
+                            </PieChart>
+                        </ResponsiveContainer>
 
                     </GlassCard>
 

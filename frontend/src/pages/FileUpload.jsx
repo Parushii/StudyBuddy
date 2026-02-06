@@ -1,34 +1,58 @@
 import { useState } from "react";
 
 const FileUpload = () => {
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false); 
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
+  const handleFileChange = (e) => {
+    setFiles(Array.from(e.target.files));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) {
-      setMessage("Please fill all fields and select a file.");
+
+    if (files.length === 0) {
+      setMessage("Please fill all fields and select files.");
       return;
     }
 
+    setLoading(true);  
+    setMessage("");
+
     const formData = new FormData();
-    formData.append("file", file);
+    files.forEach((file) => formData.append("files", file));
 
     try {
-      const res = await fetch("http://localhost:5000/upload", {
+      const res = await fetch("http://localhost:5000/api/drive/upload", {
         method: "POST",
         body: formData,
       });
 
       const data = await res.json();
-      if (res.ok)
-        setMessage(`File uploaded successfully! Link: ${data.link}`);
-      else setMessage(`Upload failed: ${data.error}`);
+
+if (res.ok) {
+  const successFiles = data.results.filter(f => f.status === "success");
+  const failedFiles = data.results.filter(f => f.status !== "success");
+
+  let msg = "";
+  if (successFiles.length > 0) {
+    msg += `✅ Uploaded: ${successFiles.map(f => f.file).join(", ")}\n`;
+  }
+  if (failedFiles.length > 0) {
+    msg += `⚠️ Failed: ${failedFiles.map(f => `${f.file} (${f.reason})`).join(", ")}`;
+  }
+
+  setMessage(msg);
+} else {
+  setMessage(`Upload failed: ${data.error}`);
+}
+
     } catch (err) {
       console.error(err);
       setMessage("Upload failed. Check console.");
+    } finally {
+      setLoading(false);   
     }
   };
 
@@ -40,13 +64,14 @@ const FileUpload = () => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select File:
+              Select Files:
             </label>
             <input
               type="file"
+              multiple
+              disabled={loading}
               onChange={handleFileChange}
               className="w-full text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-yellow-400 file:text-black hover:file:bg-yellow-500 cursor-pointer"
             />
@@ -54,22 +79,20 @@ const FileUpload = () => {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-md font-semibold hover:bg-neutral-400 cursor-pointer hover:text-black transition-colors duration-300"
+            disabled={loading}   
+            className={`w-full py-2 rounded-md font-semibold transition-colors duration-300
+              ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-black text-white hover:bg-neutral-400 hover:text-black"
+              }`}
           >
-            Upload
+            {loading ? "Uploading..." : "Upload"}
           </button>
         </form>
 
         {message && (
-          <p
-            className={`mt-4 text-center font-medium ${
-              message.includes("success")
-                ? "text-green-600"
-                : message.includes("failed")
-                ? "text-red-600"
-                : "text-yellow-600"
-            }`}
-          >
+          <p className="mt-4 text-center font-medium text-yellow-700">
             {message}
           </p>
         )}

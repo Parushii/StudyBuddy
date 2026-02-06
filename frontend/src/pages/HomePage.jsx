@@ -1,6 +1,8 @@
-import React from "react";
+  import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-black text-white flex">
 
@@ -24,7 +26,7 @@ export default function HomePage() {
   </button>
 
   {/* New IntelliRack */}
-  <button className="w-full py-2 rounded-lg border border-zinc-700 hover:bg-zinc-800 transition">
+  <button className="cursor-pointer w-full py-2 rounded-lg border border-zinc-700 hover:bg-zinc-800 transition" onClick={() => navigate("/notebookview")}>
     + New IntelliRack
   </button>
 

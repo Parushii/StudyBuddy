@@ -18,7 +18,7 @@ export default function Login() {
     try {
       await login(formData);
       alert("Login successful 🎉");
-      navigate("/");
+      navigate("/homepage");
     } catch (err) {
       alert("Login failed ❌");
     }
