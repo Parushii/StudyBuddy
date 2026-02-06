@@ -2,51 +2,90 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
 
-const quizData = [
-  {
-    question: "Which IoT device optimizes temperature in smart homes?",
-    options: ["Smart locks", "Smart thermostats", "Smart bins", "Smart shelves"],
-    answer: 1,
-  },
-  {
-    question: "Main benefit of intelligent parking systems?",
-    options: [
-      "Manual tolling",
-      "Guides drivers to spaces",
-      "Tracks pollution",
-      "Bus locations",
-    ],
-    answer: 1,
-  },
-  {
-    question: "IoT system for disaster warnings?",
-    options: [
-      "Smart bins",
-      "Weather apps",
-      "Detection sensors",
-      "Streetlights",
-    ],
-    answer: 2,
-  },
-];
-
 export default function Quiz() {
   const navigate = useNavigate();
+  const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
   const [started, setStarted] = useState(false);
   const [answers, setAnswers] = useState({});
   const [revealed, setRevealed] = useState({});
   const [current, setCurrent] = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
-  const score = quizData.filter(
-    (q, i) => answers[i] === q.answer
-  ).length;
+  const [inputMode, setInputMode] = useState("text");
+  const [textInput, setTextInput] = useState("");
+  const [fileInput, setFileInput] = useState(null);
+  const [quizData, setQuizData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+
+  const score = quizData.filter((q, i) => answers[i] === q.answer).length;
 
   const selectedAnswer = answers[current];
   const isCurrentRevealed = revealed[current] === true;
   const currentCorrectIndex = quizData[current]?.answer;
   const isCurrentCorrect =
     isCurrentRevealed && selectedAnswer === currentCorrectIndex;
+
+  const resetQuizState = () => {
+    setStarted(false);
+    setAnswers({});
+    setRevealed({});
+    setSubmitted(false);
+    setCurrent(0);
+  };
+
+  const handleGenerateQuiz = async () => {
+    setError("");
+
+    if (inputMode === "text") {
+      if (!textInput.trim()) {
+        setError("Please enter some text");
+        return;
+      }
+
+    } else {
+      if (!fileInput) {
+        setError("Please select a file");
+        return;
+      }
+    }
+
+    setLoading(true);
+    resetQuizState();
+    setQuizData([]);
+
+    try {
+      let response;
+
+      if (inputMode === "text") {
+        response = await fetch(`${API}/generate-quiz`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: textInput.trim() }),
+        });
+      } else {
+        const formData = new FormData();
+        formData.append("file", fileInput);
+        response = await fetch(`${API}/generate-quiz-file`, {
+          method: "POST",
+          body: formData,
+        });
+      }
+
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error || "Failed to generate quiz");
+        return;
+      }
+
+      setQuizData(data.quiz || []);
+    } catch (err) {
+      setError("Failed to connect to server");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white relative">
@@ -64,7 +103,76 @@ export default function Quiz() {
           ← Home
         </button>
 
-        {!started ? (
+        {quizData.length === 0 ? (
+          <div className="bg-white dark:bg-black border border-black/10 dark:border-white/10 rounded-2xl p-8">
+            <h1 className="text-4xl font-bold mb-2">Generate a Quiz</h1>
+            <p className="text-black/60 dark:text-white/60 mb-8">
+              Upload a file or paste text to generate your quiz
+            </p>
+
+            <div className="flex gap-3 mb-6">
+              <button
+                onClick={() => setInputMode("text")}
+                className={`px-4 py-2 rounded-xl border transition ${
+                  inputMode === "text"
+                    ? "border-cyan-400/60 bg-cyan-400/10"
+                    : "border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10"
+                }`}
+              >
+                Enter text
+              </button>
+              <button
+                onClick={() => setInputMode("file")}
+                className={`px-4 py-2 rounded-xl border transition ${
+                  inputMode === "file"
+                    ? "border-cyan-400/60 bg-cyan-400/10"
+                    : "border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10"
+                }`}
+              >
+                Upload file
+              </button>
+            </div>
+
+            {inputMode === "text" ? (
+              <div>
+                <textarea
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  placeholder="Paste your content here"
+                  className="w-full h-48 bg-white dark:bg-black border border-black/10 dark:border-white/10 rounded-xl p-4 text-black dark:text-white placeholder-black/40 dark:placeholder-white/40 focus:outline-none focus:border-cyan-400"
+                />
+              </div>
+            ) : (
+              <div>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.pptx"
+                  onChange={(e) => setFileInput(e.target.files?.[0] || null)}
+                  className="w-full rounded-xl px-4 py-3 bg-white dark:bg-black border border-black/10 dark:border-white/10 text-black dark:text-white"
+                />
+                {fileInput && (
+                  <p className="text-sm text-black/50 dark:text-white/50 mt-2">
+                    Selected: {fileInput.name}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {error && (
+              <div className="mt-4 rounded-xl border border-red-500/40 bg-red-500/10 p-3">
+                <p className="text-red-300 text-sm">❌ {error}</p>
+              </div>
+            )}
+
+            <button
+              onClick={handleGenerateQuiz}
+              disabled={loading}
+              className="mt-6 w-full rounded-xl py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-cyan-400/50 transition disabled:opacity-50"
+            >
+              {loading ? "Generating..." : "Generate Quiz"}
+            </button>
+          </div>
+        ) : !started ? (
           <div className="min-h-[80vh] flex items-center justify-center">
             <div className="bg-white dark:bg-black border border-black/10 dark:border-white/10 rounded-2xl p-10 text-center">
               <h1 className="text-5xl font-bold mb-4">Quiz Master</h1>
@@ -77,6 +185,16 @@ export default function Quiz() {
                 className="w-full rounded-xl py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-cyan-400/50 transition"
               >
                 Start Quiz
+              </button>
+
+              <button
+                onClick={() => {
+                  setQuizData([]);
+                  resetQuizState();
+                }}
+                className="mt-3 w-full rounded-xl py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-purple-400/50 transition"
+              >
+                Change Input
               </button>
             </div>
           </div>
@@ -118,15 +236,14 @@ export default function Quiz() {
 
             <button
               onClick={() => {
-                setStarted(false);
-                setAnswers({});
-                setRevealed({});
-                setSubmitted(false);
-                setCurrent(0);
+                setQuizData([]);
+                resetQuizState();
+                setTextInput("");
+                setFileInput(null);
               }}
               className="w-full rounded-xl py-3 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-purple-400/50 transition"
             >
-              Retake Quiz
+              Create New Quiz
             </button>
           </div>
         ) : (
