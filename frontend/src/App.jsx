@@ -20,6 +20,8 @@ import Dashboard from "./pages/Dashboard";
 import HighlightTopics from "./pages/HighlightTopics";
 import { SelectedFilesProvider } from "./context/SelectedFilesContext";
 import Quiz from "./pages/Quiz";
+import Flashcards from "./pages/Flashcards";
+import YoutubeSummarizer from "./pages/YoutubeSummarizer";
 
 function App() {
   return (
@@ -44,6 +46,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/highlighttopics" element={<HighlightTopics />} />
             <Route path="/quiz" element={<Quiz />} />
+            <Route path="/flashcards" element={<Flashcards />} />
+            <Route path="/youtube-summarizer"  element={<YoutubeSummarizer />} />
           </Routes>
         </Router>
         </SelectedFilesProvider>

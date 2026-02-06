@@ -21,7 +21,7 @@ export default function HomePage() {
   />
 
   {/* MagicShunter Button */}
-  <button className="w-full py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 transition">
+  <button className="w-full py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 transition cursor-pointer" onClick={()=> navigate("/upload")}>
     ✨ MagicShunter
   </button>
 

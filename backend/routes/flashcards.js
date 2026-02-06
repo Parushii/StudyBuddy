@@ -39,11 +39,11 @@ router.post("/generate-flashcards", async (req, res) => {
     return res.status(400).json({ error: "No paragraph provided" });
   }
 
-  if (paragraph.length > 5000) {
-    return res
-      .status(400)
-      .json({ error: "Text is too long. Please limit to 5000 characters." });
-  }
+  // if (paragraph.length > 5000) {
+  //   return res
+  //     .status(400)
+  //     .json({ error: "Text is too long. Please limit to 5000 characters." });
+  // }
 
   try {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;

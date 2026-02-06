@@ -3,15 +3,24 @@ const multer = require("multer");
 const fs = require("fs");
 const axios = require("axios");
 const FormData = require("form-data");
-const { findOrCreateFolder, fetchDriveTree, drive } = require("../services/drive");
+
+const {
+  drive,
+  findOrCreateFolder,
+  fetchDriveTree,
+} = require("../services/drive");
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
-// Upload and classify files
+/**
+ * MULTI FILE UPLOAD
+ */
 router.post("/upload", upload.array("files"), async (req, res) => {
   try {
-    if (!req.files || req.files.length === 0) return res.status(400).json({ error: "No files uploaded" });
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "No files uploaded" });
+    }
 
     const results = [];
     const rootFolder = await findOrCreateFolder("StudyBuddyAI");
@@ -21,34 +30,67 @@ router.post("/upload", upload.array("files"), async (req, res) => {
 
       try {
         const formData = new FormData();
-        formData.append("file", fs.createReadStream(filePath), file.originalname);
+        formData.append(
+          "file",
+          fs.createReadStream(filePath),
+          file.originalname
+        );
 
-        const classifyRes = await axios.post("http://127.0.0.1:8000/classify", formData, { headers: formData.getHeaders() });
-        const { subject: predictedSubject, unit: predictedUnit } = classifyRes.data;
+        const classifyRes = await axios.post(
+          "http://127.0.0.1:8000/classify",
+          formData,
+          { headers: formData.getHeaders() }
+        );
 
-        if (!predictedSubject || !predictedUnit) {
+        const { subject: predictedSubject, unit: predictedUnit } =
+          classifyRes.data;
+
+        console.log("📘 Classified File:", file.originalname);
+        console.log("➡️ Subject:", predictedSubject);
+        console.log("➡️ Unit:", predictedUnit);
+
+        const subjectFolder = await findOrCreateFolder(
+          predictedSubject,
+          rootFolder
+        );
+        const unitFolder = await findOrCreateFolder(
+          predictedUnit,
+          subjectFolder
+        );
+
+        // ---- DUPLICATE CHECK (UNCHANGED LOGIC) ----
+        const existingFile = await drive.files.list({
+          q: `'${unitFolder}' in parents and name='${file.originalname}' and trashed=false`,
+          fields: "files(id, name)",
+        });
+
+        if (existingFile.data.files.length > 0) {
           fs.unlinkSync(filePath);
-          results.push({ file: file.originalname, status: "skipped", reason: "Could not classify file" });
+          results.push({
+            file: file.originalname,
+            status: "failed",
+            reason: "File already exists in this folder",
+          });
           continue;
         }
-        console.log("📘 Classified File:", file.originalname);
-console.log("➡️ Subject:", predictedSubject);
-console.log("➡️ Unit:", predictedUnit);
 
-        const subjectFolder = await findOrCreateFolder(predictedSubject, rootFolder);
-        const unitFolder = await findOrCreateFolder(predictedUnit, subjectFolder);
+        // ---- UPLOAD ----
+        const fileMetadata = {
+          name: file.originalname,
+          parents: [unitFolder],
+        };
 
-        c// ---- Duplicate check ----
-  const existingFile = await drive.files.list({
-    q: `'${unitFolder}' in parents and name='${file.originalname}' and trashed=false`,
-    fields: "files(id, name)",
-  });
-console.log("Checking for duplicates:", file.originalname, "in folder", unitFolder);
+        const media = {
+          mimeType: file.mimetype,
+          body: fs.createReadStream(filePath),
+        };
 
-  if (existingFile.data.files.length > 0) {
-    return { status: "failed", reason: "File already exists" };
-  }
-        const uploadedFileId = await require("../services/drive").uploadFile(filePath, file.originalname, unitFolder);
+        const uploadedFile = await drive.files.create({
+          resource: fileMetadata,
+          media,
+          fields: "id",
+        });
+
         fs.unlinkSync(filePath);
 
         results.push({
@@ -56,40 +98,62 @@ console.log("Checking for duplicates:", file.originalname, "in folder", unitFold
           status: "success",
           subject: predictedSubject,
           unit: predictedUnit,
-          link: `https://drive.google.com/file/d/${uploadedFileId}/view`
+          link: `https://drive.google.com/file/d/${uploadedFile.data.id}/view`,
         });
       } catch (fileErr) {
+        console.error("❌ File error:", file.originalname, fileErr.message);
+
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        results.push({ file: file.originalname, status: "failed", reason: "Processing error" });
+
+        results.push({
+          file: file.originalname,
+          status: "failed",
+          reason: "Processing error",
+        });
       }
     }
 
-    res.json({ message: "Upload completed", results });
+    res.json({
+      message: "Upload completed",
+      results,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Upload failed" });
   }
 });
 
-// Get drive structure
-router.get("/structure", async (req, res) => {
+/**
+ * DRIVE STRUCTURE (unchanged)
+ */
+router.get("/drive-structure", async (req, res) => {
   try {
+    // 1️⃣ Find StudyBuddyAI root folder
     const rootRes = await drive.files.list({
       q: "name='StudyBuddyAI' and mimeType='application/vnd.google-apps.folder' and trashed=false",
-      fields: "files(id)"
+      fields: "files(id)",
     });
 
-    if (rootRes.data.files.length === 0) return res.json([]);
+    if (rootRes.data.files.length === 0) {
+      return res.json([]);
+    }
 
-    const rootFolderId = rootRes.data.files[0].id;
+    const studyBuddyRootId = rootRes.data.files[0].id;
+
+    // 2️⃣ Fetch ONLY folders inside StudyBuddyAI (subjects)
     const subjectsRes = await drive.files.list({
-      q: `'${rootFolderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-      fields: "files(id, name)"
+      q: `'${studyBuddyRootId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      fields: "files(id, name)",
     });
 
     const structure = [];
-    for (const folder of subjectsRes.data.files) {
-      structure.push({ subject: folder.name, children: await fetchDriveTree(folder.id) });
+
+    // 3️⃣ For each subject, fetch its children
+    for (const subjectFolder of subjectsRes.data.files) {
+      structure.push({
+        subject: subjectFolder.name,
+        children: await fetchDriveTree(subjectFolder.id),
+      });
     }
 
     res.json(structure);
@@ -98,5 +162,6 @@ router.get("/structure", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch drive structure" });
   }
 });
+
 
 module.exports = router;

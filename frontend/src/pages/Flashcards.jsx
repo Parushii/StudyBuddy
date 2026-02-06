@@ -3,6 +3,8 @@ import axios from "axios";
 import { MdFlip } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Flashcards() {
   const navigate = useNavigate();
@@ -32,10 +34,10 @@ export default function Flashcards() {
       return;
     }
 
-    if (paragraph.length > 5000) {
-      setError("Text exceeds 5000 characters");
-      return;
-    }
+    // if (paragraph.length > 5000) {
+    //   setError("Text exceeds 5000 characters");
+    //   return;
+    // }
 
     setError("");
     setFlashcards([]);
@@ -43,13 +45,21 @@ export default function Flashcards() {
     setCurrentIndex(0);
 
     try {
-      const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+      const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
       const res = await axios.post(`${API}/generate-flashcards`, { paragraph });
       setFlashcards(res.data.flashcards || []);
     } catch (err) {
       setError("Failed to generate flashcards");
     }
   };
+
+  const location = useLocation();
+
+useEffect(() => {
+  if (location.state?.extractedText) {
+    setParagraph(location.state.extractedText);
+  }
+}, []);
 
   const toggleFlip = (i) =>
     setFlipped((prev) => ({ ...prev, [i]: !prev[i] }));
@@ -64,10 +74,10 @@ export default function Flashcards() {
           <ThemeToggle />
         </div>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/notebookview")}
           className="mb-8 px-5 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 transition cursor-pointer"
         >
-          ← Home
+          ← Back
         </button>
 
         <h1 className="text-5xl font-bold mb-4 text-center">
