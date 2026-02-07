@@ -92,6 +92,24 @@ export default function NotebookView() {
   });
 };
 
+const generateQuizFromFiles = async () => {
+  const formData = new FormData();
+
+  selectedFiles.forEach((f) => {
+    if (f.localFile) {
+      formData.append("files", f.localFile);
+    }
+  });
+
+  const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
+  const res = await axios.post(`${API}/api/extract-text`, formData);
+
+  navigate("/quiz", {
+    state: { extractedText: res.data.text },
+  });
+};
+
   return (
     <div className="min-h-screen flex bg-white dark:bg-black">
       {/* LEFT */}
@@ -234,7 +252,7 @@ export default function NotebookView() {
           icon={Plus}
           title="Generate Quiz"
           description="Auto-generated quizzes based on your study material."
-          onClick={() => navigate("/quiz")}
+          onClick={() => requireFiles(generateQuizFromFiles)}
         />
         <FeatureCard
           icon={Video}
