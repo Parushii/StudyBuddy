@@ -1,17 +1,7 @@
 import React, { useRef } from "react";
-import {
-  Upload,
-  Mic,
-  Plus,
-  Sparkles,
-  BookOpen,
-  Video,
-  Trash2,
-  Clock,
-  Calendar,
-} from "lucide-react";
+import {Upload,Mic,Plus,Sparkles,BookOpen,Video,Trash2,Clock,Calendar} from "lucide-react";
 import SubjectSidebar from "./SubjectSidebar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import { useSelectedFiles } from "../context/SelectedFilesContext";
 import axios from "axios";
 
@@ -44,6 +34,10 @@ const FeatureCard = ({ icon: Icon, title, description, onClick }) => (
 
 export default function NotebookView() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const notebookName =  location.state?.notebookName || "Untitled IntelliRack";
+
   const fileInputRef = useRef(null);
 
   const {
@@ -75,9 +69,36 @@ export default function NotebookView() {
     }
     action();
   };
+const buildFormDataFromSelectedFiles = () => {
+  const formData = new FormData();
+
+  const driveFileIds = [];
+
+  selectedFiles.forEach((file) => {
+    if (file.source === "local" && file.localFile) {
+      // Uploaded files
+      formData.append("files", file.localFile);
+    }
+
+    if (file.source === "drive") {
+      // Google Drive files
+      driveFileIds.push({
+        id: file.id,
+        name: file.name,
+      });
+    }
+  });
+
+  if (driveFileIds.length > 0) {
+    formData.append("driveFiles", JSON.stringify(driveFileIds));
+  }
+
+  return formData;
+};
 
   const generateFlashcardsFromFiles = async () => {
-  const formData = new FormData();
+  // const formData = new FormData();
+  const formData = buildFormDataFromSelectedFiles();
 
   selectedFiles.forEach(f => {
     formData.append("files", f.localFile);
@@ -93,8 +114,8 @@ export default function NotebookView() {
 };
 
 const generateQuizFromFiles = async () => {
-  const formData = new FormData();
-
+  // const formData = new FormData();
+  const formData = buildFormDataFromSelectedFiles();
   selectedFiles.forEach((f) => {
     if (f.localFile) {
       formData.append("files", f.localFile);
@@ -114,7 +135,7 @@ const generateQuizFromFiles = async () => {
     <div className="min-h-screen flex bg-white dark:bg-black">
       {/* LEFT */}
       <div className="w-[26%] min-w-[280px] flex flex-col gap-4 p-6 border-r border-black/10 dark:border-white/10">
-
+        <h1 className="text-xl font-bold text-center">{notebookName}</h1>
         {/* Upload */}
         <div className="rounded-2xl p-4 border border-black/10 dark:border-white/10">
           <h2 className="text-sm font-medium mb-3 flex items-center gap-2">
@@ -230,7 +251,7 @@ const generateQuizFromFiles = async () => {
           icon={Sparkles}
           title="Highlight Key Topics"
           description="Identify important concepts automatically from your notes."
-          onClick={() => navigate("/highlighttopics")}
+          onClick={() => requireFiles(() => navigate("/highlighttopics"))}
         />
         <FeatureCard
           icon={BookOpen}
