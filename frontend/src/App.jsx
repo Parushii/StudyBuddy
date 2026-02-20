@@ -36,7 +36,7 @@ function App() {
             <Route path="/editor" element={<Editor />} />
             <Route path="/voicetotext" element={<VoiceToText />} />
             <Route path="/youtubelink" element={<YoutubeLink />} />
-            <Route path="/notebookview" element={<NotebookView />} />
+            <Route path="/notebookview/:notebookId" element={<NotebookView />} />
             <Route path="/scheduleplanner" element={<SchedulePlanner />} />    
             <Route path="/whiteboard" element={<Whiteboard />} />
             <Route path="/highlightedtopics" element={<HighlightedTopicsView />} />
@@ -44,9 +44,9 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/homepage" element={<HomePage />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/highlighttopics" element={<HighlightTopics />} />
-            <Route path="/quiz" element={<Quiz />} />
-            <Route path="/flashcards" element={<Flashcards />} />
+            <Route path="/highlighttopics/:notebookId" element={<HighlightTopics />} />
+            <Route path="/quiz/:notebookId" element={<Quiz />} />
+            <Route path="/flashcards/:notebookId" element={<Flashcards />} />
             <Route path="/youtube-summarizer"  element={<YoutubeSummarizer />} />
           </Routes>
         </Router>

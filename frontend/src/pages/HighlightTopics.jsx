@@ -1,80 +1,95 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useSelectedFiles } from "../context/SelectedFilesContext";
-import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 export default function HighlightTopics() {
-  const navigate = useNavigate();
-  const { selectedFiles } = useSelectedFiles();
+  const { notebookId } = useParams();
 
-  const [content, setContent] = useState(null);
+  const [content, setContent] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState({
-    title: "Generating notes…",
-    content: "Please wait while we analyze your study material.",
+    title: "Select a topic",
+    content: "",
   });
   const [loading, setLoading] = useState(false);
 
+  const API =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
   useEffect(() => {
-    if (selectedFiles.length === 0) {
-      navigate("/notebookview");
-      return;
-    }
+    if (!notebookId) return;
+    loadHighlights();
+  }, [notebookId]);
 
-    generateNotesFromContext();
-  }, []);
+  const loadHighlights = async () => {
+    try {
+      setLoading(true);
 
-const generateNotesFromContext = async () => {
-  try {
-    setLoading(true);
+      const res = await axios.get(
+        `${API}/api/highlights/${notebookId}`
+      );
 
-    const formData = new FormData();
+      if (res.data && res.data.chapters?.length > 0) {
+        setContent(res.data.chapters);
 
-    selectedFiles.forEach((file) => {
-      if (file.localFile) {
-        // uploaded files
-        formData.append("files", file.localFile);
-      } else if (file.source === "drive") {
-        // drive files → send metadata
-        formData.append(
-          "driveFiles",
-          JSON.stringify({
-            id: file.id,
-            name: file.name,
-          })
-        );
+        // ✅ Auto-select first topic
+        const firstFile = res.data.chapters[0];
+        const firstChapter = firstFile?.chapters?.[0];
+        const firstTopic = firstChapter?.topics?.[0];
+
+        if (firstTopic) {
+          setSelectedTopic({
+            title: firstTopic.topicTitle,
+            content: firstTopic.content,
+          });
+        }
+      } else {
+        await regenerateHighlights();
       }
-    });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const API =
-      import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const regenerateHighlights = async () => {
+    try {
+      setLoading(true);
 
-    const res = await axios.post(
-      `${API}/api/generate-notes`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
+      const res = await axios.post(
+        `${API}/api/highlights/generate/${notebookId}`,
+        {
+          userId: localStorage.getItem("userId"),
+        }
+      );
 
-    setContent(res.data);
-  } catch (err) {
-    console.error(err);
-    alert("Failed to generate notes");
-  } finally {
-    setLoading(false);
-  }
-};
+      setContent(res.data.chapters);
 
+      // ✅ Auto-select first topic after generation
+      const firstFile = res.data.chapters?.[0];
+      const firstChapter = firstFile?.chapters?.[0];
+      const firstTopic = firstChapter?.topics?.[0];
+
+      if (firstTopic) {
+        setSelectedTopic({
+          title: firstTopic.topicTitle,
+          content: firstTopic.content,
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to generate highlights");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="h-screen w-full bg-zinc-950 text-white flex">
-      {/* LEFT PANE */}
       <aside className="w-[28%] border-r border-zinc-800 p-6 overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-2 text-purple-400">
+        <h2 className="text-lg font-semibold mb-4 text-purple-400">
           📖 Contents
         </h2>
-
-        <p className="text-sm text-zinc-400 mb-4">
-          Using {selectedFiles.length} selected file(s)
-        </p>
 
         {loading && (
           <p className="text-sm text-zinc-400">
@@ -82,49 +97,40 @@ const generateNotesFromContext = async () => {
           </p>
         )}
 
-        {content && (
-          <div className="space-y-6 text-sm">
-            {Object.entries(content).map(([fileName, chapters]) => (
-              <div key={fileName}>
-                <p className="text-purple-400 font-semibold mb-3">
-                  {fileName}
-                </p>
+        {Array.isArray(content) &&
+          content.map((fileGroup) => (
+            <div key={fileGroup.fileName} className="mb-8">
+              {/* ✅ File Name */}
+              <h3 className="text-sm text-zinc-400 mb-3">
+                📄 {fileGroup.fileName}
+              </h3>
 
-                {Object.entries(chapters).map(
-                  ([chapterTitle, topics]) => (
-                    <div key={chapterTitle} className="ml-2 mb-3">
-                      <p className="text-zinc-400 font-medium mb-2">
-                        {chapterTitle}
-                      </p>
+              {fileGroup.chapters.map((chapter) => (
+                <div key={chapter.chapterTitle} className="mb-6">
+                  <p className="text-purple-400 font-semibold mb-3">
+                    {chapter.chapterTitle}
+                  </p>
 
-                      <div className="ml-4 space-y-1">
-                        {Object.entries(topics).map(
-                          ([topic, explanation]) => (
-                            <button
-                              key={topic}
-                              onClick={() =>
-                                setSelectedTopic({
-                                  title: topic,
-                                  content: explanation,
-                                })
-                              }
-                              className="block text-left w-full px-2 py-1 rounded-md hover:bg-zinc-800 transition"
-                            >
-                              • {topic}
-                            </button>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+                  {chapter.topics.map((topic) => (
+                    <button
+                      key={topic.topicTitle}
+                      onClick={() =>
+                        setSelectedTopic({
+                          title: topic.topicTitle,
+                          content: topic.content,
+                        })
+                      }
+                      className="block text-left w-full px-2 py-1 rounded-md hover:bg-zinc-800 transition"
+                    >
+                      • {topic.topicTitle}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
+          ))}
       </aside>
 
-      {/* CENTER PANE */}
       <main className="flex-1 p-10 flex flex-col">
         <h1 className="text-3xl font-bold mb-6 text-purple-300">
           {selectedTopic.title}
@@ -134,13 +140,12 @@ const generateNotesFromContext = async () => {
           {selectedTopic.content}
         </div>
 
-        <div className="mt-6 flex gap-4">
-          <button className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition">
-            💾 Save to Notes
-          </button>
-
-          <button className="px-4 py-2 rounded-lg border border-zinc-700 hover:bg-zinc-800 transition">
-            📄 Export to Google Docs
+        <div className="mt-6">
+          <button
+            onClick={regenerateHighlights}
+            className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition"
+          >
+            🔄 Regenerate Highlights
           </button>
         </div>
       </main>

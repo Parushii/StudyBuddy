@@ -1,23 +1,31 @@
-import mongoose from "mongoose";
+// models/Notebook.js
+const mongoose = require("mongoose");
 
 const notebookSchema = new mongoose.Schema(
   {
-    userId: {
+    name: {
+      type: String,
+      required: true,
+    },
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-
-    title: {
-      type: String,
-      required: true,
-    },
-
-    description: {
-      type: String,
-    },
+    sourceFiles: [
+    {
+      name: String,
+      source: String, // "local" | "drive"
+      driveFileId: String, 
+      extractedText: String,
+      uploadedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ]
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Notebook", notebookSchema);
+module.exports = mongoose.model("Notebook", notebookSchema);

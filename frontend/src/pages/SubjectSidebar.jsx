@@ -77,8 +77,7 @@ export default function SubjectSidebar() {
     <div className="flex-1 flex flex-col gap-3 overflow-y-auto">
       <div
         onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center justify-between cursor-pointer
-  text-xs font-medium text-black/70 dark:text-white/70"
+        className="flex items-center justify-between cursor-pointer text-xs font-medium text-black/70 dark:text-white/70"
       >
         <span>Select from Existing Files</span>
         <span>{collapsed ? "▼" : "▲"}</span>

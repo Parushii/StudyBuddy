@@ -6,11 +6,12 @@ const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const JSZip = require("jszip");
 const WordExtractor = require("word-extractor");
+const Quiz = require("../models/Quiz");
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
-const GEMINI_QUIZ_MODEL = "gemini-2.5-flash";
+const GEMINI_QUIZ_MODEL = "gemini-2.5-flash-lite";
 
 function decodeXmlEntities(value) {
   if (!value) return "";
@@ -206,6 +207,37 @@ router.post("/generate-quiz", async (req, res) => {
     });
   }
 });
+router.post("/generate/:notebookId", async (req, res) => {
+  try {
+    const { notebookId } = req.params;
+    const { text, userId } = req.body;
+
+    if (!text) {
+      return res.status(400).json({ error: "Text required" });
+    }
+
+    // Generate from AI
+    const generated = await generateQuizFromText(text);
+
+    // REPLACE existing quiz
+    const quiz = await Quiz.findOneAndUpdate(
+      { notebookId },
+      {
+        userId,
+        notebookId,
+        questions: generated,
+      },
+      { upsert: true, new: true }
+    );
+
+    res.json(quiz);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Quiz generation failed" });
+  }
+});
+
 
 router.post("/generate-quiz-file", upload.single("file"), async (req, res) => {
   let tempPath;
@@ -249,5 +281,18 @@ router.post("/generate-quiz-file", upload.single("file"), async (req, res) => {
     }
   }
 });
+
+router.get("/:notebookId", async (req, res) => {
+  try {
+    const quiz = await Quiz.findOne({
+      notebookId: req.params.notebookId,
+    });
+
+    res.json(quiz);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch quiz" });
+  }
+});
+
 
 module.exports = router;

@@ -15,6 +15,7 @@ const generateScheduleRoute = require("./routes/generateSchedule");
 const youtubeSummarizerRoutes = require("./routes/youtubeSummarizer"); //
 const flashcardsRoutes = require("./routes/flashcards"); //
 const { generateIndexFromText, generateScheduleFromText } = require("./gemini");
+const notebookRoutes = require("./routes/notebook");
 
 const extracttextRoutes = require("./routes/extracttext"); 
 const quizRoutes = require("./routes/quiz");
@@ -24,21 +25,32 @@ const upload = multer({ dest: "uploads/" });
 const uploadMultiple = multer({ dest: "uploads/" });
 app.use(cors({ origin: ["http://localhost:5173", "http://localhost:8000"] }));
 app.use(express.json());
-// mongoose
-//   .connect(process.env.MONGO_URI)
-//   .then(() => console.log("✅ MongoDB connected"))
-//   .catch(err => console.error("MongoDB error:", err));
+
+const dns = require("dns");
+dns.setServers(["1.1.1.1", "1.0.0.1"]);
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then((conn) => {
+    console.log(`MongoDB Connected`);
+  })
+  .catch((err) => {
+    console.error("Database connection failed:", err.message);
+    process.exit(1);
+  });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/drive", driveRoutes); 
-app.use("/api", generateNotesRoute);
+app.use("/api/highlights", generateNotesRoute);
 app.use("/api", generateScheduleRoute);
 app.use("/api", extracttextRoutes);
+app.use("/api/notebooks", notebookRoutes);
+
 
 //
 app.use(youtubeSummarizerRoutes);
-app.use(flashcardsRoutes);
-app.use(quizRoutes);
+app.use("/api/flashcards", flashcardsRoutes);
+app.use("/api/quiz", quizRoutes);
 
 app.get("/version", (req, res) => {
   let pkg = {};

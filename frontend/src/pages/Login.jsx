@@ -20,6 +20,7 @@ export default function Login() {
       alert("Login successful 🎉");
       navigate("/homepage");
     } catch (err) {
+      console.error(err);
       alert("Login failed ❌");
     }
   };

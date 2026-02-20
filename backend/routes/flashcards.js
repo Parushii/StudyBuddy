@@ -1,6 +1,6 @@
 const express = require("express");
 const axios = require("axios");
-
+const FlashcardSet = require("../models/Flashcard");
 const router = express.Router();
 
 // Gemini text model to use (must be present in ListModels for your key)
@@ -117,5 +117,43 @@ Paragraph: ${paragraph}`;
     });
   }
 });
+
+
+/* SAVE FLASHCARDS */
+router.post("/", async (req, res) => {
+  try {
+    const { userId, notebookId, cards } = req.body;
+
+    const updated = await FlashcardSet.findOneAndUpdate(
+      { notebookId }, // find existing set
+      {
+        userId,
+        notebookId,
+        cards
+      },
+      { upsert: true, new: true } // create if not exists
+    );
+
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save flashcards" });
+  }
+});
+
+
+/* GET FLASHCARDS BY NOTEBOOK */
+router.get("/:notebookId", async (req, res) => {
+  try {
+    const flashcards = await FlashcardSet.findOne({
+      notebookId: req.params.notebookId
+    });
+
+    res.json(flashcards);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch flashcards" });
+  }
+});
+
+
 
 module.exports = router;

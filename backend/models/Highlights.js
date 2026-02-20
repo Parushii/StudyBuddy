@@ -1,56 +1,40 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const topicSchema = new mongoose.Schema(
   {
-    topicTitle: {
-      type: String,
-      required: true,
-    },
-
-    content: {
-      type: String,
-      required: true,
-    },
-
-    referenceFiles: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "File",
-      },
-    ],
+    topicTitle: String,
+    content: String,
   },
   { _id: false }
 );
 
 const chapterSchema = new mongoose.Schema(
   {
-    chapterTitle: {
-      type: String,
-      required: true,
-    },
-
+    chapterTitle: String,
     topics: [topicSchema],
+  },
+  { _id: false }
+);
+
+const fileGroupSchema = new mongoose.Schema(
+  {
+    fileName: String,
+    chapters: [chapterSchema],
   },
   { _id: false }
 );
 
 const highlightsSchema = new mongoose.Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
+    userId: String,
     notebookId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Notebook",
       required: true,
     },
-
-    chapters: [chapterSchema],
+    chapters: [fileGroupSchema], // now grouped per file
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Highlights", highlightsSchema);
+module.exports = mongoose.model("Highlights", highlightsSchema);

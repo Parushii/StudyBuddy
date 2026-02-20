@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
 
 export default function Quiz() {
@@ -7,7 +7,7 @@ export default function Quiz() {
   const location = useLocation();
   const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-  const extractedText = location.state?.extractedText || "";
+  const { notebookId } = useParams();
 
   const [quizData, setQuizData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +19,7 @@ export default function Quiz() {
   const [revealed, setRevealed] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
-  const score = quizData.filter(
+  const score = quizData?.filter(
     (q, i) => answers[i] === q.answer
   ).length;
 
@@ -29,40 +29,104 @@ export default function Quiz() {
   const isCorrect =
     isCurrentRevealed && selectedAnswer === correctIndex;
 
-  // 🔹 AUTO GENERATE QUIZ ON LOAD
+  // AUTO GENERATE QUIZ ON LOAD
   useEffect(() => {
-    if (!extractedText) {
-      setError("No study material found to generate quiz.");
-      setLoading(false);
-      return;
-    }
+    const loadQuiz = async () => {
+      try {
+        // Try to get existing quiz
+        const existing = await fetch(
+          `${API}/api/quiz/${notebookId}`
+        );
 
-    generateQuiz(extractedText);
-  }, [extractedText]);
+        const existingData = await existing.json();
 
-  const generateQuiz = async (text) => {
+        if (existingData && existingData.questions?.length > 0) {
+          setQuizData(existingData.questions);
+          setLoading(false);
+          return;
+        }
+
+        // If not exists → generate
+        const textRes = await fetch(
+          `${API}/api/notebooks/${notebookId}/text`
+        );
+        const textData = await textRes.json();
+
+        const genRes = await fetch(
+          `${API}/api/quiz/generate/${notebookId}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: textData.text,
+              userId: localStorage.getItem("userId"),
+            }),
+          }
+        );
+
+        const genData = await genRes.json();
+        console.log("Generated quiz response:", genData);
+        setQuizData(genData.questions);
+
+      } catch (err) {
+        setError("Failed to load quiz");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (notebookId) loadQuiz();
+  }, [notebookId]);
+
+
+  const regenerateQuiz = async () => {
     try {
-      const response = await fetch(`${API}/generate-quiz`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
+      setLoading(true);
+      setError("");
 
-      const data = await response.json();
+      // Get latest notebook text
+      const textRes = await fetch(
+        `${API}/api/notebooks/${notebookId}/text`
+      );
+      const textData = await textRes.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Quiz generation failed");
+      if (!textData.text) {
+        throw new Error("No study material found.");
       }
 
-      setQuizData(data.quiz || []);
+      // Generate + replace quiz
+      const genRes = await fetch(
+        `${API}/api/quiz/generate/${notebookId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: textData.text,
+            userId: localStorage.getItem("userId"),
+          }),
+        }
+      );
+
+      const genData = await genRes.json();
+
+      if (!genRes.ok) {
+        throw new Error(genData.error || "Quiz regeneration failed");
+      }
+
+      // Reset UI state
+      setQuizData(genData.questions);
+      setCurrent(0);
+      setAnswers({});
+      setRevealed({});
+      setSubmitted(false);
+
     } catch (err) {
-      setError(err.message || "Failed to connect to server");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // 🔹 LOADING SCREEN
   if (loading && !error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-black dark:text-white">
@@ -81,7 +145,7 @@ export default function Quiz() {
     );
   }
 
-  // 🔹 ERROR SCREEN
+
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-black dark:text-white">
@@ -92,7 +156,7 @@ export default function Quiz() {
           <p className="text-red-400 text-sm">{error}</p>
 
           <button
-            onClick={() => navigate("/notebookview")}
+            onClick={() => navigate("/notebookview/" + notebookId)}
             className="mt-6 px-6 py-2 rounded-xl border border-red-400/40"
           >
             Go Back
@@ -113,10 +177,16 @@ export default function Quiz() {
         </div>
 
         <button
-          onClick={() => navigate("/notebookview")}
+          onClick={() => navigate("/notebookview/" + notebookId)}
           className="mb-6 px-5 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10"
         >
           ← Back
+        </button>
+        <button
+          onClick={regenerateQuiz}
+          className="mb-4 px-4 py-2 rounded-xl border border-black/10 dark:border-white/10 cursor-pointer hover:border-cyan-400/50"
+        >
+          🔄 Regenerate Quiz
         </button>
 
         {/* START SCREEN */}
@@ -153,11 +223,10 @@ export default function Quiz() {
               {quizData.map((q, i) => (
                 <div
                   key={i}
-                  className={`p-4 rounded-xl border ${
-                    answers[i] === q.answer
+                  className={`p-4 rounded-xl border ${answers[i] === q.answer
                       ? "border-green-400/40 bg-green-400/10"
                       : "border-red-400/40 bg-red-400/10"
-                  }`}
+                    }`}
                 >
                   <p className="font-semibold">{q.question}</p>
                   <p className="text-sm mt-1">
@@ -168,7 +237,7 @@ export default function Quiz() {
             </div>
 
             <button
-              onClick={() => navigate("/notebookview")}
+              onClick={() => navigate("/notebookview/" + notebookId)}
               className="w-full py-3 rounded-xl border border-black/10 dark:border-white/10"
             >
               Back to Notebook
@@ -194,15 +263,14 @@ export default function Quiz() {
                     setAnswers((a) => ({ ...a, [current]: i }));
                     setRevealed((r) => ({ ...r, [current]: true }));
                   }}
-                  className={`w-full text-left px-5 py-3 rounded-xl border ${
-                    !isCurrentRevealed
+                  className={`w-full text-left px-5 py-3 rounded-xl border ${!isCurrentRevealed
                       ? "border-black/10 dark:border-white/10"
                       : i === correctIndex
-                      ? "border-green-400/60 bg-green-400/15"
-                      : i === selectedAnswer
-                      ? "border-red-400/60 bg-red-400/15"
-                      : "border-black/10 dark:border-white/10 opacity-50"
-                  }`}
+                        ? "border-green-400/60 bg-green-400/15"
+                        : i === selectedAnswer
+                          ? "border-red-400/60 bg-red-400/15"
+                          : "border-black/10 dark:border-white/10 opacity-50"
+                    }`}
                 >
                   {opt}
                 </button>
