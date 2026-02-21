@@ -37,10 +37,10 @@ router.post("/upload", upload.array("files"), async (req, res) => {
         );
 
         const classifyRes = await axios.post(
-          "http://127.0.0.1:8000/classify",
-          formData,
-          { headers: formData.getHeaders() }
-        );
+  "http://127.0.0.1:8000/classify",
+  formData,
+  { headers: formData.getHeaders() }
+);
 
         const { subject: predictedSubject, unit: predictedUnit } =
           classifyRes.data;
@@ -101,7 +101,12 @@ router.post("/upload", upload.array("files"), async (req, res) => {
           link: `https://drive.google.com/file/d/${uploadedFile.data.id}/view`,
         });
       } catch (fileErr) {
-        console.error("❌ File error:", file.originalname, fileErr.message);
+        console.error("========== FILE ERROR ==========");
+  console.error("File:", file.originalname);
+  console.error("Message:", fileErr.message);
+  console.error("Stack:", fileErr.stack);
+  console.error("Response:", fileErr.response?.data);
+  console.error("================================");
 
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 

@@ -19,7 +19,7 @@ const notebookRoutes = require("./routes/notebook");
 
 const extracttextRoutes = require("./routes/extracttext"); 
 const quizRoutes = require("./routes/quiz");
-
+const videoRoutes = require("./routes/videoRoutes");
 const app = express();
 const upload = multer({ dest: "uploads/" });
 const uploadMultiple = multer({ dest: "uploads/" });
@@ -45,7 +45,7 @@ app.use("/api/highlights", generateNotesRoute);
 app.use("/api", generateScheduleRoute);
 app.use("/api", extracttextRoutes);
 app.use("/api/notebooks", notebookRoutes);
-
+app.use("/api/videos", videoRoutes);
 
 //
 app.use(youtubeSummarizerRoutes);

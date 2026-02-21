@@ -108,6 +108,7 @@ export default function NotebookView() {
     navigate(`/quiz/${notebookId}`);
   };
 
+
   const requireFiles = (action) => {
     if (selectedFiles.length === 0) return alert("Please select at least one file.");
     action();
@@ -207,9 +208,15 @@ export default function NotebookView() {
         <FeatureCard icon={Clock} title="Daily Study Reminders" description="Smart reminders to keep your study routine consistent." />
         <FeatureCard icon={Calendar} title="Personalized Study Schedule" description="Auto-generated schedules based on exams and syllabus." onClick={() => navigate("/scheduleplanner")} />
         <FeatureCard icon={Plus} title="Generate Quiz" description="Auto-generated quizzes based on your study material." onClick={() => requireFiles(generateQuizFromFiles)} />
-        <FeatureCard icon={Video} title="Youtube Search" description="Find relevant videos based on your notes and topics." onClick={() => navigate("/youtubelink")} />
         <FeatureCard title="Youtube Summarizer" icon={BookOpen} description="Get concise summaries of YouTube videos." onClick={() => navigate("/youtube-summarizer")} />
+        <FeatureCard
+          icon={Video}
+          title="Recommended Study Videos"
+          description="AI-picked videos based on your uploaded notes."
+          onClick={() => navigate(`/videos/${notebookId}`)}
+        />
       </div>
+
     </div>
   );
 }
