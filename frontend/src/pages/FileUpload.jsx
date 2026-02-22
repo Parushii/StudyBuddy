@@ -12,9 +12,8 @@ const FileUpload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (files.length === 0) {
-      setMessage("Please fill all fields and select files.");
+      setMessage("Please select some files to upload.");
       return;
     }
 
@@ -43,7 +42,6 @@ const FileUpload = () => {
         if (failedFiles.length > 0) {
           msg += `⚠️ Failed: ${failedFiles.map(f => `${f.file} (${f.reason})`).join(", ")}`;
         }
-
         setMessage(msg);
       } else {
         setMessage(`Upload failed: ${data.error}`);
@@ -57,67 +55,66 @@ const FileUpload = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden
-      bg-gradient-to-br from-slate-50 via-cyan-50 to-slate-100
-      dark:from-black dark:via-neutral-900 dark:to-black
-      flex items-center justify-center px-6
-    ">
-      {/* grid background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0000000d_1px,transparent_1px),linear-gradient(to_bottom,#0000000d_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff0d_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0d_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+    <div
+      className="relative min-h-screen overflow-hidden flex items-center justify-center px-6"
+      style={{
+        fontFamily: "Garamond, Georgia, serif",
+        backgroundColor: "#E8DCC8",
+        backgroundImage:
+          "repeating-linear-gradient(90deg, rgba(210,180,140,0.25) 0px, rgba(210,180,140,0.25) 2px, transparent 2px, transparent 40px)",
+      }}
+    >
+      {/* Moving Glitter */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        {[...Array(40)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-amber-300 rounded-full opacity-80"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animation: `float ${5 + Math.random() * 5}s linear infinite`,
+              animationDelay: `${Math.random() * 5}s`,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Card */}
-      <div className="relative w-full max-w-xl rounded-3xl
-        bg-white/80 dark:bg-white/5
-        backdrop-blur-xl
-        border border-black/10 dark:border-white/10
-        shadow-[0_30px_80px_rgba(0,0,0,0.18)]
-        p-10
-      ">
+      <div
+        className="relative w-full max-w-xl rounded-3xl bg-white/80 backdrop-blur-xl border border-black/10 shadow-[0_30px_80px_rgba(0,0,0,0.18)] p-10 z-10"
+      >
         {/* Back button */}
         <button
           onClick={() => window.location.href = "/homepage"}
-          className="absolute left-6 top-6 flex items-center gap-2
-            text-sm text-black/60 dark:text-white/60
-            hover:text-black dark:hover:text-white transition cursor-pointer
-          "
+          className="absolute left-6 top-6 flex items-center gap-2 text-sm text-amber-900 hover:text-yellow-700 transition cursor-pointer"
         >
           <ArrowLeft size={16} />
-          Back to home
+          Back to Library
         </button>
 
         {/* Title */}
-        <h2 className="mt-6 text-4xl font-bold text-center tracking-tight">
-          Upload Study Files
+        <h2 className="mt-6 text-4xl font-bold text-center text-amber-800 tracking-tight">
+          Magic Shunter
         </h2>
 
         {/* Subtitle */}
-        <p className="mt-4 text-center text-sm max-w-md mx-auto
-          text-black/60 dark:text-white/60
-        ">
-          Upload once. We’ll automatically organize files into
-          <span className="font-semibold text-cyan-500"> subjects & units</span>
+        <p className="mt-4 text-center text-sm max-w-md mx-auto text-amber-900/70">
+          Drop your study files here. They will automatically be organized into
+          <span className="font-semibold text-amber-600"> subjects & units</span>
           — ready for quizzes, flashcards, and summaries.
         </p>
 
-        {/* Feature row */}
+        {/* Feature Row */}
         <div className="mt-8 grid grid-cols-3 gap-4 text-center text-xs">
-          <div className="rounded-xl p-4 bg-black/5 dark:bg-white/5">
-            ⚡ Auto categorization
-          </div>
-          <div className="rounded-xl p-4 bg-black/5 dark:bg-white/5">
-            🧠 AI-ready content
-          </div>
-          <div className="rounded-xl p-4 bg-black/5 dark:bg-white/5">
-            ⏱️ Saves hours
-          </div>
+          <div className="rounded-xl p-4 bg-amber-200/20 text-amber-900">⚡ Auto categorization</div>
+          <div className="rounded-xl p-4 bg-amber-200/20 text-amber-900">🧠 AI-ready content</div>
+          <div className="rounded-xl p-4 bg-amber-200/20 text-amber-900">⏱️ Saves hours</div>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
-            <label className="block mb-2 text-sm font-medium
-              text-black/70 dark:text-white/70
-            ">
+            <label className="block mb-2 text-sm font-medium text-amber-900/80">
               Select files
             </label>
 
@@ -128,13 +125,13 @@ const FileUpload = () => {
               onChange={handleFileChange}
               className="
                 w-full text-sm
-                text-black/70 dark:text-white/70
+                text-amber-900/80
                 file:mr-3 file:py-3 file:px-5
                 file:rounded-xl
                 file:border-0
                 file:font-medium
-                file:bg-cyan-500 file:text-black
-                hover:file:bg-cyan-400
+                file:bg-amber-600 file:text-white
+                hover:file:bg-amber-500
                 transition cursor-pointer
               "
             />
@@ -143,14 +140,11 @@ const FileUpload = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`
-              w-full py-4 rounded-2xl font-semibold
-              transition-all duration-300
+            className={`w-full py-4 rounded-2xl font-semibold transition-all duration-300
               ${loading
-                ? "bg-black/30 dark:bg-white/30 cursor-not-allowed"
-                : "bg-black dark:bg-white text-white dark:text-black hover:scale-[1.02] hover:shadow-xl"
-              }
-            `}
+                ? "bg-amber-300 cursor-not-allowed text-white"
+                : "bg-amber-700 hover:bg-amber-600 text-white hover:scale-[1.02] hover:shadow-xl"
+              }`}
           >
             {loading ? "Uploading & organizing…" : "Upload & Auto-Organize"}
           </button>
@@ -158,9 +152,7 @@ const FileUpload = () => {
 
         {/* Message */}
         {message && (
-          <pre className="mt-8 text-center text-sm whitespace-pre-wrap
-            text-black/70 dark:text-white/70
-          ">
+          <pre className="mt-8 text-center text-sm whitespace-pre-wrap text-amber-900/80">
             {message}
           </pre>
         )}

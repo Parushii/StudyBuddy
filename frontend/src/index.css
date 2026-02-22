@@ -1,1 +1,18 @@
 @import "tailwindcss";
+body {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10vh);
+    opacity: 0;
+  }
+}
