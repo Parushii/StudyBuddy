@@ -1,8 +1,7 @@
-import React, { useRef,useEffect,useState } from "react";
-import {Upload,Mic,Plus,Sparkles,BookOpen,Video,Trash2,Clock,Calendar} from "lucide-react";
+import React, { useRef, useEffect, useState } from "react";
+import { Upload, Mic, Plus, Sparkles, BookOpen, Video, Trash2, Clock, Calendar } from "lucide-react";
 import SubjectSidebar from "./SubjectSidebar";
-import { useNavigate,useLocation, useParams } from "react-router-dom";
-import { useSelectedFiles } from "../context/SelectedFilesContext";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
 
 const FeatureCard = ({ icon: Icon, title, description, onClick }) => (
@@ -41,56 +40,56 @@ export default function NotebookView() {
 
   const fileInputRef = useRef(null);
 
-  const { selectedFiles, toggleFile, removeFile, clearAll, addLocalFiles } = useSelectedFiles();
 
-  // FETCH NOTEBOOK NAME
-  useEffect(() => {
-    if (!notebookId) return;
+  // NotebookView.jsx - replace context with local state
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
-    const fetchNotebook = async () => {
-      const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-      const res = await axios.get(`${API}/api/notebooks/${notebookId}`);
-      setNotebookName(res.data.name);
-    };
+  const refreshFiles = async () => {
+    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    const res = await axios.get(`${API}/api/notebooks/${notebookId}`);
+    setNotebookName(res.data.name);
+    setSelectedFiles(res.data.sourceFiles.map((f) => ({
+      id: f._id,
+      name: f.name,
+      source: f.source,
+      driveFileId: f.driveFileId || null,
+    })));
+  };
 
-    fetchNotebook();
-  }, [notebookId]);
+  useEffect(() => { if (notebookId) refreshFiles(); }, [notebookId]);
 
-  // HANDLE LOCAL FILE UPLOAD
   const handleUpload = async (e) => {
-    const files = Array.from(e.target.files);
-
-    const mapped = files.map((file) => ({
-      id: `${file.name}-${crypto.randomUUID()}`,
-      name: file.name,
-      localFile: file,
-      source: "local",
-    }));
-
-    addLocalFiles(mapped);
-
     const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
-
+    Array.from(e.target.files).forEach((f) => formData.append("files", f));
     const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
     await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, formData);
-
+    await refreshFiles();
     e.target.value = "";
   };
 
-  // HANDLE DRIVE FILE UPLOAD
-  const uploadDriveFiles = async () => {
-    const driveFiles = selectedFiles.filter((f) => f.source === "drive");
-    if (driveFiles.length === 0) return;
-
+  const handleDriveFileClick = async (file) => {
     const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-    await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, {
-      driveFiles: JSON.stringify(
-        driveFiles.map((f) => ({ id: f.id, name: f.name }))
-      ),
-    });
+    const existing = selectedFiles.find((f) => f.driveFileId === file.id);
+    if (existing) {
+      await axios.delete(`${API}/api/notebooks/${notebookId}/remove-file/${existing.id}`);
+    } else {
+      await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, {
+        driveFiles: JSON.stringify([{ id: file.id, name: file.name }]),
+      });
+    }
+    await refreshFiles();
+  };
 
-    alert("Drive files added successfully!");
+  const handleRemoveFile = async (fileId) => {
+    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    await axios.delete(`${API}/api/notebooks/${notebookId}/remove-file/${fileId}`);
+    await refreshFiles();
+  };
+
+  const handleClearAll = async () => {
+    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    await axios.delete(`${API}/api/notebooks/${notebookId}/clear-files`);
+    setSelectedFiles([]);
   };
 
   // FLASHCARDS / QUIZ GENERATORS
@@ -148,7 +147,8 @@ export default function NotebookView() {
               <h3 className="text-sm font-medium">
                 Selected Files ({selectedFiles.length})
               </h3>
-              <button onClick={clearAll} className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600">
+              <button onClick={handleClearAll}
+                className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600">
                 <Trash2 size={14} /> Clear all
               </button>
             </div>
@@ -156,7 +156,8 @@ export default function NotebookView() {
               {selectedFiles.map((file) => (
                 <div key={file.id} className="flex justify-between items-center text-sm p-2 rounded bg-black/5 dark:bg-white/5">
                   <span className="truncate">{file.name}</span>
-                  <button onClick={() => removeFile(file.id)} className="text-red-500 hover:text-red-600">✕</button>
+                  <button onClick={() => handleRemoveFile(file.id)}
+                    className="text-red-500 hover:text-red-600">✕</button>
                 </div>
               ))}
             </div>
@@ -174,13 +175,13 @@ export default function NotebookView() {
 
         {/* DRIVE FILES */}
         <div className="flex-1 overflow-y-auto">
-          <button
+          {/* <button
             onClick={uploadDriveFiles}
             className="w-full mb-2 py-2 rounded-xl bg-cyan-500 text-white text-sm hover:bg-cyan-600 transition"
           >
             Add Selected Drive Files
-          </button>
-          <SubjectSidebar selectedFiles={selectedFiles} onAddFile={toggleFile} />
+          </button> */}
+          <SubjectSidebar selectedFiles={selectedFiles} onFileClick={handleDriveFileClick} />
         </div>
 
         <button

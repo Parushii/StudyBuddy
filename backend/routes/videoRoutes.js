@@ -53,7 +53,7 @@ ${combinedText}
 
     try {
       const geminiResponse = await generateWithGemini(prompt);
-
+      console.log("Raw Gemini response:", geminiResponse);
       // Clean Gemini response (sometimes it wraps in ```json)
       const cleaned = geminiResponse
         .replace(/```json/g, "")
@@ -62,6 +62,7 @@ ${combinedText}
 
       topics = JSON.parse(cleaned);
     } catch (err) {
+      console.error("Gemini parsing error:", err);
       console.log("Gemini parsing failed. Using fallback topics.");
       topics = [
         "Natural Language Processing",

@@ -8,7 +8,6 @@ import {
   FaChevronRight,
   FaCheckCircle,
 } from "react-icons/fa";
-import { useSelectedFiles } from "../context/SelectedFilesContext";
 
 const FileIcon = ({ name }) =>
   name?.endsWith(".pdf") ? (
@@ -17,15 +16,13 @@ const FileIcon = ({ name }) =>
     <FaFileAlt className="text-black/60 dark:text-white/60" />
   );
 
-export default function SubjectSidebar() {
+export default function SubjectSidebar({ selectedFiles, onFileClick }) {
   const [subjects, setSubjects] = useState([]);
   const [openSubject, setOpenSubject] = useState(null);
   const [openUnit, setOpenUnit] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const { selectedFiles, toggleFile } = useSelectedFiles();
   const [collapsed, setCollapsed] = useState(true);
 
 
@@ -47,7 +44,7 @@ export default function SubjectSidebar() {
   }, []);
 
   const isSelected = (fileId) =>
-    selectedFiles.some((f) => f.id === fileId);
+  selectedFiles.some((f) => f.driveFileId === fileId);
 
   if (loading) {
     return (
@@ -137,13 +134,7 @@ export default function SubjectSidebar() {
                               return (
                                 <div
                                   key={file.id}
-                                  onClick={() =>
-                                    toggleFile({
-                                      id: file.id,
-                                      name: file.name,
-                                      source: "drive",   // ✅ YOU define it here
-                                    })
-                                  }
+                                  onClick={() => onFileClick({ id: file.id, name: file.name })}
 
                                   className={`flex items-center gap-2 p-2 rounded
                               cursor-pointer transition

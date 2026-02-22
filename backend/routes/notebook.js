@@ -53,110 +53,148 @@ router.get("/", authMiddleware, async (req, res) => {
 });
 
 router.post("/:id/add-files", upload.array("files"), async (req, res) => {
-    try {
-        const notebook = await Notebook.findById(req.params.id);
-        if (!notebook) return res.status(404).json({ error: "Notebook not found" });
+  try {
+    const notebook = await Notebook.findById(req.params.id);
+    if (!notebook)
+      return res.status(404).json({ error: "Notebook not found" });
 
-        /* ===============================
-            HANDLE LOCAL FILES
-        =============================== */
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                const ext = file.originalname.split(".").pop().toLowerCase();
-                let text = "";
+    /* ===============================
+       HANDLE LOCAL FILES
+    =============================== */
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const ext = file.originalname.split(".").pop().toLowerCase();
+        let text = "";
 
-                if (ext === "pdf") {
-                    const data = await pdf(fs.readFileSync(file.path));
-                    text = data.text;
-                } else if (ext === "docx") {
-                    const result = await mammoth.extractRawText({ path: file.path });
-                    text = result.value;
-                } else if (ext === "txt") {
-                    text = fs.readFileSync(file.path, "utf-8");
-                } else {
-                    text = await new Promise((resolve, reject) => {
-                        textract.fromFileWithPath(file.path, (err, text) => {
-                            if (err) reject(err);
-                            else resolve(text);
-                        });
-                    });
-                }
-
-                // Only add if not exists by name + source + extractedText
-                const exists = notebook.sourceFiles.some(
-                    f => f.name === file.originalname && f.source === "local" && f.extractedText === text
-                );
-                if (!exists) {
-                    notebook.sourceFiles.push({
-                        name: file.originalname,
-                        source: "local",
-                        extractedText: text,
-                    });
-                }
-
-                fs.unlinkSync(file.path);
-            }
-        }
-
-        /* ===============================
-           HANDLE DRIVE FILES
-        =============================== */
-        let driveFiles = [];
-        if (req.body.driveFiles) {
-            driveFiles = Array.isArray(req.body.driveFiles)
-                ? req.body.driveFiles
-                : JSON.parse(req.body.driveFiles); // <-- make sure JSON.parse
-        }
-
-        for (const file of driveFiles) {
-            const exists = notebook.sourceFiles.some((f) => f.driveFileId === file.id);
-            if (exists) continue;
-
-            const tempPath = await downloadDriveFile(file.id, file.name);
-            const ext = file.name.split(".").pop().toLowerCase();
-            let text = "";
-
-            try {
-                if (ext === "pdf") {
-                    const data = await pdf(fs.readFileSync(tempPath));
-                    text = data.text;
-                } else if (ext === "docx") {
-                    const result = await mammoth.extractRawText({ path: tempPath });
-                    text = result.value;
-                } else if (ext === "txt") {
-                    text = fs.readFileSync(tempPath, "utf-8");
-                } else {
-                    text = await new Promise((resolve, reject) => {
-                        textract.fromFileWithPath(tempPath, (err, t) => {
-                            if (err) {
-                                console.error("Textract error:", err);
-                                resolve("");
-                            } else resolve(t);
-                        });
-                    });
-                }
-            } catch (err) {
-                console.error("Failed to extract text from", file.name, err);
-                text = "";
-            }
-
-            notebook.sourceFiles.push({
-                name: file.name,
-                source: "drive",
-                driveFileId: file.id,
-                extractedText: text,
+        if (ext === "pdf") {
+          const data = await pdf(fs.readFileSync(file.path));
+          text = data.text;
+        } else if (ext === "docx") {
+          const result = await mammoth.extractRawText({ path: file.path });
+          text = result.value;
+        } else if (ext === "txt") {
+          text = fs.readFileSync(file.path, "utf-8");
+        } else {
+          text = await new Promise((resolve, reject) => {
+            textract.fromFileWithPath(file.path, (err, t) => {
+              if (err) resolve("");
+              else resolve(t);
             });
-
-            fs.unlinkSync(tempPath);
+          });
         }
 
-        await notebook.save();
+        const exists = notebook.sourceFiles.some(
+          (f) => f.name === file.originalname && f.extractedText === text
+        );
 
-        res.json({ message: "Files added successfully", notebook });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Failed to process files" });
+        if (!exists) {
+          notebook.sourceFiles.push({
+            name: file.originalname,
+            source: "local",
+            extractedText: text,
+          });
+        }
+
+        fs.unlinkSync(file.path);
+      }
     }
+
+    /* ===============================
+       HANDLE DRIVE FILES
+    =============================== */
+    let driveFiles = [];
+    if (req.body.driveFiles) {
+      driveFiles = Array.isArray(req.body.driveFiles)
+        ? req.body.driveFiles
+        : JSON.parse(req.body.driveFiles);
+    }
+
+    for (const file of driveFiles) {
+      const tempPath = await downloadDriveFile(file.id, file.name);
+      const ext = file.name.split(".").pop().toLowerCase();
+      let text = "";
+
+      try {
+        if (ext === "pdf") {
+          const data = await pdf(fs.readFileSync(tempPath));
+          text = data.text;
+        } else if (ext === "docx") {
+          const result = await mammoth.extractRawText({ path: tempPath });
+          text = result.value;
+        } else if (ext === "txt") {
+          text = fs.readFileSync(tempPath, "utf-8");
+        } else {
+          text = await new Promise((resolve) => {
+            textract.fromFileWithPath(tempPath, (err, t) => {
+              if (err) resolve("");
+              else resolve(t);
+            });
+          });
+        }
+      } catch (err) {
+        console.error("Drive extraction error:", err);
+        text = "";
+      }
+      const existsDrive = notebook.sourceFiles.some((f) => f.driveFileId === file.id);
+        if (existsDrive) continue;
+
+      const exists = notebook.sourceFiles.some(
+        (f) => f.name === file.name && f.extractedText === text
+      );
+
+      if (!exists) {
+        notebook.sourceFiles.push({
+          name: file.name,
+          source: "drive",
+          driveFileId: file.id,
+          extractedText: text,
+        });
+      }
+
+      fs.unlinkSync(tempPath);
+    }
+
+    await notebook.save();
+
+    res.json({ message: "Files added successfully", notebook });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to process files" });
+  }
+});
+
+router.delete("/:id/remove-file/:fileId", async (req, res) => {
+  try {
+    const { id, fileId } = req.params;
+
+    const notebook = await Notebook.findById(id);
+    if (!notebook) return res.status(404).json({ error: "Notebook not found" });
+
+    notebook.sourceFiles = notebook.sourceFiles.filter(
+      (file) => file._id.toString() !== fileId
+    );
+
+    await notebook.save();
+
+    res.json({ message: "File removed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to remove file" });
+  }
+});
+
+router.delete("/:id/clear-files", async (req, res) => {
+  try {
+    const notebook = await Notebook.findById(req.params.id);
+    if (!notebook) return res.status(404).json({ error: "Notebook not found" });
+
+    notebook.sourceFiles = [];
+    await notebook.save();
+
+    res.json({ message: "All files cleared" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to clear files" });
+  }
 });
 
 router.get("/:id/text", async (req, res) => {
