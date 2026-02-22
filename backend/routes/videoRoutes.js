@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Notebook = require("../models/Notebook");
 const { searchYouTube } = require("../services/youtubeService");
-const generateWithGemini = require("../gemini");
+const { generateWithGemini } = require("../gemini");
 
 // POST /api/videos/recommend/:notebookId
 router.post("/recommend/:notebookId", async (req, res) => {

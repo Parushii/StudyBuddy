@@ -118,4 +118,15 @@ ${textContent}
     throw new Error("Gemini content generation failed");
   }
 }
-module.exports = { generateIndexFromText, generateScheduleFromText };
+
+async function generateWithGemini(prompt) {
+  const result = await model.generateContent(prompt);
+  const response = await result.response;
+  return response.text();
+}
+
+module.exports = {
+  generateIndexFromText,
+  generateScheduleFromText,
+  generateWithGemini
+};
