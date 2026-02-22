@@ -119,14 +119,35 @@ export default function Quiz() {
       setAnswers({});
       setRevealed({});
       setSubmitted(false);
-
+      setStarted(false)
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
+  const handleSubmit = async () => {
+  try {
+    const finalScore = quizData.filter((q, i) => answers[i] === q.answer).length;
+    
+    await fetch(`${API}/api/quiz/save-result`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: localStorage.getItem("userId"),
+        notebookId,
+        score: finalScore,
+        total: quizData.length,
+        percentage: Math.round((finalScore / quizData.length) * 100),
+      }),
+    });
+  } catch (err) {
+    console.error("Failed to save result:", err);
+    // don't block the user from seeing results
+  } finally {
+    setSubmitted(true); // always show results even if save fails
+  }
+};
   if (loading && !error) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black text-black dark:text-white">
@@ -289,7 +310,7 @@ export default function Quiz() {
               {current === quizData.length - 1 ? (
                 <button
                   disabled={!isCurrentRevealed}
-                  onClick={() => setSubmitted(true)}
+                  onClick={handleSubmit}
                   className="px-4 py-2 rounded-xl border border-black/10 dark:border-white/10"
                 >
                   Submit

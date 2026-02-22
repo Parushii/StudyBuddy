@@ -7,6 +7,7 @@ const mammoth = require("mammoth");
 const JSZip = require("jszip");
 const WordExtractor = require("word-extractor");
 const Quiz = require("../models/Quiz");
+const QuizResult = require("../models/QuizResult");
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
@@ -87,6 +88,16 @@ function extractJsonArray(text) {
   return match ? match[0] : null;
 }
 
+function shuffleOptions(question) {
+  const correct = question.options[question.answer];
+  const shuffled = [...question.options].sort(() => Math.random() - 0.5);
+  return {
+    ...question,
+    options: shuffled,
+    answer: shuffled.indexOf(correct),
+  };
+}
+
 function normalizeQuizArray(value) {
   if (!Array.isArray(value)) return null;
 
@@ -123,7 +134,7 @@ function normalizeQuizArray(value) {
     .filter(Boolean);
 
   if (quiz.length < 5) return null;
-  return quiz.slice(0, 5);
+  return quiz.slice(0, 5).map(shuffleOptions);
 }
 
 async function generateQuizFromText(text) {
@@ -282,6 +293,33 @@ router.post("/generate-quiz-file", upload.single("file"), async (req, res) => {
   }
 });
 
+router.post("/save-result", async (req, res) => {
+  try {
+    const { userId, notebookId, score, total, percentage } = req.body;
+    
+    const result = await QuizResult.findOneAndUpdate(
+      { userId, notebookId }, // find by both userId AND notebookId
+      { score, total, percentage },
+      { upsert: true, new: true }
+    );
+    
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save result" });
+  }
+});
+
+router.get("/results/:userId", async (req, res) => {
+  try {
+    const results = await QuizResult.find({ userId: req.params.userId })
+      .populate("notebookId", "name")
+      .sort({ createdAt: -1 });
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch results" });
+  }
+});
+
 router.get("/:notebookId", async (req, res) => {
   try {
     const quiz = await Quiz.findOne({
@@ -293,6 +331,4 @@ router.get("/:notebookId", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch quiz" });
   }
 });
-
-
 module.exports = router;

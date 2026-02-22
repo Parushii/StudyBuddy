@@ -4,7 +4,7 @@ const questionSchema = new mongoose.Schema(
   {
     question: String,
     options: [String],
-    correctAnswer: Number,
+    answer: Number,
     explanation: String,
   },
   { _id: false }
