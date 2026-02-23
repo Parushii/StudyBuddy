@@ -1,30 +1,33 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Upload, Mic, Plus, Sparkles, BookOpen, Video, Trash2, Clock, Calendar } from "lucide-react";
 import SubjectSidebar from "./SubjectSidebar";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
+/* ===== Wooden Feature Card ===== */
 const FeatureCard = ({ icon: Icon, title, description, onClick }) => (
   <div
     onClick={onClick}
-    className="relative group cursor-pointer rounded-2xl p-6
-      bg-white dark:bg-black
-      border border-black/10 dark:border-white/10
-      overflow-hidden"
+    className="relative cursor-pointer p-8 rounded-xl transition hover:scale-[1.03]"
+    style={{
+      backgroundColor: "#d2b48c",
+      border: "3px solid #8B5E3C",
+      boxShadow: "4px 4px 0px #5a3a1a",
+      fontFamily: "Garamond, Georgia, serif",
+    }}
   >
-    {/* Aceternity glow */}
-    <div
-      className="absolute inset-0 opacity-0 group-hover:opacity-100
-      transition duration-300
-      bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-indigo-500/10"
-    />
-
+    <div className="absolute inset-0 rounded-xl pointer-events-none" />
     <div className="relative z-10">
-      <div className="flex items-center gap-3 mb-3">
-        <Icon className="text-cyan-500" />
-        <h3 className="text-lg font-medium">{title}</h3>
+      <div className="flex items-center gap-4 mb-4">
+        <Icon size={26} className="text-[#5a3a1a]" />
+        <h3
+          className="text-2xl tracking-wide"
+          style={{ color: "#5a3a1a", textShadow: "1px 1px #c19a6b" }}
+        >
+          {title}
+        </h3>
       </div>
-      <p className="text-sm text-black/70 dark:text-white/70">
+      <p style={{ color: "#4b2e1e" }} className="text-lg">
         {description}
       </p>
     </div>
@@ -33,16 +36,11 @@ const FeatureCard = ({ icon: Icon, title, description, onClick }) => (
 
 export default function NotebookView() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { notebookId } = useParams();
 
   const [notebookName, setNotebookName] = useState("");
-
-  const fileInputRef = useRef(null);
-
-
-  // NotebookView.jsx - replace context with local state
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const fileInputRef = useRef(null);
 
   const refreshFiles = async () => {
     const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
@@ -92,7 +90,6 @@ export default function NotebookView() {
     setSelectedFiles([]);
   };
 
-  // FLASHCARDS / QUIZ GENERATORS
   const generateFlashcardsFromFiles = async () => {
     const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
     const textRes = await axios.get(`${API}/api/notebooks/${notebookId}/text`);
@@ -107,30 +104,71 @@ export default function NotebookView() {
     navigate(`/quiz/${notebookId}`);
   };
 
-
   const requireFiles = (action) => {
     if (selectedFiles.length === 0) return alert("Please select at least one file.");
     action();
   };
 
   return (
-    <div className="min-h-screen flex bg-white dark:bg-black">
-      {/* LEFT */}
-      <div className="w-[26%] min-w-[280px] flex flex-col gap-4 p-6 border-r border-black/10 dark:border-white/10">
-        <h1 className="text-xl font-bold text-center">{notebookName}</h1>
+    <div
+      className="min-h-screen flex relative overflow-hidden"
+      style={{
+        fontFamily: "Garamond, Georgia, serif",
+        backgroundColor: "#E8DCC8",
+        backgroundImage:
+          "repeating-linear-gradient(90deg, rgba(210,180,140,0.25) 0px, rgba(210,180,140,0.25) 2px, transparent 2px, transparent 40px)",
+      }}
+    >
 
-        {/* LOCAL FILE UPLOAD */}
-        <div className="rounded-2xl p-4 border border-black/10 dark:border-white/10">
-          <h2 className="text-sm font-medium mb-3 flex items-center gap-2">
-            <Upload size={16} className="text-cyan-500" />
-            Upload Study Material
+      {/* ===== FLOATING GLITTER ===== */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        {[...Array(35)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-3 h-3 bg-amber-300 rounded-full opacity-70"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animation: `float ${5 + Math.random() * 5}s linear infinite`,
+              animationDelay: `${Math.random() * 5}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* LEFT PANEL */}
+      <div className="w-[28%] min-w-[320px] p-8 flex flex-col gap-8 border-r border-amber-900/40 relative z-10">
+
+        <h1
+          className="text-3xl text-center"
+          style={{ color: "#5a3a1a", textShadow: "1px 1px #c19a6b" }}
+        >
+          {notebookName}
+        </h1>
+
+        {/* Upload */}
+        <div
+          className="p-6 rounded-xl"
+          style={{
+            backgroundColor: "#d2b48c",
+            border: "3px solid #8B5E3C",
+            boxShadow: "4px 4px 0px #5a3a1a",
+          }}
+        >
+          <h2 className="text-xl mb-4 flex items-center gap-3 text-[#5a3a1a]">
+            <Upload size={22} /> Upload Study Material
           </h2>
+
           <div
             onClick={() => fileInputRef.current.click()}
-            className="rounded-xl border border-dashed border-black/20 dark:border-white/20 p-4 text-xs text-center cursor-pointer hover:border-cyan-400 transition"
+            className="p-5 text-lg text-center cursor-pointer rounded-md"
+            style={{
+              backgroundColor: "#E8DCC8",
+              border: "2px dashed #8B5E3C",
+            }}
           >
-            Click or drag files here
+            Click to add scrolls 📜
           </div>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -140,84 +178,84 @@ export default function NotebookView() {
           />
         </div>
 
-        {/* SELECTED FILES */}
-        {selectedFiles.length > 0 ? (
-          <div className="rounded-2xl p-4 border border-black/10 dark:border-white/10">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm font-medium">
-                Selected Files ({selectedFiles.length})
-              </h3>
-              <button onClick={handleClearAll}
-                className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600">
-                <Trash2 size={14} /> Clear all
+        {/* Selected Files */}
+        {selectedFiles.length > 0 && (
+          <div
+            className="p-6 rounded-xl"
+            style={{
+              backgroundColor: "#d2b48c",
+              border: "3px solid #8B5E3C",
+              boxShadow: "4px 4px 0px #5a3a1a",
+            }}
+          >
+            <div className="flex justify-between mb-4 text-lg">
+              <span>Selected Scrolls ({selectedFiles.length})</span>
+              <button
+                onClick={handleClearAll}
+                style={{ color: "#8b0000" }}
+              >
+                Clear All
               </button>
             </div>
-            <div className="space-y-2">
+
+            <div className="space-y-3">
               {selectedFiles.map((file) => (
-                <div key={file.id} className="flex justify-between items-center text-sm p-2 rounded bg-black/5 dark:bg-white/5">
+                <div
+                  key={file.id}
+                  className="flex justify-between items-center p-3 rounded text-lg"
+                  style={{
+                    backgroundColor: "#E8DCC8",
+                    border: "1px solid #8B5E3C",
+                  }}
+                >
                   <span className="truncate">{file.name}</span>
-                  <button onClick={() => handleRemoveFile(file.id)}
-                    className="text-red-500 hover:text-red-600">✕</button>
+                  <button onClick={() => handleRemoveFile(file.id)}>✕</button>
                 </div>
               ))}
             </div>
           </div>
-        ) : (
-          <div className="relative rounded-2xl p-6 text-center border border-white/10 dark:border-white/10 bg-white dark:bg-black overflow-hidden group">
-            <div className="absolute inset-0 opacity-100 bg-gradient-to-br from-cyan-500/20 via-purple-500/20 to-indigo-500/20" />
-            <div className="absolute inset-0 bg-[radial-gradient(#0000001a_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff1a_1px,transparent_1px)] bg-[size:20px_20px]" />
-            <div className="relative z-10">
-              <div className="text-xl font-semibold text-black dark:text-white mb-2">No files selected</div>
-              <div className="text-sm text-black/70 dark:text-white/70">Upload files or select from the sidebar to get started</div>
-            </div>
-          </div>
         )}
 
-        {/* DRIVE FILES */}
-        <div className="flex-1 overflow-y-auto">
-          {/* <button
-            onClick={uploadDriveFiles}
-            className="w-full mb-2 py-2 rounded-xl bg-cyan-500 text-white text-sm hover:bg-cyan-600 transition"
-          >
-            Add Selected Drive Files
-          </button> */}
-          <SubjectSidebar selectedFiles={selectedFiles} onFileClick={handleDriveFileClick} />
+        {/* Drive Files Container Styled */}
+        <div
+          className="rounded-xl p-4"
+          style={{
+            backgroundColor: "#d2b48c",
+            border: "3px solid #8B5E3C",
+            boxShadow: "4px 4px 0px #5a3a1a",
+          }}
+        >
+          <SubjectSidebar
+            selectedFiles={selectedFiles}
+            onFileClick={handleDriveFileClick}
+          />
         </div>
 
+        {/* Voice Button */}
         <button
-          className="rounded-xl py-3 border border-black/10 dark:border-white/10 flex items-center justify-center gap-2 cursor-pointer mt-2"
           onClick={() => navigate("/voicetotext")}
+          className="py-4 text-xl rounded-md"
+          style={{
+            background: "linear-gradient(to bottom, #8B5E3C, #5a3a1a)",
+            border: "2px solid #3e2412",
+            color: "#f5e6cc",
+            boxShadow: "4px 4px 0px #2e1a0d",
+          }}
         >
-          <Mic size={16} /> Record Voice Note
+          🎙 Record Voice Note
         </button>
       </div>
 
-      {/* RIGHT - Feature Cards */}
-      <div className="flex-1 grid grid-cols-2 gap-6 p-6">
-        <FeatureCard
-          icon={Sparkles}
-          title="Highlight Key Topics"
-          description="Identify important concepts automatically from your notes."
-          onClick={() => requireFiles(() => navigate("/highlighttopics/" + notebookId))}
-        />
-        <FeatureCard
-          icon={BookOpen}
-          title="Summaries & Flashcards"
-          description="Create concise summaries and quick revision flashcards."
-          onClick={() => requireFiles(generateFlashcardsFromFiles)}
-        />
-        <FeatureCard icon={Clock} title="Daily Study Reminders" description="Smart reminders to keep your study routine consistent." />
-        <FeatureCard icon={Calendar} title="Personalized Study Schedule" description="Auto-generated schedules based on exams and syllabus." onClick={() => navigate("/scheduleplanner")} />
-        <FeatureCard icon={Plus} title="Generate Quiz" description="Auto-generated quizzes based on your study material." onClick={() => requireFiles(generateQuizFromFiles)} />
-        <FeatureCard title="Youtube Summarizer" icon={BookOpen} description="Get concise summaries of YouTube videos." onClick={() => navigate("/youtube-summarizer")} />
-        <FeatureCard
-          icon={Video}
-          title="Recommended Study Videos"
-          description="AI-picked videos based on your uploaded notes."
-          onClick={() => navigate(`/videos/${notebookId}`)}
-        />
+      {/* RIGHT PANEL */}
+      <div className="flex-1 grid grid-cols-2 gap-10 p-10 relative z-10">
+        <FeatureCard icon={Sparkles} title="Highlight Key Topics" description="Identify important concepts automatically." onClick={() => requireFiles(() => navigate("/highlighttopics/" + notebookId))} />
+        <FeatureCard icon={BookOpen} title="Summaries & Flashcards" description="Create concise summaries and flashcards." onClick={() => requireFiles(generateFlashcardsFromFiles)} />
+        <FeatureCard icon={Clock} title="Daily Study Reminders" description="Smart reminders for consistency." />
+        <FeatureCard icon={Calendar} title="Study Schedule" description="Auto-generated schedules." onClick={() => navigate("/scheduleplanner")} />
+        <FeatureCard icon={Plus} title="Generate Quiz" description="Auto-generated quizzes." onClick={() => requireFiles(generateQuizFromFiles)} />
+        <FeatureCard icon={BookOpen} title="YouTube Summarizer" description="Summarize YouTube lectures." onClick={() => navigate("/youtube-summarizer")} />
+        <FeatureCard icon={Video} title="Recommended Videos" description="AI-picked study videos." onClick={() => navigate(`/videos/${notebookId}`)} />
       </div>
-
     </div>
   );
 }

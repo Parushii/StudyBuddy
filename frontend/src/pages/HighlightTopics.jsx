@@ -31,7 +31,6 @@ export default function HighlightTopics() {
       if (res.data && res.data.chapters?.length > 0) {
         setContent(res.data.chapters);
 
-        // ✅ Auto-select first topic
         const firstFile = res.data.chapters[0];
         const firstChapter = firstFile?.chapters?.[0];
         const firstTopic = firstChapter?.topics?.[0];
@@ -65,7 +64,6 @@ export default function HighlightTopics() {
 
       setContent(res.data.chapters);
 
-      // ✅ Auto-select first topic after generation
       const firstFile = res.data.chapters?.[0];
       const firstChapter = firstFile?.chapters?.[0];
       const firstTopic = firstChapter?.topics?.[0];
@@ -85,65 +83,81 @@ export default function HighlightTopics() {
   };
 
   return (
-    <div className="h-screen w-full bg-zinc-950 text-white flex">
-      <aside className="w-[28%] border-r border-zinc-800 p-6 overflow-y-auto">
-        <h2 className="text-lg font-semibold mb-4 text-purple-400">
+    <div className="h-screen w-full bg-[#fdf6ec] flex relative overflow-hidden">
+
+      {/* ✨ Glitter Overlay */}
+      <div className="pointer-events-none absolute inset-0 opacity-20 animate-pulse bg-[radial-gradient(circle_at_20%_30%,#ffffff_2px,transparent_3px),radial-gradient(circle_at_70%_60%,#fff8dc_2px,transparent_3px)] bg-[length:120px_120px]" />
+
+      {/* SIDEBAR */}
+      <aside className="w-[28%] border-r border-[#e6c79c] p-8 overflow-y-auto bg-[#fff8ee]">
+        <h2 className="text-2xl font-bold mb-6 text-[#5c4033]">
           📖 Contents
         </h2>
 
         {loading && (
-          <p className="text-sm text-zinc-400">
+          <p className="text-base text-[#8b6f47]">
             Generating structured notes…
           </p>
         )}
 
         {Array.isArray(content) &&
           content.map((fileGroup) => (
-            <div key={fileGroup.fileName} className="mb-8">
-              {/* ✅ File Name */}
-              <h3 className="text-sm text-zinc-400 mb-3">
+            <div key={fileGroup.fileName} className="mb-10">
+              
+              <h3 className="text-base text-[#8b6f47] mb-4 font-medium">
                 📄 {fileGroup.fileName}
               </h3>
 
               {fileGroup.chapters.map((chapter) => (
                 <div key={chapter.chapterTitle} className="mb-6">
-                  <p className="text-purple-400 font-semibold mb-3">
+                  <p className="text-lg font-semibold mb-3 text-[#4b2e2e]">
                     {chapter.chapterTitle}
                   </p>
 
-                  {chapter.topics.map((topic) => (
-                    <button
-                      key={topic.topicTitle}
-                      onClick={() =>
-                        setSelectedTopic({
-                          title: topic.topicTitle,
-                          content: topic.content,
-                        })
-                      }
-                      className="block text-left w-full px-2 py-1 rounded-md hover:bg-zinc-800 transition"
-                    >
-                      • {topic.topicTitle}
-                    </button>
-                  ))}
+                  {chapter.topics.map((topic) => {
+                    const isActive =
+                      selectedTopic.title === topic.topicTitle;
+
+                    return (
+                      <button
+                        key={topic.topicTitle}
+                        onClick={() =>
+                          setSelectedTopic({
+                            title: topic.topicTitle,
+                            content: topic.content,
+                          })
+                        }
+                        className={`block text-left w-full px-4 py-2 rounded-xl transition text-base
+                        ${
+                          isActive
+                            ? "bg-[#d2b48c] text-[#3e2723] font-medium shadow-sm"
+                            : "hover:bg-[#f5deb3]/70 text-[#5c4033]"
+                        }`}
+                      >
+                        • {topic.topicTitle}
+                      </button>
+                    );
+                  })}
                 </div>
               ))}
             </div>
           ))}
       </aside>
 
-      <main className="flex-1 p-10 flex flex-col">
-        <h1 className="text-3xl font-bold mb-6 text-purple-300">
+      {/* MAIN CONTENT */}
+      <main className="flex-1 p-12 flex flex-col relative z-10">
+        <h1 className="text-4xl font-bold mb-8 text-[#4b2e2e]">
           {selectedTopic.title}
         </h1>
 
-        <div className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl p-6 leading-relaxed text-zinc-200 whitespace-pre-wrap">
+        <div className="flex-1 bg-[#d2b48c] border border-[#c19a6b] rounded-2xl p-8 leading-relaxed text-[#3e2723] whitespace-pre-wrap shadow-md text-lg">
           {selectedTopic.content}
         </div>
 
-        <div className="mt-6">
+        <div className="mt-8">
           <button
             onClick={regenerateHighlights}
-            className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 transition"
+            className="px-6 py-3 rounded-xl bg-[#8b5e3c] hover:bg-[#6f4e37] text-white transition text-lg shadow-sm"
           >
             🔄 Regenerate Highlights
           </button>

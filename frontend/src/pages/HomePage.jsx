@@ -282,37 +282,82 @@ export default function HomePage() {
       {/* ===== CREATE RACK MODAL ===== */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="w-[420px] rounded-2xl bg-zinc-900 border border-zinc-800 p-6 shadow-2xl">
-            <h2 className="text-xl font-semibold text-purple-400 mb-2">
-              Create New IntelliRack
-            </h2>
 
-            <input
-              autoFocus
-              type="text"
-              placeholder="e.g. DBMS Final Revision"
-              value={newRackName}
-              onChange={(e) => setNewRackName(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-zinc-800 outline-none focus:ring-2 focus:ring-purple-500 mb-4"
-            />
+            <div
+  className="w-[460px] rounded-xl p-8 shadow-2xl relative"
+  style={{
+    backgroundColor: "#E8DCC8",
+    backgroundImage:
+      "repeating-linear-gradient(90deg, rgba(210,180,140,0.25) 0px, rgba(210,180,140,0.25) 2px, transparent 2px, transparent 40px)",
+    border: "3px solid #8B5E3C",
+  }}
+>
+  {/* Wooden Frame Effect */}
+  <div className="absolute inset-0 rounded-xl border-[6px] border-[#5a3a1a] pointer-events-none" />
+  <div className="absolute inset-3 rounded-lg border border-amber-900/40 pointer-events-none" />
 
-            <div className="flex justify-end gap-3">
-              <button
-                className="px-4 py-2 rounded-lg border border-zinc-700 hover:bg-zinc-800 transition"
-                onClick={() => setShowModal(false)}
-              >
-                Cancel
-              </button>
+  {/* Title */}
+  <h2
+    className="text-2xl text-center mb-6 tracking-wide"
+    style={{
+      fontFamily: "Garamond, Georgia, serif",
+      color: "#5a3a1a",
+      textShadow: "1px 1px 0px #c19a6b",
+    }}
+  >
+    ✨ Create a New IntelliRack
+  </h2>
 
-              <button
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 transition"
-                onClick={createNewRack}
-              >
-                Create
-              </button>
-            </div>
+  {/* Engraved Input */}
+  <input
+    autoFocus
+    type="text"
+    placeholder="e.g. DBMS Final Revision"
+    value={newRackName}
+    onChange={(e) => setNewRackName(e.target.value)}
+    className="w-full px-5 py-3 rounded-md mb-6 outline-none"
+    style={{
+      backgroundColor: "#d2b48c",
+      border: "2px solid #8B5E3C",
+      color: "#4b2e1e",
+      fontFamily: "Garamond, Georgia, serif",
+      boxShadow:
+        "inset 2px 2px 4px rgba(0,0,0,0.2), inset -2px -2px 4px rgba(255,255,255,0.3)",
+    }}
+  />
+
+  {/* Buttons */}
+  <div className="flex justify-end gap-4">
+    <button
+      onClick={() => setShowModal(false)}
+      className="px-5 py-2 rounded-md transition"
+      style={{
+        backgroundColor: "#c19a6b",
+        border: "2px solid #8B5E3C",
+        fontFamily: "Garamond, Georgia, serif",
+        color: "#4b2e1e",
+        boxShadow: "2px 2px 0px #5a3a1a",
+      }}
+    >
+      Cancel
+    </button>
+
+    <button
+      onClick={createNewRack}
+      className="px-5 py-2 rounded-md transition hover:scale-105"
+      style={{
+        background: "linear-gradient(to bottom, #8B5E3C, #5a3a1a)",
+        border: "2px solid #3e2412",
+        fontFamily: "Garamond, Georgia, serif",
+        color: "#f5e6cc",
+        boxShadow: "2px 2px 0px #2e1a0d",
+      }}
+    >
+      Create
+    </button>
+  </div>
+</div>
           </div>
-        </div>
       )}
     </div>
   );
