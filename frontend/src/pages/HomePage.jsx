@@ -33,7 +33,8 @@ const BookSpine = ({ title }) => {
       <div className="absolute top-0 left-0 right-0 h-1 bg-white/20 rounded-t-sm" />
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40 rounded-b-sm" />
 
-      <span className="text-xs text-amber-200 tracking-wide rotate-[-90deg] whitespace-nowrap group-hover:text-yellow-300 transition">
+      {/* Slightly bigger text */}
+      <span className="text-sm text-white-200 tracking-wide rotate-[-90deg] whitespace-nowrap group-hover:text-yellow-300 transition">
         {title.length > 20 ? title.slice(0, 18) + "…" : title}
       </span>
     </div>
@@ -51,15 +52,14 @@ const RackDoor = ({ onClick }) => {
         transition-transform duration-500 origin-left
         group-hover:-rotate-6 group-hover:-translate-x-2"
       >
-        <div className="absolute inset-2 border border-amber-900/40 rounded-sm" />
+        <div className="absolute inset-2 border border-white-900/40 rounded-sm" />
         <div className="absolute top-6 bottom-6 left-1/2 w-[1px] bg-black/30" />
         <div className="absolute right-2 w-2 h-2 bg-yellow-500 rounded-full shadow" />
         <div className="absolute top-0 left-0 right-0 h-1 bg-white/20 rounded-t-sm" />
       </div>
 
-      {/* Popup */}
       <div className="absolute -top-14 left-1/2 -translate-x-1/2 
-        bg-amber-900 text-amber-100 text-xs px-4 py-2 rounded-md
+        bg-white-900/90 backdrop-blur-sm text-white-100 text-sm px-4 py-2 rounded-md
         opacity-0 group-hover:opacity-100
         transition-opacity duration-300 shadow-lg whitespace-nowrap">
         ✨ Enter the IntelliRack
@@ -72,40 +72,45 @@ export default function HomePage() {
   const navigate = useNavigate();
   const [racks, setRacks] = useState([]);
   const [driveSubjects, setDriveSubjects] = useState([]);
-
-  // ================= MODAL STATE =================
   const [showModal, setShowModal] = useState(false);
   const [newRackName, setNewRackName] = useState("");
+  const [loadingArchive, setLoadingArchive] = useState(true);
 
-  // ================= FETCH DATA =================
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
-        }
-
-        const notebookRes = await axios.get(`${API}/api/notebooks`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setRacks(notebookRes.data);
-
-        const driveRes = await axios.get(
-          `${API}/api/drive/drive-structure`,
-          { headers: { Authorization: `Bearer ${token}` }
-        });
-        setDriveSubjects(driveRes.data || []);
-      } catch (err) {
-        console.error(err);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
       }
-    };
 
-    fetchData();
-  }, [navigate]);
+      const notebookRes = await axios.get(`${API}/api/notebooks`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRacks(notebookRes.data);
 
-  // ================= CREATE NEW RACK =================
+      // START loader
+      setLoadingArchive(true);
+
+      const driveRes = await axios.get(
+        `${API}/api/drive/drive-structure`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setDriveSubjects(driveRes.data || []);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      // STOP loader
+      setLoadingArchive(false);
+    }
+  };
+
+  fetchData();
+}, [navigate]);
+
   const createNewRack = async () => {
     if (!newRackName.trim()) return;
 
@@ -115,9 +120,7 @@ export default function HomePage() {
       const res = await axios.post(
         `${API}/api/notebooks`,
         { name: newRackName },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setRacks((prev) => [res.data, ...prev]);
@@ -134,43 +137,53 @@ export default function HomePage() {
 
   return (
     <div
-      className="min-h-screen text-amber-100 text-lg flex relative overflow-hidden"
+      className="min-h-screen text-white text-xl flex relative overflow-hidden"
       style={{
         fontFamily: "Garamond, Georgia, serif",
-        backgroundColor: "#E8DCC8",
-        backgroundImage:
-          "repeating-linear-gradient(90deg, rgba(210,180,140,0.25) 0px, rgba(210,180,140,0.25) 2px, transparent 2px, transparent 40px)",
+        backgroundImage: "url('/library.jpg')",
+        backgroundSize: "cover",        // keeps it elegant
+  backgroundPosition: "center",
+  backgroundAttachment: "fixed",  // THIS makes it not scroll
+  backgroundRepeat: "no-repeat"
       }}
     >
-      {/* ===== Floating Glitter ===== */}
+      {/* ===== Dark Overlay ===== */}
+<div className="absolute inset-0 bg-black/55 z-0 pointer-events-none"></div>
+      {/* ===== Fireflies ===== */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         {[...Array(40)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-3 h-3 bg-amber-300 rounded-full opacity-80"
+            className="absolute rounded-full"
             style={{
+              width: `${4 + Math.random() * 4}px`,
+              height: `${4 + Math.random() * 4}px`,
+              backgroundColor: "#fde68a",
+              boxShadow: "0 0 10px 4px rgba(255, 223, 100, 0.9)",
               left: `${Math.random() * 100}%`,
-              animation: `float ${5 + Math.random() * 5}s linear infinite`,
+              top: `${Math.random() * 100}%`,
+              animation: `floatFirefly ${6 + Math.random() * 6}s ease-in-out infinite`,
               animationDelay: `${Math.random() * 5}s`,
+              opacity: 0.8,
             }}
           />
         ))}
       </div>
 
       {/* ===== Sidebar ===== */}
-      <aside className="w-[220px] bg-[#3d2509]/90 border-r border-amber-900/30 p-6 flex flex-col justify-between relative z-10">
+      <aside className="w-[220px] bg-[#3d2509]/70 backdrop-blur-md border-r border-white-900/30 p-6 flex flex-col justify-between relative z-10">
         <div className="space-y-10">
-          <div className="h-16 border border-dashed border-amber-400/40 rounded flex items-center justify-center text-amber-500/60 text-sm">
+          <div className="h-16 border border-dashed border-white-400/40 rounded flex items-center justify-center text-white-500/60 text-base">
             Logo
           </div>
 
-          <h1 className="text-2xl font-semibold tracking-wide text-amber-800">
+          <h1 className="text-3xl font-semibold tracking-wide text-white-800">
             Study Hall
           </h1>
 
           <button
             onClick={() => navigate("/dashboard")}
-            className="hover:text-yellow-600 transition text-sm text-white-900"
+            className="hover:text-yellow-600 transition text-base text-white"
           >
             🏰 Dashboard
           </button>
@@ -181,7 +194,7 @@ export default function HomePage() {
             localStorage.removeItem("token");
             window.location.href = "/login";
           }}
-          className="text-red-500 hover:text-red-400 transition text-sm"
+          className="text-red-500 hover:text-red-400 transition text-base"
         >
           🔥 Leave Hall
         </button>
@@ -189,15 +202,19 @@ export default function HomePage() {
 
       {/* ===== Main Library ===== */}
       <main className="flex-1 overflow-y-auto p-12 relative z-10">
-        <h2 className="text-4xl text-center mb-10 text-amber-800">
+        <h2 className="text-5xl text-center mb-10 text-white-800">
           The Grand Library
         </h2>
 
-        {/* Create Button */}
         <div className="flex justify-center mb-20">
           <button
             onClick={() => setShowModal(true)}
-            className="px-8 py-3 bg-amber-700 hover:bg-amber-600 text-white rounded-full shadow-lg transition"
+            className="px-8 py-3 rounded-full shadow-lg transition backdrop-blur-md"
+            style={{
+              background: "rgba(139,94,60,0.75)",
+              border: "2px solid #8B5E3C",
+              color: "#fff3dc",
+            }}
           >
             ➕ Create New IntelliRack
           </button>
@@ -207,13 +224,13 @@ export default function HomePage() {
         <div className="space-y-24">
           {racks.map((rack) => (
             <div key={rack._id}>
-              <h3 className="text-2xl text-amber-900 mb-6">{rack.name}</h3>
+              <h3 className="text-3xl text-white-900 mb-6">{rack.name}</h3>
 
               <div className="relative">
                 <div className="flex items-end ml-6">
                   <div className="flex items-end gap-4 flex-wrap">
                     {(rack.sourceFiles || []).length === 0 ? (
-                      <div className="text-amber-700/60 italic mb-4">
+                      <div className="text-white-700/60 italic mb-4 text-lg">
                         This shelf awaits knowledge...
                       </div>
                     ) : (
@@ -244,9 +261,10 @@ export default function HomePage() {
         <div className="flex justify-center mt-28">
           <button
             onClick={() => navigate("/upload")}
-            className="w-20 h-20 rounded-full bg-green-600 hover:bg-green-500 
-            shadow-xl flex items-center justify-center text-3xl 
-            transition-transform hover:scale-110"
+            className="w-24 h-24 rounded-full backdrop-blur-md shadow-xl flex items-center justify-center text-4xl transition-transform hover:scale-110"
+            style={{
+              background: "rgba(34,197,94,0.75)",
+            }}
             title="Magic Shunter — Just dump your material in there and it will be assigned to correct shelf."
           >
             🍃
@@ -255,110 +273,91 @@ export default function HomePage() {
 
         {/* ===== Ancient Archive ===== */}
         <div className="mt-32">
-          <h3 className="text-3xl text-amber-800 mb-10">
-            The Ancient Archive
-          </h3>
+  <h3 className="text-4xl text-white-800 mb-10">
+    The Ancient Archive
+  </h3>
 
-          {driveSubjects.map((sub) => (
-            <div key={sub.subject} className="mb-16">
-              <h4 className="text-xl mb-4 text-amber-900">{sub.subject}</h4>
+  {loadingArchive ? (
+    <div className="text-center text-xl text-yellow-300 animate-pulse">
+      📜 Summoning the Ancient Scrolls...
+    </div>
+  ) : (
+    driveSubjects.map((sub) => (
+      <div key={sub.subject} className="mb-16">
+        <h4 className="text-2xl mb-4 text-white-900">
+          {sub.subject}
+        </h4>
 
-              <div className="relative">
-                <div className="flex items-end gap-4 flex-wrap ml-6">
-                  {(sub.children || []).map((unit) =>
-                    (unit.children || []).map((file) => (
-                      <BookSpine key={file.id} title={file.name} />
-                    ))
-                  )}
-                </div>
+        <div className="relative">
+          <div className="flex items-end gap-4 flex-wrap ml-6">
+            {(sub.children || []).map((unit) =>
+              (unit.children || []).map((file) => (
+                <BookSpine key={file.id} title={file.name} />
+              ))
+            )}
+          </div>
 
-                <div className="h-5 bg-gradient-to-r from-[#d2b48c] via-[#c19a6b] to-[#d2b48c] rounded shadow mt-[-6px]" />
-              </div>
-            </div>
-          ))}
+          <div className="h-5 bg-gradient-to-r from-[#d2b48c] via-[#c19a6b] to-[#d2b48c] rounded shadow mt-[-6px]" />
         </div>
+      </div>
+    ))
+  )}
+</div>
+        {/* // ===== CREATE RACK MODAL ===== */}
+{showModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div
+      className="w-[460px] rounded-xl p-8 shadow-2xl relative"
+      style={{
+        background: "rgba(139,94,60,0.95)",
+        border: "3px solid #8B5E3C",
+        fontFamily: "Garamond, Georgia, serif",
+      }}
+    >
+      <h2 className="text-2xl text-center mb-6 text-[#fff3dc]">
+        ✨ Create a New IntelliRack
+      </h2>
+
+      <input
+        autoFocus
+        type="text"
+        placeholder="e.g. DBMS Final Revision"
+        value={newRackName}
+        onChange={(e) => setNewRackName(e.target.value)}
+        className="w-full px-5 py-3 rounded-md mb-6 outline-none text-black"
+      />
+
+      <div className="flex justify-end gap-4">
+        <button
+          onClick={() => setShowModal(false)}
+          className="px-5 py-2 rounded-md bg-gray-400 hover:bg-gray-500 text-black"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={createNewRack}
+          className="px-5 py-2 rounded-md bg-green-600 hover:bg-green-500 text-white"
+        >
+          Create
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </main>
 
-      {/* ===== CREATE RACK MODAL ===== */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-
-            <div
-  className="w-[460px] rounded-xl p-8 shadow-2xl relative"
-  style={{
-    backgroundColor: "#E8DCC8",
-    backgroundImage:
-      "repeating-linear-gradient(90deg, rgba(210,180,140,0.25) 0px, rgba(210,180,140,0.25) 2px, transparent 2px, transparent 40px)",
-    border: "3px solid #8B5E3C",
-  }}
->
-  {/* Wooden Frame Effect */}
-  <div className="absolute inset-0 rounded-xl border-[6px] border-[#5a3a1a] pointer-events-none" />
-  <div className="absolute inset-3 rounded-lg border border-amber-900/40 pointer-events-none" />
-
-  {/* Title */}
-  <h2
-    className="text-2xl text-center mb-6 tracking-wide"
-    style={{
-      fontFamily: "Garamond, Georgia, serif",
-      color: "#5a3a1a",
-      textShadow: "1px 1px 0px #c19a6b",
-    }}
-  >
-    ✨ Create a New IntelliRack
-  </h2>
-
-  {/* Engraved Input */}
-  <input
-    autoFocus
-    type="text"
-    placeholder="e.g. DBMS Final Revision"
-    value={newRackName}
-    onChange={(e) => setNewRackName(e.target.value)}
-    className="w-full px-5 py-3 rounded-md mb-6 outline-none"
-    style={{
-      backgroundColor: "#d2b48c",
-      border: "2px solid #8B5E3C",
-      color: "#4b2e1e",
-      fontFamily: "Garamond, Georgia, serif",
-      boxShadow:
-        "inset 2px 2px 4px rgba(0,0,0,0.2), inset -2px -2px 4px rgba(255,255,255,0.3)",
-    }}
-  />
-
-  {/* Buttons */}
-  <div className="flex justify-end gap-4">
-    <button
-      onClick={() => setShowModal(false)}
-      className="px-5 py-2 rounded-md transition"
-      style={{
-        backgroundColor: "#c19a6b",
-        border: "2px solid #8B5E3C",
-        fontFamily: "Garamond, Georgia, serif",
-        color: "#4b2e1e",
-        boxShadow: "2px 2px 0px #5a3a1a",
-      }}
-    >
-      Cancel
-    </button>
-
-    <button
-      onClick={createNewRack}
-      className="px-5 py-2 rounded-md transition hover:scale-105"
-      style={{
-        background: "linear-gradient(to bottom, #8B5E3C, #5a3a1a)",
-        border: "2px solid #3e2412",
-        fontFamily: "Garamond, Georgia, serif",
-        color: "#f5e6cc",
-        boxShadow: "2px 2px 0px #2e1a0d",
-      }}
-    >
-      Create
-    </button>
-  </div>
-</div>
-          </div>
-      )}
+      {/* Firefly Animation */}
+      <style>
+        {`
+        @keyframes floatFirefly {
+          0% { transform: translateY(0px) translateX(0px); opacity: 0.7; }
+          50% { transform: translateY(-40px) translateX(20px); opacity: 1; }
+          100% { transform: translateY(0px) translateX(0px); opacity: 0.7; }
+        }
+        `}
+      </style>
+      
     </div>
   );
 }

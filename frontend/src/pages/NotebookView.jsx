@@ -4,30 +4,25 @@ import SubjectSidebar from "./SubjectSidebar";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
-/* ===== Wooden Feature Card ===== */
+/* ===== Translucent Wooden Card ===== */
 const FeatureCard = ({ icon: Icon, title, description, onClick }) => (
   <div
     onClick={onClick}
-    className="relative cursor-pointer p-8 rounded-xl transition hover:scale-[1.03]"
+    className="relative cursor-pointer p-8 rounded-2xl transition hover:scale-[1.04] backdrop-blur-md"
     style={{
-      backgroundColor: "#d2b48c",
-      border: "3px solid #8B5E3C",
-      boxShadow: "4px 4px 0px #5a3a1a",
-      fontFamily: "Garamond, Georgia, serif",
+      background: "rgba(101, 67, 33, 0.55)", // translucent wood
+      border: "1px solid rgba(255, 223, 150, 0.25)",
+      boxShadow: "0 0 25px rgba(255, 200, 120, 0.15)",
     }}
   >
-    <div className="absolute inset-0 rounded-xl pointer-events-none" />
-    <div className="relative z-10">
+    <div className="relative z-10 text-amber-100">
       <div className="flex items-center gap-4 mb-4">
-        <Icon size={26} className="text-[#5a3a1a]" />
-        <h3
-          className="text-2xl tracking-wide"
-          style={{ color: "#5a3a1a", textShadow: "1px 1px #c19a6b" }}
-        >
+        <Icon size={26} className="text-amber-300 drop-shadow-[0_0_6px_rgba(255,200,120,0.7)]" />
+        <h3 className="text-2xl tracking-wide font-semibold">
           {title}
         </h3>
       </div>
-      <p style={{ color: "#4b2e1e" }} className="text-lg">
+      <p className="text-lg text-amber-200/90">
         {description}
       </p>
     </div>
@@ -42,8 +37,9 @@ export default function NotebookView() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
 
+  const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
   const refreshFiles = async () => {
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
     const res = await axios.get(`${API}/api/notebooks/${notebookId}`);
     setNotebookName(res.data.name);
     setSelectedFiles(res.data.sourceFiles.map((f) => ({
@@ -55,207 +51,211 @@ export default function NotebookView() {
   };
 
   useEffect(() => { if (notebookId) refreshFiles(); }, [notebookId]);
+const handleUpload = async (e) => {
+  const formData = new FormData();
+  Array.from(e.target.files).forEach((f) =>
+    formData.append("files", f)
+  );
 
-  const handleUpload = async (e) => {
-    const formData = new FormData();
-    Array.from(e.target.files).forEach((f) => formData.append("files", f));
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-    await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, formData);
-    await refreshFiles();
-    e.target.value = "";
-  };
+  await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, formData);
+  await refreshFiles();
+  e.target.value = "";
+};
 
-  const handleDriveFileClick = async (file) => {
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-    const existing = selectedFiles.find((f) => f.driveFileId === file.id);
-    if (existing) {
-      await axios.delete(`${API}/api/notebooks/${notebookId}/remove-file/${existing.id}`);
-    } else {
-      await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, {
-        driveFiles: JSON.stringify([{ id: file.id, name: file.name }]),
-      });
-    }
-    await refreshFiles();
-  };
+const handleDriveFileClick = async (file) => {
+  const existing = selectedFiles.find(
+    (f) => f.driveFileId === file.id
+  );
 
-  const handleRemoveFile = async (fileId) => {
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-    await axios.delete(`${API}/api/notebooks/${notebookId}/remove-file/${fileId}`);
-    await refreshFiles();
-  };
-
-  const handleClearAll = async () => {
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-    await axios.delete(`${API}/api/notebooks/${notebookId}/clear-files`);
-    setSelectedFiles([]);
-  };
-
-  const generateFlashcardsFromFiles = async () => {
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-    const textRes = await axios.get(`${API}/api/notebooks/${notebookId}/text`);
-    navigate("/flashcards/" + notebookId, {
-      state: { extractedText: textRes.data.text },
+  if (existing) {
+    await axios.delete(
+      `${API}/api/notebooks/${notebookId}/remove-file/${existing.id}`
+    );
+  } else {
+    await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, {
+      driveFiles: JSON.stringify([{ id: file.id, name: file.name }]),
     });
-  };
+  }
 
-  const generateQuizFromFiles = async () => {
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-    await axios.get(`${API}/api/notebooks/${notebookId}/text`);
-    navigate(`/quiz/${notebookId}`);
-  };
+  await refreshFiles();
+};
 
-  const requireFiles = (action) => {
-    if (selectedFiles.length === 0) return alert("Please select at least one file.");
-    action();
-  };
+const handleRemoveFile = async (fileId) => {
+  await axios.delete(
+    `${API}/api/notebooks/${notebookId}/remove-file/${fileId}`
+  );
+  await refreshFiles();
+};
+
+const handleClearAll = async () => {
+  await axios.delete(
+    `${API}/api/notebooks/${notebookId}/clear-files`
+  );
+  setSelectedFiles([]);
+};
+
+const generateFlashcardsFromFiles = async () => {
+  const textRes = await axios.get(
+    `${API}/api/notebooks/${notebookId}/text`
+  );
+  navigate("/flashcards/" + notebookId, {
+    state: { extractedText: textRes.data.text },
+  });
+};
+
+const generateQuizFromFiles = async () => {
+  await axios.get(
+    `${API}/api/notebooks/${notebookId}/text`
+  );
+  navigate(`/quiz/${notebookId}`);
+};
+const requireFiles = (action) => {
+  if (selectedFiles.length === 0) {
+    alert("Select at least one scroll 🌿");
+    return;
+  }
+  action();
+};
 
   return (
     <div
-      className="min-h-screen flex relative overflow-hidden"
+      className="min-h-screen flex relative overflow-hidden font-serif"
       style={{
-        fontFamily: "Garamond, Georgia, serif",
-        backgroundColor: "#E8DCC8",
-        backgroundImage:
-          "repeating-linear-gradient(90deg, rgba(210,180,140,0.25) 0px, rgba(210,180,140,0.25) 2px, transparent 2px, transparent 40px)",
+        backgroundImage: "url('/enchanted-forest.jpg')", // 🔥 replace with your image path
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
 
-      {/* ===== FLOATING GLITTER ===== */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        {[...Array(35)].map((_, i) => (
+      {/* Dark overlay for depth */}
+      <div className="absolute inset-0 bg-black/55 backdrop-blur-[2px]" />
+
+      {/* 🐞 Fireflies */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        {[...Array(45)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-3 h-3 bg-amber-300 rounded-full opacity-70"
+            className="absolute w-2 h-2 rounded-full bg-yellow-300"
             style={{
               left: `${Math.random() * 100}%`,
-              animation: `float ${5 + Math.random() * 5}s linear infinite`,
+              top: `${Math.random() * 100}%`,
+              boxShadow: "0 0 12px 4px rgba(255, 230, 150, 0.8)",
+              animation: `firefly ${6 + Math.random() * 6}s ease-in-out infinite`,
               animationDelay: `${Math.random() * 5}s`,
+              opacity: 0.8,
             }}
           />
         ))}
       </div>
 
       {/* LEFT PANEL */}
-      <div className="w-[28%] min-w-[320px] p-8 flex flex-col gap-8 border-r border-amber-900/40 relative z-10">
+      <div className="w-[28%] min-w-[320px] p-8 flex flex-col gap-8 border-r border-amber-200/20 relative z-10 text-amber-100">
 
-        <h1
-          className="text-3xl text-center"
-          style={{ color: "#5a3a1a", textShadow: "1px 1px #c19a6b" }}
-        >
+        <h1 className="text-3xl text-center font-semibold tracking-wide drop-shadow-lg">
           {notebookName}
         </h1>
 
-        {/* Upload */}
-        <div
-          className="p-6 rounded-xl"
-          style={{
-            backgroundColor: "#d2b48c",
-            border: "3px solid #8B5E3C",
-            boxShadow: "4px 4px 0px #5a3a1a",
-          }}
-        >
-          <h2 className="text-xl mb-4 flex items-center gap-3 text-[#5a3a1a]">
-            <Upload size={22} /> Upload Study Material
+        {/* Upload Box */}
+        <div className="p-6 rounded-2xl backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20 shadow-lg">
+          <h2 className="text-xl mb-4 flex items-center gap-3 text-amber-200">
+            <Upload size={22} /> Add Scrolls
           </h2>
 
           <div
             onClick={() => fileInputRef.current.click()}
-            className="p-5 text-lg text-center cursor-pointer rounded-md"
-            style={{
-              backgroundColor: "#E8DCC8",
-              border: "2px dashed #8B5E3C",
-            }}
+            className="p-5 text-lg text-center cursor-pointer rounded-lg border border-dashed border-amber-300/40 hover:bg-amber-200/10 transition"
           >
-            Click to add scrolls 📜
+            Click to add ancient texts 📜
           </div>
 
           <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            hidden
-            onChange={handleUpload}
-          />
+  ref={fileInputRef}
+  type="file"
+  multiple
+  hidden
+  onChange={handleUpload}
+/>
         </div>
-
-        {/* Selected Files */}
         {selectedFiles.length > 0 && (
-          <div
-            className="p-6 rounded-xl"
-            style={{
-              backgroundColor: "#d2b48c",
-              border: "3px solid #8B5E3C",
-              boxShadow: "4px 4px 0px #5a3a1a",
-            }}
-          >
-            <div className="flex justify-between mb-4 text-lg">
-              <span>Selected Scrolls ({selectedFiles.length})</span>
-              <button
-                onClick={handleClearAll}
-                style={{ color: "#8b0000" }}
-              >
-                Clear All
-              </button>
-            </div>
+  <div className="p-6 rounded-2xl backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20 shadow-lg">
+    <div className="flex justify-between mb-4 text-lg">
+      <span>Selected Scrolls ({selectedFiles.length})</span>
+      <button
+        onClick={handleClearAll}
+        className="text-red-300 hover:text-red-400 transition"
+      >
+        Clear All
+      </button>
+    </div>
 
-            <div className="space-y-3">
-              {selectedFiles.map((file) => (
-                <div
-                  key={file.id}
-                  className="flex justify-between items-center p-3 rounded text-lg"
-                  style={{
-                    backgroundColor: "#E8DCC8",
-                    border: "1px solid #8B5E3C",
-                  }}
-                >
-                  <span className="truncate">{file.name}</span>
-                  <button onClick={() => handleRemoveFile(file.id)}>✕</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Drive Files Container Styled */}
+    <div className="space-y-3">
+      {selectedFiles.map((file) => (
         <div
-          className="rounded-xl p-4"
-          style={{
-            backgroundColor: "#d2b48c",
-            border: "3px solid #8B5E3C",
-            boxShadow: "4px 4px 0px #5a3a1a",
-          }}
+          key={file.id}
+          className="flex justify-between items-center p-3 rounded-lg bg-amber-100/10 border border-amber-300/20"
         >
-          <SubjectSidebar
-            selectedFiles={selectedFiles}
-            onFileClick={handleDriveFileClick}
-          />
+          <span className="truncate">{file.name}</span>
+          <button onClick={() => handleRemoveFile(file.id)}>✕</button>
         </div>
+      ))}
+    </div>
+  </div>
+)}
 
-        {/* Voice Button */}
-        <button
-          onClick={() => navigate("/voicetotext")}
-          className="py-4 text-xl rounded-md"
-          style={{
-            background: "linear-gradient(to bottom, #8B5E3C, #5a3a1a)",
-            border: "2px solid #3e2412",
-            color: "#f5e6cc",
-            boxShadow: "4px 4px 0px #2e1a0d",
-          }}
-        >
-          🎙 Record Voice Note
-        </button>
+        {/* Sidebar */}
+        <div className="rounded-2xl p-4 backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20">
+          <SubjectSidebar
+  selectedFiles={selectedFiles}
+  onFileClick={handleDriveFileClick}
+/>
+        </div>
       </div>
 
       {/* RIGHT PANEL */}
-      <div className="flex-1 grid grid-cols-2 gap-10 p-10 relative z-10">
-        <FeatureCard icon={Sparkles} title="Highlight Key Topics" description="Identify important concepts automatically." onClick={() => requireFiles(() => navigate("/highlighttopics/" + notebookId))} />
-        <FeatureCard icon={BookOpen} title="Summaries & Flashcards" description="Create concise summaries and flashcards." onClick={() => requireFiles(generateFlashcardsFromFiles)} />
-        <FeatureCard icon={Clock} title="Daily Study Reminders" description="Smart reminders for consistency." />
-        <FeatureCard icon={Calendar} title="Study Schedule" description="Auto-generated schedules." onClick={() => navigate("/scheduleplanner")} />
-        <FeatureCard icon={Plus} title="Generate Quiz" description="Auto-generated quizzes." onClick={() => requireFiles(generateQuizFromFiles)} />
-        <FeatureCard icon={BookOpen} title="YouTube Summarizer" description="Summarize YouTube lectures." onClick={() => navigate("/youtube-summarizer")} />
-        <FeatureCard icon={Video} title="Recommended Videos" description="AI-picked study videos." onClick={() => navigate(`/videos/${notebookId}`)} />
+      <div className="flex-1 grid grid-cols-2 gap-10 p-12 relative z-10">
+
+        <FeatureCard icon={Sparkles} title="Highlight Key Topics" description="Let the forest spirits reveal important concepts." onClick={() => requireFiles(() => navigate("/highlighttopics/" + notebookId))} />
+        <FeatureCard
+  icon={BookOpen}
+  title="Summaries & Flashcards"
+  description="Turn scrolls into wisdom fragments."
+  onClick={() => requireFiles(generateFlashcardsFromFiles)}
+/>
+        <FeatureCard icon={Clock} title="Daily Study Reminders" description="Whispers from the woodland to stay consistent." />
+        <FeatureCard
+  icon={Calendar}
+  title="Study Schedule"
+  description="Align your study rhythm with nature."
+  onClick={() => navigate("/scheduleplanner")}
+/>
+        <FeatureCard
+  icon={Plus}
+  title="Generate Quiz"
+  description="Test your arcane knowledge."
+  onClick={() => requireFiles(generateQuizFromFiles)}
+/>
+        <FeatureCard
+  icon={Video}
+  title="Recommended Videos"
+  description="Curated by the spirits of learning."
+  onClick={() => navigate(`/videos/${notebookId}`)}
+/>
+
       </div>
+
+      {/* 🔥 Firefly animation keyframes */}
+      <style>
+        {`
+          @keyframes firefly {
+            0% { transform: translateY(0px) translateX(0px); opacity: 0.4; }
+            25% { transform: translateY(-20px) translateX(10px); opacity: 1; }
+            50% { transform: translateY(-10px) translateX(-15px); opacity: 0.6; }
+            75% { transform: translateY(-25px) translateX(5px); opacity: 1; }
+            100% { transform: translateY(0px) translateX(0px); opacity: 0.5; }
+          }
+        `}
+      </style>
+
     </div>
   );
 }
