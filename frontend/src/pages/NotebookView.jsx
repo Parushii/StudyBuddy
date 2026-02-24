@@ -237,7 +237,7 @@ const requireFiles = (action) => {
         <FeatureCard
   icon={Video}
   title="Recommended Videos"
-  description="Curated by the spirits of learning."
+  description="Dive into the stream of knowledge."
   onClick={() => navigate(`/videos/${notebookId}`)}
 />
 
