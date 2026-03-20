@@ -8,6 +8,7 @@ const JSZip = require("jszip");
 const WordExtractor = require("word-extractor");
 const Quiz = require("../models/Quiz");
 const QuizResult = require("../models/QuizResult");
+const StudentProgress = require("../models/StudentProgress");
 
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
@@ -292,20 +293,38 @@ router.post("/generate-quiz-file", upload.single("file"), async (req, res) => {
     }
   }
 });
-
-router.post("/save-result", async (req, res) => {
+router.post("/submit", async (req, res) => {
   try {
-    const { userId, notebookId, score, total, percentage } = req.body;
-    
-    const result = await QuizResult.findOneAndUpdate(
-      { userId, notebookId }, // find by both userId AND notebookId
-      { score, total, percentage },
-      { upsert: true, new: true }
-    );
-    
+    const { userId, notebookId, topicTitle, score, total } = req.body;
+
+    const percentage = (score / total) * 100;
+
+    const result = new QuizResult({
+      userId,
+      notebookId,
+      score,
+      total,
+      percentage
+    });
+
+    await result.save();
+
+    const progress = await StudentProgress.findOne({
+      userId,
+      notebookId,
+      topicTitle
+    });
+
+    if (progress) {
+      progress.lastQuizScore = percentage;
+      progress.bestQuizScore = Math.max(progress.bestQuizScore, percentage);
+      await progress.save();
+    }
+
     res.json(result);
+
   } catch (err) {
-    res.status(500).json({ error: "Failed to save result" });
+    res.status(500).json({ error: "Failed to submit quiz" });
   }
 });
 

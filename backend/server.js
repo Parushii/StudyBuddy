@@ -16,6 +16,7 @@ const youtubeSummarizerRoutes = require("./routes/youtubeSummarizer"); //
 const flashcardsRoutes = require("./routes/flashcards"); //
 const { generateIndexFromText, generateScheduleFromText } = require("./gemini");
 const notebookRoutes = require("./routes/notebook");
+const progressRoutes = require("./routes/studentProgress");
 
 const extracttextRoutes = require("./routes/extracttext"); 
 const quizRoutes = require("./routes/quiz");
@@ -46,6 +47,7 @@ app.use("/api", generateScheduleRoute);
 app.use("/api", extracttextRoutes);
 app.use("/api/notebooks", notebookRoutes);
 app.use("/api/videos", videoRoutes);
+app.use("/api/progress",progressRoutes);
 
 //
 app.use(youtubeSummarizerRoutes);

@@ -150,6 +150,19 @@ export default function Flashcards() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
+  const [topicTitle, setTopicTitle] = useState("Flashcards");
+  const [notebook, setNotebook] = useState(null);
+
+useEffect(() => {
+  const fetchNotebook = async () => {
+    const res = await fetch(`${API}/api/notebooks/${notebookId}`);
+    const data = await res.json();
+    setNotebook(data);
+  };
+
+  fetchNotebook();
+}, [notebookId]);
+const subject = notebook?.name || "Unknown";
 
   /* Assign a palette to each card index deterministically */
   const palette = useMemo(
@@ -187,6 +200,20 @@ export default function Flashcards() {
     } catch { setError("Failed to generate flashcards."); }
     finally { setGenerating(false); }
   };
+  const trackFlashcard = async (correct) => {
+    if (!notebook) return;
+  try {
+    await axios.post(`${API}/api/progress/flashcard`, {
+      userId: localStorage.getItem("userId"),
+      notebookId,
+      topicTitle,
+      subject,
+      correct
+    });
+  } catch (err) {
+    console.error("Flashcard tracking failed", err);
+  }
+};
 
   const isFlipped = !!flipped[currentIndex];
   const progress = flashcards.length > 0 ? ((currentIndex + 1) / flashcards.length) * 100 : 0;
@@ -388,7 +415,45 @@ export default function Flashcards() {
                 }}
               >Next →</button>
             </div>
+                <div className="flex justify-center gap-4 mb-6">
 
+  <button
+    onClick={() => {
+      trackFlashcard(true);
+      if (currentIndex < flashcards.length - 1) {
+        setCurrentIndex(i => i + 1);
+        setFlipped({});
+      }
+    }}
+    className="px-5 py-2 rounded-xl text-sm font-medium"
+    style={{
+      background: "linear-gradient(135deg,#6aaa5a,#4a7c3f)",
+      border: "2px solid #2d5a27",
+      color: "#fff"
+    }}
+  >
+    ✅ I knew this
+  </button>
+
+  <button
+    onClick={() => {
+      trackFlashcard(false);
+      if (currentIndex < flashcards.length - 1) {
+        setCurrentIndex(i => i + 1);
+        setFlipped({});
+      }
+    }}
+    className="px-5 py-2 rounded-xl text-sm font-medium"
+    style={{
+      background: "linear-gradient(135deg,#e87040,#c05020)",
+      border: "2px solid #a04010",
+      color: "#fff"
+    }}
+  >
+    ❌ I didn’t know this
+  </button>
+
+</div>
             {/* Regenerate */}
             {extractedText && (
               <div className="text-center">

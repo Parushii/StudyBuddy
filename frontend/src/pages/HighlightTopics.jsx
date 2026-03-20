@@ -78,8 +78,21 @@ export default function HighlightTopics() {
   const [selectedTopic, setSelectedTopic] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(false);
   const [fontSize, setFontSize] = useState(17);
+  const [startTime, setStartTime] = useState(null);
+  const [notebook, setNotebook] = useState(null);
 
   const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+useEffect(() => {
+  const fetchNotebook = async () => {
+    const res = await fetch(`${API}/api/notebooks/${notebookId}`);
+    const data = await res.json();
+    setNotebook(data);
+  };
+
+  fetchNotebook();
+}, [notebookId]);
+const subject = notebook?.name || "Unknown";
+
 
   useEffect(() => { if (notebookId) loadHighlights(); }, [notebookId]);
 
@@ -117,6 +130,55 @@ export default function HighlightTopics() {
       setLoading(false);
     }
   };
+
+  const handleTopicClick = async (topic) => {
+
+  if (startTime && selectedTopic.title) {
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+    await axios.post(`${API}/api/progress/time`, {
+      userId: localStorage.getItem("userId"),
+      notebookId,
+      subject,
+      topicTitle: selectedTopic.title,
+      timeSpent
+    });
+  }
+
+  setSelectedTopic({
+    title: topic.topicTitle,
+    content: topic.content
+  });
+
+  setStartTime(Date.now());
+
+  try {
+    await axios.post(`${API}/api/progress/topic-visit`, {
+      userId: localStorage.getItem("userId"),
+      notebookId,
+      subject,
+      topicTitle: topic.topicTitle
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+useEffect(() => {
+  return () => {
+    if (startTime && selectedTopic.title) {
+      const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+      axios.post(`${API}/api/progress/time`, {
+        userId: localStorage.getItem("userId"),
+        notebookId,
+        subject,
+        topicTitle: selectedTopic.title,
+        timeSpent
+      });
+    }
+  };
+}, [selectedTopic]);
 
   return (
     <div className="h-screen w-full flex" style={{ fontFamily: "Georgia, serif", backgroundColor: "#f0e6d3" }}>
@@ -184,7 +246,7 @@ export default function HighlightTopics() {
                     return (
                       <button
                         key={topic.topicTitle}
-                        onClick={() => setSelectedTopic({ title: topic.topicTitle, content: topic.content })}
+                        onClick={() => handleTopicClick(topic)}
                         className="block text-left w-full px-3 py-2 rounded-lg text-sm mb-1"
                         style={{
                           background: isActive ? "linear-gradient(to right, #fff8f0, #fdf0e0)" : "transparent",
