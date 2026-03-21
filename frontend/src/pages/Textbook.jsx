@@ -57,7 +57,7 @@ export default function TextbookQA() {
         <div className="min-h-screen relative bg-black text-white font-sans overflow-hidden">
             {/* Background Image */}
             <div
-                className="absolute inset-0 bg-cover bg-center opacity-60 pointer-events-none"
+                className="absolute inset-0 bg-cover bg-center opacity-40 pointer-events-none"
                 style={{
                     backgroundImage: 'url("/textbook.jpg")', backgroundSize: "cover",        // keeps it elegant
                     backgroundPosition: "center",
@@ -148,7 +148,7 @@ export default function TextbookQA() {
                         <h2 className="text-xl font-semibold mb-2">Answer:</h2>
                         <p className="whitespace-pre-line leading-relaxed">{answer}</p>
 
-                        {sources.length > 0 && (
+                        {/* {sources.length > 0 && (
                             <div className="mt-4 text-sm">
                                 <h3 className="font-semibold mb-1">Sources:</h3>
                                 <ul className="list-disc list-inside space-y-1">
@@ -159,7 +159,7 @@ export default function TextbookQA() {
                                     ))}
                                 </ul>
                             </div>
-                        )}
+                        )} */}
                     </div>
                 )}
 
