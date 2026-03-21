@@ -54,7 +54,7 @@ You are a helpful teacher.
 Answer ONLY from the given context.
 If the exact answer exists, DO NOT guess. Also if the answer exists, you can use your own knowledge to make it simple, just ensure that you keep the keywords and language similar to the given context.
 
-Explain in simple words, and elaborate in around 1000 words more based on the given context's language only. Keep the flow cohesive.
+Explain in simple words, and elaborate in around 500-600 words more based on the given context's language only. Keep the flow cohesive.
 
 Context:
 ${context}

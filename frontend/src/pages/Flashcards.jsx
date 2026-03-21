@@ -474,3 +474,5 @@ const subject = notebook?.name || "Unknown";
     </div>
   );
 }
+
+export { FloatingLeaves, Fireflies, CornerVine };

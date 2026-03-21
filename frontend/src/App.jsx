@@ -23,6 +23,7 @@ import Quiz from "./pages/Quiz";
 import Flashcards from "./pages/Flashcards";
 import YoutubeSummarizer from "./pages/YoutubeSummarizer";
 import VideoRecommendations from "./pages/VideoRecommendations";
+import Textbook from "./pages/Textbook";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
             <Route path="/flashcards/:notebookId" element={<Flashcards />} />
             <Route path="/youtube-summarizer"  element={<YoutubeSummarizer />} />
             <Route path="/videos/:notebookId" element={<VideoRecommendations />} />
+            <Route path="/textbook"  element={<Textbook />} />
           </Routes>
         </Router>
         </SelectedFilesProvider>
