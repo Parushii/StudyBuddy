@@ -294,17 +294,28 @@ router.post("/generate-quiz-file", upload.single("file"), async (req, res) => {
   }
 });
 router.post("/submit", async (req, res) => {
+  console.log("Quiz submission received:", req.body);
   try {
     const { userId, notebookId, topicTitle, score, total } = req.body;
 
     const percentage = (score / total) * 100;
 
+    const all = await QuizResult.find({});
+console.log("ALL RECORDS:", all);
+    // Count previous attempts for this user + notebook
+    const attempts = await QuizResult.countDocuments({
+      userId: new mongoose.Types.ObjectId(userId),
+      notebookId: new mongoose.Types.ObjectId(notebookId)
+    });
+
+    // Save new attempt with attempt number
     const result = new QuizResult({
-      userId,
-      notebookId,
+      userId: new mongoose.Types.ObjectId(userId),
+      notebookId: new mongoose.Types.ObjectId(notebookId),
       score,
       total,
-      percentage
+      percentage,
+      attempt: attempts + 1,
     });
 
     await result.save();

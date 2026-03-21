@@ -1,7 +1,7 @@
 const { google } = require("googleapis");
 const readline = require("readline");
 const fs = require("fs");
-require("dotenv").config();
+require("dotenv").config({ path: require("path").resolve(__dirname, "../../.env") });
 
 const oAuth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID,
@@ -13,6 +13,7 @@ const SCOPES = ["https://www.googleapis.com/auth/drive.file"];
 
 const authUrl = oAuth2Client.generateAuthUrl({
   access_type: "offline",
+  prompt: "consent",
   scope: SCOPES,
 });
 console.log("Authorize this app by visiting:", authUrl);

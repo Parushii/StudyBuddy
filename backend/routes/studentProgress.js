@@ -1,6 +1,7 @@
 const express = require("express");
 const StudentProgress = require("../models/StudentProgress");
 const QuizResult = require("../models/QuizResult");
+const mongoose = require("mongoose");
 
 const router = express.Router();
 
@@ -91,43 +92,56 @@ router.post("/submit", async (req, res) => {
 
     const percentage = (score / total) * 100;
 
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+    const notebookObjectId = new mongoose.Types.ObjectId(notebookId);
+
+    // Get last attempt
+    const lastAttempt = await QuizResult.findOne({
+      userId: userObjectId,
+      notebookId: notebookObjectId,
+    }).sort({ attempt: -1 });
+
+    const nextAttempt = lastAttempt ? lastAttempt.attempt + 1 : 1;
+
+    // Save with attempt
     const result = new QuizResult({
-      userId,
-      notebookId,
+      userId: userObjectId,
+      notebookId: notebookObjectId,
       subject,
       topicTitle,
       score,
       total,
-      percentage
+      percentage,
+      attempt: nextAttempt, 
     });
 
     await result.save();
 
     let progress = await StudentProgress.findOne({
-      userId,
-      notebookId,
+      userId: userObjectId,
+      notebookId: notebookObjectId,
       subject,
       topicTitle
     });
 
     if (!progress) {
       progress = new StudentProgress({
-        userId,
-        notebookId,
+        userId: userObjectId,
+        notebookId: notebookObjectId,
         subject,
         topicTitle
       });
     }
 
-    if (progress) {
-  progress.lastQuizScore = percentage;
-  progress.bestQuizScore = Math.max(progress.bestQuizScore, percentage);
-  await progress.save();
-}
+    progress.lastQuizScore = percentage;
+    progress.bestQuizScore = Math.max(progress.bestQuizScore || 0, percentage);
+
+    await progress.save();
 
     res.json(result);
 
   } catch (err) {
+    console.error("Error submitting quiz:", err);
     res.status(500).json({ error: "Failed to submit quiz" });
   }
 });

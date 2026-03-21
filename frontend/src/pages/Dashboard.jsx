@@ -9,23 +9,23 @@ import {
 
 /* ── Design tokens ── */
 const C = {
-    bg:            "#f0f7f2",          // light sage background
-    bgInner:       "#e8f4ec",          // slightly deeper sage for depth
-    card:          "#ffffff",          // pure white cards
-    cardHoverGreen:"rgba(26,158,92,0.08)",
+    bg: "#f0f7f2",          // light sage background
+    bgInner: "#e8f4ec",          // slightly deeper sage for depth
+    card: "#ffffff",          // pure white cards
+    cardHoverGreen: "rgba(26,158,92,0.08)",
     cardHoverGold: "rgba(212,146,10,0.08)",
-    emerald:       "#1a9e5c",
+    emerald: "#1a9e5c",
     emeraldBright: "#22c975",
-    emeraldGlow:   "rgba(34,201,117,0.3)",
+    emeraldGlow: "rgba(34,201,117,0.3)",
     emeraldBorder: "rgba(26,158,92,0.2)",
-    gold:          "#c4870a",
-    goldBright:    "#f5b82e",
-    goldGlow:      "rgba(245,184,46,0.35)",
-    goldBorder:    "rgba(196,135,10,0.22)",
-    textDark:      "#0e2a18",
-    textMid:       "#2d5a3a",
-    textSub:       "#6b9478",
-    gridLine:      "rgba(26,158,92,0.07)",
+    gold: "#c4870a",
+    goldBright: "#f5b82e",
+    goldGlow: "rgba(245,184,46,0.35)",
+    goldBorder: "rgba(196,135,10,0.22)",
+    textDark: "#0e2a18",
+    textMid: "#2d5a3a",
+    textSub: "#6b9478",
+    gridLine: "rgba(26,158,92,0.07)",
 };
 
 const PIE_COLORS = [C.emeraldBright, C.goldBright, "rgba(34,201,117,0.25)"];
@@ -33,10 +33,10 @@ const PIE_COLORS = [C.emeraldBright, C.goldBright, "rgba(34,201,117,0.25)"];
 /* ── Glowing light card ── */
 const GlassCard = ({ children, className = "", accent = "green" }) => {
     const [hovered, setHovered] = React.useState(false);
-    const isGold   = accent === "gold";
-    const glowColor = isGold ? C.goldGlow    : C.emeraldGlow;
-    const glowRgb   = isGold ? "212,146,10"  : "26,158,92";
-    const animName  = isGold ? "borderPulseGold" : "borderPulseGreen";
+    const isGold = accent === "gold";
+    const glowColor = isGold ? C.goldGlow : C.emeraldGlow;
+    const glowRgb = isGold ? "212,146,10" : "26,158,92";
+    const animName = isGold ? "borderPulseGold" : "borderPulseGreen";
 
     return (
         <div
@@ -105,19 +105,38 @@ const GlowStyles = () => (
 /* ── Custom Tooltip ── */
 const MysticTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
+
     return (
         <div style={{
-            background: "#fff", border: `1.5px solid ${C.emeraldBorder}`,
-            borderRadius: 12, padding: "10px 16px",
-            fontFamily: "Georgia, serif", fontSize: 13, color: C.textDark,
+            background: "#fff",
+            border: `1.5px solid ${C.emeraldBorder}`,
+            borderRadius: 12,
+            padding: "10px 16px",
+            fontFamily: "Georgia, serif",
+            fontSize: 13,
+            color: C.textDark,
             boxShadow: `0 8px 24px rgba(26,158,92,0.12)`,
         }}>
-            <p style={{ color: C.emerald, fontWeight: "bold", marginBottom: 4 }}>{label}</p>
-            {payload.map((p, i) => (
-                <p key={i} style={{ color: C.gold }}>
-                    {p.name}: {typeof p.value === "number" ? p.value.toFixed(1) : p.value}
-                </p>
-            ))}
+            <p style={{ color: C.emerald, fontWeight: "bold", marginBottom: 4 }}>
+                {label}
+            </p>
+
+            {payload.map((p, i) => {
+                const value = p.value;
+
+                let display;
+                if (value < 1) {
+                    display = `${Math.round(value * 60)} min`;  // 🔥 convert to minutes
+                } else {
+                    display = `${value.toFixed(1)} hrs`;
+                }
+
+                return (
+                    <p key={i} style={{ color: C.gold }}>
+                        {p.name}: {display}
+                    </p>
+                );
+            })}
         </div>
     );
 };
@@ -133,11 +152,11 @@ const StatBadge = ({ icon, label, value, accent = "green" }) => (
 
 /* ════════════════════ DASHBOARD ════════════════════ */
 export default function Dashboard() {
-    const [quizResults,  setQuizResults]  = useState([]);
+    const [quizResults, setQuizResults] = useState([]);
     const [progressData, setProgressData] = useState([]);
 
-    const API         = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-    const username    = localStorage.getItem("userName") || "Student";
+    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    const username = localStorage.getItem("userName") || "Student";
     const displayName = username.charAt(0).toUpperCase() + username.slice(1);
 
     useEffect(() => {
@@ -145,7 +164,7 @@ export default function Dashboard() {
         if (!userId) return;
         const fetchData = async () => {
             try {
-                const quizRes  = await fetch(`${API}/api/quiz/results/${userId}`);
+                const quizRes = await fetch(`${API}/api/quiz/results/${userId}`);
                 const quizData = await quizRes.json();
                 console.log("Quiz results:", quizData);
                 setQuizResults(quizData);
@@ -156,26 +175,67 @@ export default function Dashboard() {
         fetchData();
     }, []);
 
+    const bestResults = Object.values(
+        quizResults.reduce((acc, r) => {
+            const key = r.notebookId._id;
+
+            if (!acc[key] || r.percentage > acc[key].percentage) {
+                acc[key] = r;
+            }
+
+            return acc;
+        }, {})
+    );
+
+    // ✅ ADD THIS BELOW bestResults
+    const attemptsByNotebook = useMemo(() => {
+        const grouped = quizResults.reduce((acc, r) => {
+            const key = r.notebookId?._id || r.notebookId;
+
+            if (!acc[key]) {
+                acc[key] = {
+                    name: r.notebookId?.name || "Notebook",
+                    attempts: []
+                };
+            }
+
+            acc[key].attempts.push({
+                attempt: r.attempt || 1,
+                percentage: r.percentage,
+                createdAt: r.createdAt
+            });
+
+            return acc;
+        }, {});
+
+        // ✅ sort attempts
+        Object.values(grouped).forEach(n => {
+            n.attempts.sort((a, b) => a.attempt - b.attempt);
+        });
+
+        return grouped;
+    }, [quizResults]);
+
     const weeklyProgress = useMemo(() => {
-        const weeks = [0,0,0,0], counts = [0,0,0,0];
+        const weeks = [0, 0, 0, 0], counts = [0, 0, 0, 0];
         const now = new Date();
-        quizResults.forEach((quiz) => {
-            const diffDays  = Math.floor((now - new Date(quiz.createdAt)) / (1000*60*60*24));
+        bestResults.forEach((quiz) => {
+            const diffDays = Math.floor((now - new Date(quiz.createdAt)) / (1000 * 60 * 60 * 24));
             const weekIndex = Math.floor(diffDays / 7);
             if (weekIndex < 4) { const i = 3 - weekIndex; weeks[i] += quiz.percentage; counts[i]++; }
         });
-        return weeks.map((sum, i) => ({ week: `W${i+1}`, score: counts[i] ? Math.round(sum/counts[i]) : 0 }));
-    }, [quizResults]);
+        return weeks.map((sum, i) => ({ week: `W${i + 1}`, score: counts[i] ? Math.round(sum / counts[i]) : 0 }));
+    }, [bestResults]);
 
-    const totalCorrect   = quizResults.reduce((s, r) => s + r.score, 0);
-    const totalQuestions = quizResults.reduce((s, r) => s + r.total, 0);
+    const totalCorrect = bestResults.reduce((s, r) => s + r.score, 0);
+    const totalQuestions = bestResults.reduce((s, r) => s + r.total, 0);
     const totalIncorrect = totalQuestions - totalCorrect;
 
     const quizPie = totalQuestions > 0
         ? [
-            { name: "Correct",   value: Math.round((totalCorrect   / totalQuestions) * 100) },
+            { name: "Correct", value: Math.round((totalCorrect / totalQuestions) * 100) },
             { name: "Incorrect", value: Math.round((totalIncorrect / totalQuestions) * 100) },
-          ]
+        ]
         : [{ name: "No Data", value: 100 }];
 
     const timeData = Object.values(
@@ -186,24 +246,68 @@ export default function Dashboard() {
         }, {})
     );
 
-    const totalTime  = progressData.reduce((s, p) => s + p.timeSpent, 0);
-    const hours      = Math.floor(totalTime / 3600);
-    const minutes    = Math.floor((totalTime % 3600) / 60);
-    const studyTime  = `${hours}h ${minutes}m`;
+    const streakData = useMemo(() => {
+    const activityDates = new Set();
 
-    const mostStudied  = timeData.length > 0 ? timeData.reduce((a,b) => a.hours > b.hours ? a : b).subject : "-";
-    const leastStudied = timeData.length > 0 ? timeData.reduce((a,b) => a.hours < b.hours ? a : b).subject : "-";
+    const normalize = (date) => {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d.getTime();
+    };
 
-    const flashCorrect  = progressData.reduce((s, p) => s + p.flashcardCorrect, 0);
-    const flashWrong    = progressData.reduce((s, p) => s + p.flashcardWrong,   0);
+    progressData.forEach(p => {
+        if (p.timeSpent > 0) {
+            activityDates.add(normalize(p.updatedAt));
+        }
+    });
+
+    quizResults.forEach(q => {
+        activityDates.add(normalize(q.createdAt));
+    });
+
+    // sorted descending
+    const dates = Array.from(activityDates).sort((a, b) => b - a);
+
+    if (dates.length === 0) return 0;
+
+    let streak = 0;
+    let current = new Date();
+    current.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < dates.length; i++) {
+        const d = new Date(dates[i]);
+        const diff = Math.round((current - d) / (1000 * 60 * 60 * 24));
+
+        if (diff === 0 || diff === 1) {
+            streak++;
+            current = new Date(d); 
+            current.setHours(0,0,0,0);
+        } else if (diff > 1) {
+            break; // streak broken
+        }
+    }
+
+    return streak;
+}, [progressData, quizResults]);
+
+    const totalTime = progressData.reduce((s, p) => s + p.timeSpent, 0);
+    const hours = Math.floor(totalTime / 3600);
+    const minutes = Math.floor((totalTime % 3600) / 60);
+    const studyTime = `${hours}h ${minutes}m`;
+
+    const mostStudied = timeData.length > 0 ? timeData.reduce((a, b) => a.hours > b.hours ? a : b).subject : "-";
+    const leastStudied = timeData.length > 0 ? timeData.reduce((a, b) => a.hours < b.hours ? a : b).subject : "-";
+
+    const flashCorrect = progressData.reduce((s, p) => s + p.flashcardCorrect, 0);
+    const flashWrong = progressData.reduce((s, p) => s + p.flashcardWrong, 0);
     const flashAccuracy = flashCorrect + flashWrong > 0
         ? Math.round((flashCorrect / (flashCorrect + flashWrong)) * 100) : 0;
 
-    const avgQuiz    = quizResults.length > 0
+    const avgQuiz = quizResults.length > 0
         ? quizResults.reduce((s, r) => s + r.percentage, 0) / quizResults.length : 0;
     const focusScore = Math.round(avgQuiz * 0.5 + flashAccuracy * 0.3 + Math.min(hours * 5, 20));
     const weeklyScores = weeklyProgress;
-    const weakSubject  = leastStudied;
+    const weakSubject = leastStudied;
 
     return (
         <div className="min-h-screen relative" style={{
@@ -232,16 +336,16 @@ export default function Dashboard() {
                 <GlassCard accent="green">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                         <div className="md:col-span-2">
-                            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:14 }}>
-                                <div style={{ flex:1, height:1, background:`linear-gradient(to right, transparent, ${C.emeraldBorder})` }}/>
-                                <span style={{ color:C.emeraldBorder, fontSize:10, letterSpacing:6 }}>✦ ✦ ✦</span>
-                                <div style={{ flex:1, height:1, background:`linear-gradient(to left, transparent, ${C.emeraldBorder})` }}/>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                                <div style={{ flex: 1, height: 1, background: `linear-gradient(to right, transparent, ${C.emeraldBorder})` }} />
+                                <span style={{ color: C.emeraldBorder, fontSize: 10, letterSpacing: 6 }}>✦ ✦ ✦</span>
+                                <div style={{ flex: 1, height: 1, background: `linear-gradient(to left, transparent, ${C.emeraldBorder})` }} />
                             </div>
-                            <h1 style={{ fontSize:30, fontWeight:"normal", color:C.textDark, margin:0 }}>
+                            <h1 style={{ fontSize: 30, fontWeight: "normal", color: C.textDark, margin: 0 }}>
                                 Welcome back,{" "}
-                                <span style={{ color:C.emerald, fontWeight:"600" }}>{displayName} 👋</span>
+                                <span style={{ color: C.emerald, fontWeight: "600" }}>{displayName} 👋</span>
                             </h1>
-                            <p style={{ fontSize:13, color:C.textSub, marginTop:6, letterSpacing:"0.03em" }}>
+                            <p style={{ fontSize: 13, color: C.textSub, marginTop: 6, letterSpacing: "0.03em" }}>
                                 Consistency beats intensity.
                             </p>
                         </div>
@@ -252,20 +356,20 @@ export default function Dashboard() {
                                 border: `1.5px solid ${C.emeraldBorder}`,
                                 color: C.emerald,
                             }}>
-                                <p style={{ fontSize:10, textTransform:"uppercase", letterSpacing:"0.12em", color:C.textSub, marginBottom:4 }}>
+                                <p style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em", color: C.textSub, marginBottom: 4 }}>
                                     Today's Motivation
                                 </p>
                                 Just 1 focused session can change your day
                             </div>
 
-                            <div style={{ display:"flex", gap:20, color:C.textDark }}>
-                                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                                    <Flame size={16} style={{ color:C.gold }} />
-                                    <span style={{ fontSize:14 }}>6 Day Streak</span>
+                            <div style={{ display: "flex", gap: 20, color: C.textDark }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <Flame size={16} style={{ color: C.gold }} />
+                                    <span style={{ fontSize: 14 }}>{streakData} Day Streak</span>
                                 </div>
-                                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                                    <Star size={16} style={{ color:C.gold }} />
-                                    <span style={{ fontSize:14 }}>124 Stars</span>
+                                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                    <Star size={16} style={{ color: C.gold }} />
+                                    <span style={{ fontSize: 14 }}>124 Stars</span>
                                 </div>
                             </div>
                         </div>
@@ -274,12 +378,12 @@ export default function Dashboard() {
 
                 {/* ══ MINI STATS ══ */}
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-                    <StatBadge accent="green" icon={<Clock        size={18} style={{ color:C.emerald }} />} label="Study Time"         value={studyTime} />
-                    <StatBadge accent="green" icon={<BookOpen     size={18} style={{ color:C.emerald }} />} label="Most Studied"       value={mostStudied} />
-                    <StatBadge accent="gold"  icon={<AlertTriangle size={18} style={{ color:C.gold   }}/>} label="Least Studied"      value={leastStudied} />
-                    <StatBadge accent="green" icon={<Zap          size={18} style={{ color:C.emerald }} />} label="Flashcard Accuracy" value={`${flashAccuracy}%`} />
-                    <StatBadge accent="gold"  icon={<Star         size={18} style={{ color:C.gold    }} />} label="Avg Quiz Score"     value={`${avgQuiz.toFixed(1)}%`} />
-                    <StatBadge accent="gold"  icon={<Calendar     size={18} style={{ color:C.gold    }} />} label="Next Exam"          value={`${weakSubject || "-"} · Revise`} />
+                    <StatBadge accent="green" icon={<Clock size={18} style={{ color: C.emerald }} />} label="Study Time" value={studyTime} />
+                    <StatBadge accent="green" icon={<BookOpen size={18} style={{ color: C.emerald }} />} label="Most Studied" value={mostStudied} />
+                    <StatBadge accent="gold" icon={<AlertTriangle size={18} style={{ color: C.gold }} />} label="Least Studied" value={leastStudied} />
+                    <StatBadge accent="green" icon={<Zap size={18} style={{ color: C.emerald }} />} label="Flashcard Accuracy" value={`${flashAccuracy}%`} />
+                    <StatBadge accent="gold" icon={<Star size={18} style={{ color: C.gold }} />} label="Avg Quiz Score" value={`${avgQuiz.toFixed(1)}%`} />
+                    <StatBadge accent="gold" icon={<Calendar size={18} style={{ color: C.gold }} />} label="Next Exam" value={`${weakSubject || "-"} · Revise`} />
                 </div>
 
                 {/* ══ CHARTS ══ */}
@@ -287,15 +391,17 @@ export default function Dashboard() {
 
                     {/* Time per Subject */}
                     <GlassCard className="md:col-span-2" accent="green">
-                        <h3 style={{ color:C.textDark, marginBottom:14, fontSize:15, fontWeight:"600" }}>
+                        <h3 style={{ color: C.textDark, marginBottom: 14, fontSize: 15, fontWeight: "600" }}>
                             ⏱ Time per Subject (hrs)
                         </h3>
                         <ResponsiveContainer width="100%" height={200}>
                             <BarChart data={timeData}>
-                                <XAxis dataKey="subject" tick={{ fill:C.textSub, fontFamily:"Georgia, serif", fontSize:11 }} axisLine={{ stroke:C.emeraldBorder }} tickLine={false} />
-                                <YAxis tick={{ fill:C.textSub, fontFamily:"Georgia, serif", fontSize:11 }} axisLine={false} tickLine={false} />
-                                <Tooltip content={<MysticTooltip />} cursor={{ fill:"rgba(26,158,92,0.04)" }} />
-                                <Bar dataKey="hours" radius={[8,8,0,0]}>
+                                <XAxis dataKey="subject" tick={{ fill: C.textSub, fontFamily: "Georgia, serif", fontSize: 11 }} axisLine={{ stroke: C.emeraldBorder }} tickLine={false} />
+                                <YAxis tick={{ fill: C.textSub, fontFamily: "Georgia, serif", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(value) =>
+                                    value < 1 ? `${Math.round(value * 60)}m` : `${value}h`
+                                } />
+                                <Tooltip content={<MysticTooltip />} cursor={{ fill: "rgba(26,158,92,0.04)" }} />
+                                <Bar dataKey="hours" radius={[8, 8, 0, 0]}>
                                     {timeData.map((_, i) => <Cell key={i} fill={i % 2 === 0 ? C.emerald : C.emeraldBright} />)}
                                 </Bar>
                             </BarChart>
@@ -304,7 +410,7 @@ export default function Dashboard() {
 
                     {/* Quiz Accuracy */}
                     <GlassCard className="md:col-span-2" accent="gold">
-                        <h3 style={{ color:C.textDark, marginBottom:14, fontSize:15, fontWeight:"600" }}>🧠 Quiz Accuracy</h3>
+                        <h3 style={{ color: C.textDark, marginBottom: 14, fontSize: 15, fontWeight: "600" }}>🧠 Quiz Accuracy</h3>
                         <ResponsiveContainer width="100%" height={240}>
                             <PieChart>
                                 <Pie data={quizPie} innerRadius={50} outerRadius={75} dataKey="value" strokeWidth={0}>
@@ -312,29 +418,91 @@ export default function Dashboard() {
                                 </Pie>
                                 <Tooltip content={<MysticTooltip />} />
                                 <Legend verticalAlign="bottom"
-                                    formatter={(v) => <span style={{ color:C.textSub, fontFamily:"Georgia, serif", fontSize:12 }}>{v}</span>} />
+                                    formatter={(v) => <span style={{ color: C.textSub, fontFamily: "Georgia, serif", fontSize: 12 }}>{v}</span>} />
                             </PieChart>
                         </ResponsiveContainer>
                     </GlassCard>
 
                     {/* Quiz Scores by Notebook */}
                     <GlassCard className="md:col-span-2" accent="green">
-                        <h3 style={{ color:C.textDark, marginBottom:14, fontSize:15, fontWeight:"600" }}>📝 Quiz Scores by Notebook</h3>
-                        {quizResults.length === 0 ? (
-                            <p style={{ fontSize:13, color:C.textSub }}>No quiz results yet</p>
+                        <h3 style={{ color: C.textDark, marginBottom: 14, fontSize: 15, fontWeight: "600" }}>
+                            📝 Best Quiz Scores by Notebook
+                        </h3>
+
+                        {Object.keys(attemptsByNotebook).length === 0 ? (
+                            <p style={{ fontSize: 13, color: C.textSub }}>
+                                No quiz results yet
+                            </p>
                         ) : (
-                            <div className="space-y-2 max-h-48 overflow-y-auto">
-                                {quizResults.map((r, i) => (
-                                    <div key={i} className="flex justify-between items-center text-sm p-2 rounded-xl" style={{
-                                        background: "rgba(26,158,92,0.04)",
-                                        border: `1px solid ${C.emeraldBorder}`,
-                                    }}>
-                                        <span className="truncate" style={{ color:C.textMid }}>{r.notebookId.name || "Notebook"}</span>
-                                        <span style={{ fontWeight:"700", fontSize:13, color: r.percentage >= 70 ? C.emerald : C.gold }}>
-                                            {r.score}/{r.total} ({r.percentage}%)
-                                        </span>
-                                    </div>
-                                ))}
+                            <div className="space-y-4 max-h-64 overflow-y-auto">
+
+                                {Object.entries(attemptsByNotebook).map(([id, data]) => {
+
+                                    const best = data.attempts.reduce((a, b) =>
+                                        a.percentage > b.percentage ? a : b
+                                    );
+
+                                    const first = data.attempts[0]?.percentage || 0;
+                                    const last = data.attempts[data.attempts.length - 1]?.percentage || 0;
+                                    const improvement = last - first;
+
+                                    return (
+                                        <div key={id}
+                                            className="p-3 rounded-xl"
+                                            style={{
+                                                background: "rgba(26,158,92,0.04)",
+                                                border: `1px solid ${C.emeraldBorder}`,
+                                            }}>
+
+                                            {/* Top Row */}
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span style={{ color: C.textMid }}>
+                                                    {data.name}
+                                                </span>
+
+                                                <span style={{
+                                                    fontWeight: "700",
+                                                    color: C.emerald
+                                                }}>
+                                                    ⭐ {best.percentage}%
+                                                </span>
+                                            </div>
+
+                                            {/* Attempts + Improvement */}
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span style={{ fontSize: 11, color: C.textSub }}>
+                                                    Attempts: {data.attempts.length}
+                                                </span>
+
+                                                <span style={{
+                                                    fontSize: 11,
+                                                    fontWeight: "600",
+                                                    color: improvement >= 0 ? C.emerald : C.gold
+                                                }}>
+                                                    {improvement >= 0 ? "⬆" : "⬇"} {Math.abs(improvement)}%
+                                                </span>
+                                            </div>
+
+                                            {/* 📈 Trend Chart */}
+                                            <ResponsiveContainer width="100%" height={100}>
+                                                <LineChart data={data.attempts}>
+                                                    <XAxis dataKey="attempt" hide />
+                                                    <YAxis hide />
+                                                    <Tooltip />
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="percentage"
+                                                        stroke={C.emerald}
+                                                        strokeWidth={2}
+                                                        dot={{ r: 3 }}
+                                                    />
+                                                </LineChart>
+                                            </ResponsiveContainer>
+
+                                        </div>
+                                    );
+                                })}
+
                             </div>
                         )}
                     </GlassCard>
@@ -342,49 +510,49 @@ export default function Dashboard() {
                     {/* Focus Score */}
                     <GlassCard className="flex flex-col justify-between md:col-span-2" accent="gold">
                         <div>
-                            <Target size={22} className="mb-2" style={{ color:C.gold }} />
-                            <p style={{ fontSize:11, textTransform:"uppercase", letterSpacing:"0.1em", color:C.textSub }}>Focus Score</p>
+                            <Target size={22} className="mb-2" style={{ color: C.gold }} />
+                            <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: C.textSub }}>Focus Score</p>
                             <p style={{
-                                fontSize:56, fontWeight:"bold", lineHeight:1, margin:"8px 0 0",
-                                background:`linear-gradient(135deg, ${C.gold}, ${C.emerald})`,
-                                WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent",
+                                fontSize: 56, fontWeight: "bold", lineHeight: 1, margin: "8px 0 0",
+                                background: `linear-gradient(135deg, ${C.gold}, ${C.emerald})`,
+                                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
                             }}>{focusScore}</p>
                         </div>
-                        <p style={{ fontSize:12, color:C.textSub, marginTop:12 }}>
+                        <p style={{ fontSize: 12, color: C.textSub, marginTop: 12 }}>
                             Based on quiz + flashcards + study time
                         </p>
                     </GlassCard>
 
                     {/* Weekly Progress */}
                     <GlassCard className="md:col-span-2" accent="green">
-                        <h3 style={{ color:C.textDark, marginBottom:10, fontSize:15, fontWeight:"600" }}>📈 Weekly Progress</h3>
+                        <h3 style={{ color: C.textDark, marginBottom: 10, fontSize: 15, fontWeight: "600" }}>📈 Weekly Progress</h3>
                         <ResponsiveContainer width="100%" height={140}>
                             <LineChart data={weeklyScores}>
-                                <XAxis dataKey="week" tick={{ fill:C.textSub, fontFamily:"Georgia, serif", fontSize:11 }} axisLine={{ stroke:C.emeraldBorder }} tickLine={false} />
+                                <XAxis dataKey="week" tick={{ fill: C.textSub, fontFamily: "Georgia, serif", fontSize: 11 }} axisLine={{ stroke: C.emeraldBorder }} tickLine={false} />
                                 <YAxis hide />
                                 <Tooltip content={<MysticTooltip />} />
                                 <Line type="monotone" dataKey="score" stroke={C.emerald} strokeWidth={2.5}
-                                    dot={{ r:4, fill:C.emerald, stroke:"#fff", strokeWidth:2 }} />
+                                    dot={{ r: 4, fill: C.emerald, stroke: "#fff", strokeWidth: 2 }} />
                             </LineChart>
                         </ResponsiveContainer>
                     </GlassCard>
 
                     {/* Areas for Improvement */}
                     <GlassCard className="md:col-span-2" accent="gold">
-                        <h3 style={{ color:C.textDark, marginBottom:14, fontSize:15, fontWeight:"600" }}>🛠 Areas for Improvement</h3>
-                        <ul className="space-y-4" style={{ fontSize:13, color:C.textMid }}>
-                            <li style={{ display:"flex", alignItems:"flex-start", gap:8 }}>
-                                <AlertTriangle size={15} style={{ color:C.gold, marginTop:2, flexShrink:0 }} />
+                        <h3 style={{ color: C.textDark, marginBottom: 14, fontSize: 15, fontWeight: "600" }}>🛠 Areas for Improvement</h3>
+                        <ul className="space-y-4" style={{ fontSize: 13, color: C.textMid }}>
+                            <li style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                                <AlertTriangle size={15} style={{ color: C.gold, marginTop: 2, flexShrink: 0 }} />
                                 <span>Increase focus on{" "}
-                                    <span style={{ color:C.gold, fontWeight:"700" }}>{weakSubject}</span>
+                                    <span style={{ color: C.gold, fontWeight: "700" }}>{weakSubject}</span>
                                 </span>
                             </li>
-                            <li style={{ display:"flex", alignItems:"flex-start", gap:8 }}>
-                                <Clock size={15} style={{ color:C.emerald, marginTop:2, flexShrink:0 }} />
+                            <li style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                                <Clock size={15} style={{ color: C.emerald, marginTop: 2, flexShrink: 0 }} />
                                 Try longer uninterrupted study sessions
                             </li>
-                            <li style={{ display:"flex", alignItems:"flex-start", gap:8 }}>
-                                <BookOpen size={15} style={{ color:C.emerald, marginTop:2, flexShrink:0 }} />
+                            <li style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                                <BookOpen size={15} style={{ color: C.emerald, marginTop: 2, flexShrink: 0 }} />
                                 Revise incorrect quiz questions
                             </li>
                         </ul>

@@ -7,6 +7,10 @@ const quizResultSchema = new mongoose.Schema({
   score: Number,
   total: Number,
   percentage: Number,
+  attempt: {
+    type: Number,
+    default: 1
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model("QuizResult", quizResultSchema);
