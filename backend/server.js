@@ -24,6 +24,7 @@ const videoRoutes = require("./routes/videoRoutes");
 const app = express();
 const upload = multer({ dest: "uploads/" });
 const uploadMultiple = multer({ dest: "uploads/" });
+const textbookRoutes = require("./routes/textbookRoutes");
 app.use(cors({ origin: ["http://localhost:5173", "http://localhost:8000"] }));
 app.use(express.json());
 
@@ -48,11 +49,10 @@ app.use("/api", extracttextRoutes);
 app.use("/api/notebooks", notebookRoutes);
 app.use("/api/videos", videoRoutes);
 app.use("/api/progress",progressRoutes);
-
-//
 app.use(youtubeSummarizerRoutes);
 app.use("/api/flashcards", flashcardsRoutes);
 app.use("/api/quiz", quizRoutes);
+app.use("/api/textbook", textbookRoutes);
 
 app.get("/version", (req, res) => {
   let pkg = {};
