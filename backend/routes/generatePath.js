@@ -245,9 +245,18 @@ router.post("/generate", async (req, res) => {
             { status: "archived" }
         );
 
+        const formattedSteps = steps.map((s, i) => ({
+            title: s.title || `Step ${i + 1}`,
+            type: s.type || "read",
+            topic: weakTopics[i]?.topic || "general", 
+            duration: s.duration || 10,
+            completed: false,
+            reason: weakTopics[i]?.reasons?.join(", ") || ""
+        }));
+
         const newPath = new LearningPath({
             userId,
-            steps: steps.map((s) => ({ ...s, completed: false })),
+            steps: formattedSteps,
             status: "active",
         });
 
@@ -287,6 +296,10 @@ router.get("/path/:userId", async (req, res) => {
             userId: req.params.userId,
             status: "active",
         });
+
+        if (!path) {
+            return res.status(404).json({ message: "No path found" });
+        }
 
         res.json(path);
     } catch {
