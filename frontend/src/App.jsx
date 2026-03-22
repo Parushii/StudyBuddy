@@ -24,6 +24,7 @@ import Flashcards from "./pages/Flashcards";
 import YoutubeSummarizer from "./pages/YoutubeSummarizer";
 import VideoRecommendations from "./pages/VideoRecommendations";
 import Textbook from "./pages/Textbook";
+import LearningPath from "./pages/LearningPath";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
             <Route path="/youtube-summarizer"  element={<YoutubeSummarizer />} />
             <Route path="/videos/:notebookId" element={<VideoRecommendations />} />
             <Route path="/textbook"  element={<Textbook />} />
+            <Route path="/learning-path" element={<LearningPath />} />
           </Routes>
         </Router>
         </SelectedFilesProvider>

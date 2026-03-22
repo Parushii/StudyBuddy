@@ -6,6 +6,8 @@ import {
     BarChart, Bar, XAxis, YAxis, Tooltip, LineChart, Line,
     PieChart, Pie, Cell, ResponsiveContainer, Legend,
 } from "recharts";
+import { useNavigate } from "react-router-dom";
+import Mascot from "../components/Mascot";
 
 /* ── Design tokens ── */
 const C = {
@@ -159,6 +161,9 @@ export default function Dashboard() {
     const username = localStorage.getItem("userName") || "Student";
     const displayName = username.charAt(0).toUpperCase() + username.slice(1);
 
+    const navigate = useNavigate();
+    const userId = localStorage.getItem("userId");
+
     useEffect(() => {
         const userId = localStorage.getItem("userId");
         if (!userId) return;
@@ -187,7 +192,6 @@ export default function Dashboard() {
         }, {})
     );
 
-    // ✅ ADD THIS BELOW bestResults
     const attemptsByNotebook = useMemo(() => {
         const grouped = quizResults.reduce((acc, r) => {
             const key = r.notebookId?._id || r.notebookId;
@@ -247,48 +251,48 @@ export default function Dashboard() {
     );
 
     const streakData = useMemo(() => {
-    const activityDates = new Set();
+        const activityDates = new Set();
 
-    const normalize = (date) => {
-        const d = new Date(date);
-        d.setHours(0, 0, 0, 0);
-        return d.getTime();
-    };
+        const normalize = (date) => {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            return d.getTime();
+        };
 
-    progressData.forEach(p => {
-        if (p.timeSpent > 0) {
-            activityDates.add(normalize(p.updatedAt));
+        progressData.forEach(p => {
+            if (p.timeSpent > 0) {
+                activityDates.add(normalize(p.updatedAt));
+            }
+        });
+
+        quizResults.forEach(q => {
+            activityDates.add(normalize(q.createdAt));
+        });
+
+        // sorted descending
+        const dates = Array.from(activityDates).sort((a, b) => b - a);
+
+        if (dates.length === 0) return 0;
+
+        let streak = 0;
+        let current = new Date();
+        current.setHours(0, 0, 0, 0);
+
+        for (let i = 0; i < dates.length; i++) {
+            const d = new Date(dates[i]);
+            const diff = Math.round((current - d) / (1000 * 60 * 60 * 24));
+
+            if (diff === 0 || diff === 1) {
+                streak++;
+                current = new Date(d);
+                current.setHours(0, 0, 0, 0);
+            } else if (diff > 1) {
+                break; // streak broken
+            }
         }
-    });
 
-    quizResults.forEach(q => {
-        activityDates.add(normalize(q.createdAt));
-    });
-
-    // sorted descending
-    const dates = Array.from(activityDates).sort((a, b) => b - a);
-
-    if (dates.length === 0) return 0;
-
-    let streak = 0;
-    let current = new Date();
-    current.setHours(0, 0, 0, 0);
-
-    for (let i = 0; i < dates.length; i++) {
-        const d = new Date(dates[i]);
-        const diff = Math.round((current - d) / (1000 * 60 * 60 * 24));
-
-        if (diff === 0 || diff === 1) {
-            streak++;
-            current = new Date(d); 
-            current.setHours(0,0,0,0);
-        } else if (diff > 1) {
-            break; // streak broken
-        }
-    }
-
-    return streak;
-}, [progressData, quizResults]);
+        return streak;
+    }, [progressData, quizResults]);
 
     const totalTime = progressData.reduce((s, p) => s + p.timeSpent, 0);
     const hours = Math.floor(totalTime / 3600);
@@ -309,6 +313,79 @@ export default function Dashboard() {
     const weeklyScores = weeklyProgress;
     const weakSubject = leastStudied;
 
+    const triggers = {
+        lowEngagement: (timeData.length === 0) || (leastStudied !== "-" && timeData.find(t => t.subject === leastStudied)?.hours < 1),
+
+        lowPerformance: avgQuiz < 50,
+
+        weakConcepts: flashAccuracy < 60,
+
+        lowFocus: focusScore < 40,
+    };
+    const positiveTriggers = {
+        highPerformance: avgQuiz >= 75,
+        strongConcepts: flashAccuracy >= 75,
+        consistentStudy: streakData >= 3,
+        highFocus: focusScore >= 70,
+    };
+    /* Mascot Logic */
+    const [mascotMessage, setMascotMessage] = useState(null);
+
+    useEffect(() => {
+        let timer;
+
+       const getMessage = () => {
+    // ❌ CRITICAL NEGATIVE STATES FIRST (highest priority)
+
+    if (triggers.lowFocus) {
+        return "Your focus is dropping... let’s get you back on track ⚡";
+    }
+
+    if (triggers.lowPerformance) {
+        return "Struggling with quizzes? Wanna improve this? Come with me 👀";
+    }
+
+    if (triggers.weakConcepts) {
+        return "Flashcards look weak 😬 Let’s fix your concepts!";
+    }
+
+    if (triggers.lowEngagement) {
+        return `You barely studied ${leastStudied} 😶 Wanna turn this around?`;
+    }
+
+    // ✅ POSITIVE STATES (only if no major issue)
+
+    if (positiveTriggers.highPerformance) {
+        return "You're crushing quizzes 🔥 Keep it going!";
+    }
+
+    if (positiveTriggers.strongConcepts) {
+        return "Your concepts are getting strong 💡 Impressive!";
+    }
+
+    if (positiveTriggers.consistentStudy) {
+        return `${streakData} day streak! You're on fire 🚀`;
+    }
+
+    if (positiveTriggers.highFocus) {
+        return "Deep focus mode unlocked 🧠✨ This is elite.";
+    }
+
+    return null;
+};
+
+        const message = getMessage();
+
+        if (message) {
+            timer = setTimeout(() => {
+                setMascotMessage(message);
+            }, 1500); // delay = feels smart
+        } else {
+            setMascotMessage(null);
+        }
+
+        return () => clearTimeout(timer);
+    }, [triggers, leastStudied]);
     return (
         <div className="min-h-screen relative" style={{
             backgroundColor: C.bg,
@@ -375,7 +452,34 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </GlassCard>
+                {/* ══ LEARNING PATH PREVIEW ══ */}
+                <GlassCard accent="green">
+                    <div className="flex justify-between items-center">
 
+                        <div>
+                            <h2 style={{ color: C.textDark, fontSize: 18, fontWeight: "600" }}>
+                                🎯 Your Learning Path
+                            </h2>
+
+                            <p style={{ color: C.textSub, fontSize: 13, marginTop: 4 }}>
+                                Continue your personalized study journey
+                            </p>
+                        </div>
+
+                        <button
+                            onClick={() => navigate("/learning-path")}
+                            className="px-4 py-2 rounded-xl"
+                            style={{
+                                background: C.emerald,
+                                color: "#fff",
+                                fontSize: 13,
+                                fontWeight: "600"
+                            }}
+                        >
+                            View Path →
+                        </button>
+                    </div>
+                </GlassCard>
                 {/* ══ MINI STATS ══ */}
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
                     <StatBadge accent="green" icon={<Clock size={18} style={{ color: C.emerald }} />} label="Study Time" value={studyTime} />
@@ -560,6 +664,20 @@ export default function Dashboard() {
 
                 </div>
             </div>
+            {/* Mascot Assistant */}
+            {mascotMessage && (
+                <Mascot
+                    message={mascotMessage}
+                    mood={
+                        positiveTriggers.highPerformance ||
+                            positiveTriggers.strongConcepts ||
+                            positiveTriggers.consistentStudy ||
+                            positiveTriggers.highFocus
+                            ? "happy"
+                            : "concerned"
+                    }
+                />
+            )}
         </div>
     );
 }

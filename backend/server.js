@@ -25,6 +25,8 @@ const app = express();
 const upload = multer({ dest: "uploads/" });
 const uploadMultiple = multer({ dest: "uploads/" });
 const textbookRoutes = require("./routes/textbookRoutes");
+const learningPathRoutes = require("./routes/generatePath");
+
 app.use(cors({ origin: ["http://localhost:5173", "http://localhost:8000"] }));
 app.use(express.json());
 
@@ -53,6 +55,7 @@ app.use(youtubeSummarizerRoutes);
 app.use("/api/flashcards", flashcardsRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/textbook", textbookRoutes);
+app.use("/api/learning", learningPathRoutes);
 
 app.get("/version", (req, res) => {
   let pkg = {};
