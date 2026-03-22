@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 export default function VideoRecommendationsPage() {
   const { notebookId } = useParams();
@@ -69,6 +70,22 @@ export default function VideoRecommendationsPage() {
       </div>
 
       <div className="relative z-10 p-10">
+        {/* Back Button */}
+                  <button
+                    onClick={() => window.history.back()}
+                    className="flex items-center gap-2 px-4 py-2 mb-4 
+                       rounded-xl backdrop-blur-md 
+                       bg-[rgba(80,50,20,0.55)] 
+                       border border-amber-200/20 
+                       text-amber-200 
+                       hover:bg-amber-200/10 
+                       hover:shadow-[0_0_10px_rgba(251,191,36,0.4)] 
+                       hover:scale-105 
+                       transition"
+                  >
+                    <ArrowLeft size={18} />
+                    Back
+                  </button>
         <h1 className="text-4xl font-bold mb-8 tracking-wide drop-shadow-lg">
           🌊 The Stream of Study
         </h1>

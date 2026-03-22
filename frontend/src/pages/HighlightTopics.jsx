@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 /* ===== Botanical illustration for empty state ===== */
 const BotanicalIllustration = () => (
@@ -74,6 +75,7 @@ const CornerVine = ({ position }) => {
 
 export default function HighlightTopics() {
   const { notebookId } = useParams();
+  const navigate = useNavigate();
   const [content, setContent] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState({ title: "", content: "" });
   const [loading, setLoading] = useState(false);
@@ -82,16 +84,16 @@ export default function HighlightTopics() {
   const [notebook, setNotebook] = useState(null);
 
   const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-useEffect(() => {
-  const fetchNotebook = async () => {
-    const res = await fetch(`${API}/api/notebooks/${notebookId}`);
-    const data = await res.json();
-    setNotebook(data);
-  };
+  useEffect(() => {
+    const fetchNotebook = async () => {
+      const res = await fetch(`${API}/api/notebooks/${notebookId}`);
+      const data = await res.json();
+      setNotebook(data);
+    };
 
-  fetchNotebook();
-}, [notebookId]);
-const subject = notebook?.name || "Unknown";
+    fetchNotebook();
+  }, [notebookId]);
+  const subject = notebook?.name || "Unknown";
 
 
   useEffect(() => { if (notebookId) loadHighlights(); }, [notebookId]);
@@ -133,43 +135,10 @@ const subject = notebook?.name || "Unknown";
 
   const handleTopicClick = async (topic) => {
 
-  if (startTime && selectedTopic.title) {
-    const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-
-    await axios.post(`${API}/api/progress/time`, {
-      userId: localStorage.getItem("userId"),
-      notebookId,
-      subject,
-      topicTitle: selectedTopic.title,
-      timeSpent
-    });
-  }
-
-  setSelectedTopic({
-    title: topic.topicTitle,
-    content: topic.content
-  });
-
-  setStartTime(Date.now());
-
-  try {
-    await axios.post(`${API}/api/progress/topic-visit`, {
-      userId: localStorage.getItem("userId"),
-      notebookId,
-      subject,
-      topicTitle: topic.topicTitle
-    });
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-useEffect(() => {
-  return () => {
     if (startTime && selectedTopic.title) {
       const timeSpent = Math.floor((Date.now() - startTime) / 1000);
 
-      axios.post(`${API}/api/progress/time`, {
+      await axios.post(`${API}/api/progress/time`, {
         userId: localStorage.getItem("userId"),
         notebookId,
         subject,
@@ -177,8 +146,41 @@ useEffect(() => {
         timeSpent
       });
     }
+
+    setSelectedTopic({
+      title: topic.topicTitle,
+      content: topic.content
+    });
+
+    setStartTime(Date.now());
+
+    try {
+      await axios.post(`${API}/api/progress/topic-visit`, {
+        userId: localStorage.getItem("userId"),
+        notebookId,
+        subject,
+        topicTitle: topic.topicTitle
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
-}, [selectedTopic]);
+
+  useEffect(() => {
+    return () => {
+      if (startTime && selectedTopic.title) {
+        const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+        axios.post(`${API}/api/progress/time`, {
+          userId: localStorage.getItem("userId"),
+          notebookId,
+          subject,
+          topicTitle: selectedTopic.title,
+          timeSpent
+        });
+      }
+    };
+  }, [selectedTopic]);
 
   return (
     <div className="h-screen w-full flex" style={{ fontFamily: "Georgia, serif", backgroundColor: "#f0e6d3" }}>
@@ -197,6 +199,22 @@ useEffect(() => {
           borderBottom: "3px solid #6b3f1f",
           boxShadow: "0 3px 8px rgba(107,63,31,0.3)",
         }}>
+          {/* Back Button */}
+                  <button
+                    onClick={() => window.history.back()}
+                    className="flex items-center gap-2 px-4 py-2 mb-4 
+                       rounded-xl backdrop-blur-md 
+                       bg-[rgba(80,50,20,0.55)] 
+                       border border-amber-200/20 
+                       text-amber-200 
+                       hover:bg-amber-200/10 
+                       hover:shadow-[0_0_10px_rgba(251,191,36,0.4)] 
+                       hover:scale-105 
+                       transition"
+                  >
+                    <ArrowLeft size={18} />
+                    Back
+                  </button>
           <div className="flex items-center gap-3">
             <span className="text-2xl">📖</span>
             <div>

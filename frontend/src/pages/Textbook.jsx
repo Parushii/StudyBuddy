@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { FloatingLeaves, Fireflies, CornerVine } from "./Flashcards";
+import { ArrowLeft } from "lucide-react";
 
 export default function TextbookQA() {
     const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
@@ -78,11 +79,27 @@ export default function TextbookQA() {
 
             {/* Main Content */}
             <div className="relative z-10 max-w-4xl mx-auto p-6 space-y-8">
+                {/* Back Button */}
+                  <button
+                    onClick={() => window.history.back()}
+                    className="flex items-center gap-2 px-4 py-2 mb-4 
+                       rounded-xl backdrop-blur-md 
+                       bg-[rgba(80,50,20,0.55)] 
+                       border border-amber-200/20 
+                       text-amber-200 
+                       hover:bg-amber-200/10 
+                       hover:shadow-[0_0_10px_rgba(251,191,36,0.4)] 
+                       hover:scale-105 
+                       transition"
+                  >
+                    <ArrowLeft size={18} />
+                    Back
+                  </button>
                 <h1 className="text-4xl font-bold text-center text-white drop-shadow-lg">
-                    Textbook GPT
+                    Textbook Diver
                 </h1>
                 <p className="text-center text-white/60">
-                    Upload a textbook and ask questions — AI-powered answers at your fingertips
+                    Dive into the sea of knowledge of a Textbook: Upload a one and ask questions — AI-powered answers at your fingertips!
                 </p>
 
                 {/* File Upload */}
@@ -167,7 +184,7 @@ export default function TextbookQA() {
                 {!answer && !loading && !error && (
                     <div className="text-center py-16 text-white/40">
                         <p className="text-lg">Upload a textbook and ask a question to get started</p>
-                        <p className="text-sm mt-2">Powered by Google Gemini</p>
+                        {/* <p className="text-sm mt-2">Powered by Google Gemini</p> */}
                     </div>
                 )}
             </div>

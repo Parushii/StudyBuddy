@@ -187,6 +187,13 @@ useEffect(() => {
           >
             🏰 Dashboard
           </button>
+
+          <button
+            onClick={() => navigate("/textbook")}
+            className="hover:text-yellow-600 transition text-base text-white"
+          >
+            🥽 TextbookDiver
+          </button>
         </div>
 
         <button

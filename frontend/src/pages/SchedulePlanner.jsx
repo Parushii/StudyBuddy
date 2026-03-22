@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Calendar } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 const API = "http://localhost:5000";
 
@@ -92,6 +93,22 @@ export default function SchedulePlanner() {
       {/* Sidebar */}
       <aside className="w-[260px] bg-black/70 border-r border-white/10 p-6 flex flex-col justify-between relative z-10">
         <div>
+          {/* Back Button */}
+                  <button
+                    onClick={() => window.history.back()}
+                    className="flex items-center gap-2 px-4 py-2 mb-4 
+                       rounded-xl backdrop-blur-md 
+                       bg-[rgba(80,50,20,0.55)] 
+                       border border-amber-200/20 
+                       text-amber-200 
+                       hover:bg-amber-200/10 
+                       hover:shadow-[0_0_10px_rgba(251,191,36,0.4)] 
+                       hover:scale-105 
+                       transition"
+                  >
+                    <ArrowLeft size={18} />
+                    Back
+                  </button>
           <h2 className="text-xl mb-6 tracking-wide">
             📜 Arcane Study Planner
           </h2>
@@ -148,13 +165,6 @@ export default function SchedulePlanner() {
             )}
           </div>
         </div>
-
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="text-amber-400 hover:text-yellow-300"
-        >
-          ⬅ Return to Library
-        </button>
       </aside>
 
       {/* Main Timeline */}
