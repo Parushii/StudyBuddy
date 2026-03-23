@@ -61,6 +61,14 @@ function Home() {
           White Board
         </Link>
 
+        <Link
+          to="/calendar"
+          className="bg-red-700 px-6 py-3 rounded-xl font-semibold shadow-md hover:bg-yellow-800 transition"
+        >
+          Calendar
+        </Link>
+
+
         <ThemeToggle/>
         
       </div>

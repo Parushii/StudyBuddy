@@ -142,7 +142,7 @@ export default function SchedulePlanner() {
                 type="date"
                 value={examDate}
                 onChange={(e) => setExamDate(e.target.value)}
-                className="w-full rounded-md px-4 py-2 bg-black/50 border border-white/20"
+                className="w-full rounded-md px-4 py-2 bg-black/50 border border-white/20 text-white [color-scheme:dark]"
               />
             </div>
 
@@ -155,7 +155,7 @@ export default function SchedulePlanner() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full rounded-md px-4 py-2 bg-black/50 border border-white/20"
+                className="w-full rounded-md px-4 py-2 bg-black/50 border border-white/20 text-white [color-scheme:dark]"
               />
             </div>
 
