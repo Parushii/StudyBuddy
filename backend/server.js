@@ -26,6 +26,7 @@ const upload = multer({ dest: "uploads/" });
 const uploadMultiple = multer({ dest: "uploads/" });
 const textbookRoutes = require("./routes/textbookRoutes");
 const learningPathRoutes = require("./routes/generatePath");
+const googleCalendarRoutes = require("./routes/calendar");
 
 app.use(cors({ origin: ["http://localhost:5173", "http://localhost:8000"] }));
 app.use(express.json());
@@ -56,6 +57,7 @@ app.use("/api/flashcards", flashcardsRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/textbook", textbookRoutes);
 app.use("/api/learning", learningPathRoutes);
+
 
 app.get("/version", (req, res) => {
   let pkg = {};
@@ -155,5 +157,6 @@ app.post("/generate-schedule", upload.array("files"), async (req, res) => {
   }
 });
 
+app.use("/api", googleCalendarRoutes);
 
 app.listen(process.env.PORT, () => console.log(`🚀 Server running on http://localhost:${process.env.PORT}`));
