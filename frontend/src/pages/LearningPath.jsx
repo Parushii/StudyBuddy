@@ -3,17 +3,64 @@ import { useNavigate } from "react-router-dom";
 
 export default function LearningPath() {
     const [path, setPath] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [noPath, setNoPath] = useState(false);
+    const [fetched, setFetched] = useState(false);
+
     const navigate = useNavigate();
 
     const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
     const userId = localStorage.getItem("userId");
 
+    // ✅ FETCH PATH
     useEffect(() => {
-        fetch(`${API}/api/learning/path/${userId}`)
-            .then(res => res.json())
-            .then(data => setPath(data))
-            .catch(err => console.error(err));
-    }, []);
+        if (fetched) return;
+
+        const fetchPath = async () => {
+            try {
+                const res = await fetch(`${API}/api/learning/path/${userId}`);
+
+                if (res.status === 404) {
+                    setNoPath(true);
+                    return;
+                }
+
+                const data = await res.json();
+                setPath(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+                setFetched(true);
+            }
+        };
+
+        fetchPath();
+    }, [fetched]);
+
+    // ✅ GENERATE PATH
+    const generatePath = async () => {
+        setLoading(true);
+
+        try {
+            await fetch(`${API}/api/learning/generate`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId })
+            });
+
+            // 🔥 RE-FETCH AFTER GENERATION
+            const res = await fetch(`${API}/api/learning/path/${userId}`);
+            const data = await res.json();
+
+            setPath(data);
+            setNoPath(false);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleStart = (step) => {
         if (step.type === "quiz") navigate(`/quiz/${step.topic}`);
@@ -22,20 +69,59 @@ export default function LearningPath() {
     };
 
     const handleComplete = async (index) => {
-        await fetch(`${API}/api/learning/path/complete-step`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                pathId: path._id,
-                stepIndex: index
-            })
-        });
+        try {
+            await fetch(`${API}/api/learning/path/complete-step`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    pathId: path._id,
+                    stepIndex: index
+                })
+            });
 
-        const updated = await fetch(`${API}/api/learning/path/${userId}`);
-        setPath(await updated.json());
+            // 🔁 REFRESH PATH
+            const updated = await fetch(`${API}/api/learning/path/${userId}`);
+            const data = await updated.json();
+            setPath(data);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
-    if (!path) return <p className="p-6">Summoning your path...</p>;
+    // ✅ LOADING STATE
+    if (loading) {
+        return <p className="p-6">Summoning your path...</p>;
+    }
+
+    // ✅ NO PATH STATE
+    if (noPath) {
+        return (
+            <div className="p-6 text-center">
+                <h2>Your journey has not begun yet... ✨</h2>
+                <p>Let me craft a path tailored just for you.</p>
+
+                <button
+                    onClick={generatePath}
+                    style={{
+                        marginTop: 20,
+                        padding: "10px 16px",
+                        background: "#22c975",
+                        border: "none",
+                        borderRadius: 8,
+                        color: "#fff",
+                        cursor: "pointer"
+                    }}
+                >
+                    Generate My Path 🚀
+                </button>
+            </div>
+        );
+    }
+
+    // ✅ SAFETY CHECK
+    if (!path || !path.steps) {
+        return <p className="p-6">Preparing your journey...</p>;
+    }
 
     const completedCount = path.steps.filter(s => s.completed).length;
 
@@ -148,10 +234,7 @@ export default function LearningPath() {
                             transition: "all 0.3s"
                         }}>
 
-                            <h3 style={{
-                                color: "#f5e4b0",
-                                marginBottom: 6
-                            }}>
+                            <h3 style={{ color: "#f5e4b0" }}>
                                 ✦ Step {index + 1}: {step.title}
                             </h3>
 
@@ -165,8 +248,7 @@ export default function LearningPath() {
                             {step.reason && (
                                 <p style={{
                                     color: "#ffb347",
-                                    fontSize: 12,
-                                    marginTop: 4
+                                    fontSize: 12
                                 }}>
                                     ⚠ {step.reason}
                                 </p>
@@ -177,54 +259,20 @@ export default function LearningPath() {
                                 display: "flex",
                                 gap: 10
                             }}>
-
                                 {!isLocked && !step.completed && (
                                     <>
-                                        <button
-                                            onClick={() => handleStart(step)}
-                                            style={{
-                                                padding: "8px 14px",
-                                                background: "linear-gradient(135deg,#1a9e5c,#22c975)",
-                                                border: "none",
-                                                borderRadius: 8,
-                                                color: "#fff",
-                                                cursor: "pointer"
-                                            }}
-                                        >
+                                        <button onClick={() => handleStart(step)}>
                                             Start
                                         </button>
 
-                                        <button
-                                            onClick={() => handleComplete(index)}
-                                            style={{
-                                                padding: "8px 14px",
-                                                background: "linear-gradient(135deg,#c4870a,#f5b82e)",
-                                                border: "none",
-                                                borderRadius: 8,
-                                                color: "#fff",
-                                                cursor: "pointer"
-                                            }}
-                                        >
+                                        <button onClick={() => handleComplete(index)}>
                                             Complete
                                         </button>
                                     </>
                                 )}
 
-                                {step.completed && (
-                                    <span style={{
-                                        color: "#22c975",
-                                        fontWeight: "bold"
-                                    }}>
-                                        ✓ Completed
-                                    </span>
-                                )}
-
-                                {isLocked && (
-                                    <span style={{ color: "#999" }}>
-                                        🔒 Locked
-                                    </span>
-                                )}
-
+                                {step.completed && <span>✓ Completed</span>}
+                                {isLocked && <span>🔒 Locked</span>}
                             </div>
                         </div>
                     );

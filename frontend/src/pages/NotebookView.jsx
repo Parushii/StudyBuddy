@@ -3,6 +3,7 @@ import { Upload, Mic, Plus, Sparkles, BookOpen, Video, Trash2, Clock, Calendar }
 import SubjectSidebar from "./SubjectSidebar";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { ArrowLeft } from "lucide-react";
 
 /* ===== Translucent Wooden Card ===== */
 const FeatureCard = ({ icon: Icon, title, description, onClick }) => (
@@ -51,71 +52,71 @@ export default function NotebookView() {
   };
 
   useEffect(() => { if (notebookId) refreshFiles(); }, [notebookId]);
-const handleUpload = async (e) => {
-  const formData = new FormData();
-  Array.from(e.target.files).forEach((f) =>
-    formData.append("files", f)
-  );
-
-  await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, formData);
-  await refreshFiles();
-  e.target.value = "";
-};
-
-const handleDriveFileClick = async (file) => {
-  const existing = selectedFiles.find(
-    (f) => f.driveFileId === file.id
-  );
-
-  if (existing) {
-    await axios.delete(
-      `${API}/api/notebooks/${notebookId}/remove-file/${existing.id}`
+  const handleUpload = async (e) => {
+    const formData = new FormData();
+    Array.from(e.target.files).forEach((f) =>
+      formData.append("files", f)
     );
-  } else {
-    await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, {
-      driveFiles: JSON.stringify([{ id: file.id, name: file.name }]),
+
+    await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, formData);
+    await refreshFiles();
+    e.target.value = "";
+  };
+
+  const handleDriveFileClick = async (file) => {
+    const existing = selectedFiles.find(
+      (f) => f.driveFileId === file.id
+    );
+
+    if (existing) {
+      await axios.delete(
+        `${API}/api/notebooks/${notebookId}/remove-file/${existing.id}`
+      );
+    } else {
+      await axios.post(`${API}/api/notebooks/${notebookId}/add-files`, {
+        driveFiles: JSON.stringify([{ id: file.id, name: file.name }]),
+      });
+    }
+
+    await refreshFiles();
+  };
+
+  const handleRemoveFile = async (fileId) => {
+    await axios.delete(
+      `${API}/api/notebooks/${notebookId}/remove-file/${fileId}`
+    );
+    await refreshFiles();
+  };
+
+  const handleClearAll = async () => {
+    await axios.delete(
+      `${API}/api/notebooks/${notebookId}/clear-files`
+    );
+    setSelectedFiles([]);
+  };
+
+  const generateFlashcardsFromFiles = async () => {
+    const textRes = await axios.get(
+      `${API}/api/notebooks/${notebookId}/text`
+    );
+    navigate("/flashcards/" + notebookId, {
+      state: { extractedText: textRes.data.text },
     });
-  }
+  };
 
-  await refreshFiles();
-};
-
-const handleRemoveFile = async (fileId) => {
-  await axios.delete(
-    `${API}/api/notebooks/${notebookId}/remove-file/${fileId}`
-  );
-  await refreshFiles();
-};
-
-const handleClearAll = async () => {
-  await axios.delete(
-    `${API}/api/notebooks/${notebookId}/clear-files`
-  );
-  setSelectedFiles([]);
-};
-
-const generateFlashcardsFromFiles = async () => {
-  const textRes = await axios.get(
-    `${API}/api/notebooks/${notebookId}/text`
-  );
-  navigate("/flashcards/" + notebookId, {
-    state: { extractedText: textRes.data.text },
-  });
-};
-
-const generateQuizFromFiles = async () => {
-  await axios.get(
-    `${API}/api/notebooks/${notebookId}/text`
-  );
-  navigate(`/quiz/${notebookId}`);
-};
-const requireFiles = (action) => {
-  if (selectedFiles.length === 0) {
-    alert("Select at least one scroll 🌿");
-    return;
-  }
-  action();
-};
+  const generateQuizFromFiles = async () => {
+    await axios.get(
+      `${API}/api/notebooks/${notebookId}/text`
+    );
+    navigate(`/quiz/${notebookId}`);
+  };
+  const requireFiles = (action) => {
+    if (selectedFiles.length === 0) {
+      alert("Select at least one scroll 🌿");
+      return;
+    }
+    action();
+  };
 
   return (
     <div
@@ -150,7 +151,22 @@ const requireFiles = (action) => {
 
       {/* LEFT PANEL */}
       <div className="w-[28%] min-w-[320px] p-8 flex flex-col gap-8 border-r border-amber-200/20 relative z-10 text-amber-100">
-
+        {/* Back Button */}
+        <button
+          onClick={() => navigate("/homepage")}
+          className="flex items-center gap-2 px-4 py-2 mb-4 
+             rounded-xl backdrop-blur-md 
+             bg-[rgba(80,50,20,0.55)] 
+             border border-amber-200/20 
+             text-amber-200 
+             hover:bg-amber-200/10 
+             hover:shadow-[0_0_10px_rgba(251,191,36,0.4)] 
+             hover:scale-105 
+             transition"
+        >
+          <ArrowLeft size={18} />
+          Return to Library
+        </button>
         <h1 className="text-3xl text-center font-semibold tracking-wide drop-shadow-lg">
           {notebookName}
         </h1>
@@ -169,45 +185,45 @@ const requireFiles = (action) => {
           </div>
 
           <input
-  ref={fileInputRef}
-  type="file"
-  multiple
-  hidden
-  onChange={handleUpload}
-/>
+            ref={fileInputRef}
+            type="file"
+            multiple
+            hidden
+            onChange={handleUpload}
+          />
         </div>
         {selectedFiles.length > 0 && (
-  <div className="p-6 rounded-2xl backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20 shadow-lg">
-    <div className="flex justify-between mb-4 text-lg">
-      <span>Selected Scrolls ({selectedFiles.length})</span>
-      <button
-        onClick={handleClearAll}
-        className="text-red-300 hover:text-red-400 transition"
-      >
-        Clear All
-      </button>
-    </div>
+          <div className="p-6 rounded-2xl backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20 shadow-lg">
+            <div className="flex justify-between mb-4 text-lg">
+              <span>Selected Scrolls ({selectedFiles.length})</span>
+              <button
+                onClick={handleClearAll}
+                className="text-red-300 hover:text-red-400 transition"
+              >
+                Clear All
+              </button>
+            </div>
 
-    <div className="space-y-3">
-      {selectedFiles.map((file) => (
-        <div
-          key={file.id}
-          className="flex justify-between items-center p-3 rounded-lg bg-amber-100/10 border border-amber-300/20"
-        >
-          <span className="truncate">{file.name}</span>
-          <button onClick={() => handleRemoveFile(file.id)}>✕</button>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+            <div className="space-y-3">
+              {selectedFiles.map((file) => (
+                <div
+                  key={file.id}
+                  className="flex justify-between items-center p-3 rounded-lg bg-amber-100/10 border border-amber-300/20"
+                >
+                  <span className="truncate">{file.name}</span>
+                  <button onClick={() => handleRemoveFile(file.id)}>✕</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Sidebar */}
         <div className="rounded-2xl p-4 backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20">
           <SubjectSidebar
-  selectedFiles={selectedFiles}
-  onFileClick={handleDriveFileClick}
-/>
+            selectedFiles={selectedFiles}
+            onFileClick={handleDriveFileClick}
+          />
         </div>
       </div>
 
@@ -216,30 +232,30 @@ const requireFiles = (action) => {
 
         <FeatureCard icon={Sparkles} title="Highlight Key Topics" description="Let the forest spirits reveal important concepts." onClick={() => requireFiles(() => navigate("/highlighttopics/" + notebookId))} />
         <FeatureCard
-  icon={BookOpen}
-  title="Summaries & Flashcards"
-  description="Turn scrolls into wisdom fragments."
-  onClick={() => requireFiles(generateFlashcardsFromFiles)}
-/>
+          icon={BookOpen}
+          title="Summaries & Flashcards"
+          description="Turn scrolls into wisdom fragments."
+          onClick={() => requireFiles(generateFlashcardsFromFiles)}
+        />
         <FeatureCard icon={Clock} title="Daily Study Reminders" description="Whispers from the woodland to stay consistent." />
         <FeatureCard
-  icon={Calendar}
-  title="Study Schedule"
-  description="Align your study rhythm with nature."
-  onClick={() => navigate("/scheduleplanner")}
-/>
+          icon={Calendar}
+          title="Study Schedule"
+          description="Align your study rhythm with nature."
+          onClick={() => navigate("/scheduleplanner")}
+        />
         <FeatureCard
-  icon={Plus}
-  title="Generate Quiz"
-  description="Test your arcane knowledge."
-  onClick={() => requireFiles(generateQuizFromFiles)}
-/>
+          icon={Plus}
+          title="Generate Quiz"
+          description="Test your arcane knowledge."
+          onClick={() => requireFiles(generateQuizFromFiles)}
+        />
         <FeatureCard
-  icon={Video}
-  title="Recommended Videos"
-  description="Dive into the stream of knowledge."
-  onClick={() => navigate(`/videos/${notebookId}`)}
-/>
+          icon={Video}
+          title="Recommended Videos"
+          description="Dive into the stream of knowledge."
+          onClick={() => navigate(`/videos/${notebookId}`)}
+        />
 
       </div>
 

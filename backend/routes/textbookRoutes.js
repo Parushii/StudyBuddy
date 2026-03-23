@@ -13,6 +13,7 @@ console.log(typeof findRelevantChunks);
 // Upload textbook
 router.post("/upload", upload.single("file"), async (req, res) => {
     try {
+        await TextbookChunk.deleteMany({});
         const filePath = req.file.path;
         const dataBuffer = fs.readFileSync(filePath);
 

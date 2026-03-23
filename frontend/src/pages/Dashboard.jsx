@@ -8,6 +8,7 @@ import {
 } from "recharts";
 import { useNavigate } from "react-router-dom";
 import Mascot from "../components/Mascot";
+import { ArrowLeft } from "lucide-react";
 
 /* ── Design tokens ── */
 const C = {
@@ -334,45 +335,45 @@ export default function Dashboard() {
     useEffect(() => {
         let timer;
 
-       const getMessage = () => {
-    // ❌ CRITICAL NEGATIVE STATES FIRST (highest priority)
+        const getMessage = () => {
+            // ❌ CRITICAL NEGATIVE STATES FIRST (highest priority)
 
-    if (triggers.lowFocus) {
-        return "Your focus is dropping... let’s get you back on track ⚡";
-    }
+            if (triggers.lowFocus) {
+                return "Your focus is dropping... let’s get you back on track ⚡";
+            }
 
-    if (triggers.lowPerformance) {
-        return "Struggling with quizzes? Wanna improve this? Come with me 👀";
-    }
+            if (triggers.lowPerformance) {
+                return "Struggling with quizzes? Wanna improve this? Come with me 👀";
+            }
 
-    if (triggers.weakConcepts) {
-        return "Flashcards look weak 😬 Let’s fix your concepts!";
-    }
+            if (triggers.weakConcepts) {
+                return "Flashcards look weak 😬 Let’s fix your concepts!";
+            }
 
-    if (triggers.lowEngagement) {
-        return `You barely studied ${leastStudied} 😶 Wanna turn this around?`;
-    }
+            if (triggers.lowEngagement) {
+                return `You barely studied ${leastStudied} 😶 Wanna turn this around?`;
+            }
 
-    // ✅ POSITIVE STATES (only if no major issue)
+            // ✅ POSITIVE STATES (only if no major issue)
 
-    if (positiveTriggers.highPerformance) {
-        return "You're crushing quizzes 🔥 Keep it going!";
-    }
+            if (positiveTriggers.highPerformance) {
+                return "You're crushing quizzes 🔥 Keep it going!";
+            }
 
-    if (positiveTriggers.strongConcepts) {
-        return "Your concepts are getting strong 💡 Impressive!";
-    }
+            if (positiveTriggers.strongConcepts) {
+                return "Your concepts are getting strong 💡 Impressive!";
+            }
 
-    if (positiveTriggers.consistentStudy) {
-        return `${streakData} day streak! You're on fire 🚀`;
-    }
+            if (positiveTriggers.consistentStudy) {
+                return `${streakData} day streak! You're on fire 🚀`;
+            }
 
-    if (positiveTriggers.highFocus) {
-        return "Deep focus mode unlocked 🧠✨ This is elite.";
-    }
+            if (positiveTriggers.highFocus) {
+                return "Deep focus mode unlocked 🧠✨ This is elite.";
+            }
 
-    return null;
-};
+            return null;
+        };
 
         const message = getMessage();
 
@@ -408,7 +409,21 @@ export default function Dashboard() {
             }} />
 
             <div className="relative z-10 p-8 space-y-8">
-
+                {/* Back Button */}
+                <button
+                    onClick={() => window.history.back()}
+                    className="flex items-center gap-2 px-4 py-2 mb-4 
+             rounded-xl backdrop-blur-md 
+             bg-[rgba(20,80,50,0.55)] 
+             border border-green-200/20 
+             text-green-200 
+             hover:bg-green-200/10 
+             hover:scale-105 
+             transition shadow-md"
+                >
+                    <ArrowLeft size={18} />
+                    Back
+                </button>
                 {/* ══ HERO ══ */}
                 <GlassCard accent="green">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
