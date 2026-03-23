@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Calendar } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
+import DownloadFile from "./DownloadFile";
 
 const API = "http://localhost:5000";
 
@@ -56,6 +57,24 @@ export default function SchedulePlanner() {
     localStorage.setItem("savedStudyPlan", JSON.stringify(scheduleData));
     alert("Study plan saved successfully!");
   };
+
+  const getScheduleText = () => {
+  if (!scheduleData) return "";
+
+  let text = "";
+
+  Object.entries(scheduleData)
+  .filter(([key]) => key.includes("-")) // only dates like 2026-03-23
+  .forEach(([date, topic]) => {
+    const title = topic.split(":")[0];
+    const body = topic.split(":").slice(1).join(":");
+
+    text += `${date} - ${title}\n`;
+    text += `${body}\n\n`;
+  });
+
+  return text;
+};
 
   return (
     <div
@@ -173,6 +192,15 @@ export default function SchedulePlanner() {
           ✨ The Prophecy Timeline ✨
         </h1>
 
+        {scheduleData && (
+  <div className="flex justify-center mb-6">
+    <DownloadFile
+      content={getScheduleText()}
+      title="Study Schedule"
+    />
+  </div>
+)}
+
         {scheduleData ? (
           <div className="relative">
             {/* Glowing Energy Line */}
@@ -204,15 +232,6 @@ export default function SchedulePlanner() {
             Upload scrolls to reveal your destiny...
           </p>
         )}
-
-        <div className="mt-14 flex justify-center">
-          <button
-            onClick={handleSave}
-            className="px-8 py-3 rounded-full bg-gradient-to-r from-amber-600 to-yellow-500 text-black font-semibold shadow-lg hover:scale-105 transition"
-          >
-            💾 Preserve the Prophecy
-          </button>
-        </div>
       </main>
 
       {/* Firefly Animation */}
