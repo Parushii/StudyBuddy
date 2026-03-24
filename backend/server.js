@@ -28,7 +28,10 @@ const textbookRoutes = require("./routes/textbookRoutes");
 const learningPathRoutes = require("./routes/generatePath");
 const googleCalendarRoutes = require("./routes/calendar");
 
-app.use(cors({ origin: ["http://localhost:5173", "http://localhost:8000"] }));
+app.use(cors({ 
+  origin: ["http://localhost:5173", "http://localhost:8000"],
+  credentials: true
+}));
 app.use(express.json());
 
 const dns = require("dns");
@@ -123,39 +126,39 @@ app.post("/generate-index", upload.array("files"), async (req, res) => {
   }
 });
 
-app.post("/generate-schedule", upload.array("files"), async (req, res) => {
-  try {
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ error: "No files uploaded" });
-    }
+// app.post("/generate-schedule", upload.array("files"), async (req, res) => {
+//   try {
+//     if (!req.files || req.files.length === 0) {
+//       return res.status(400).json({ error: "No files uploaded" });
+//     }
     
-    console.log("📂 Files received:", req.files.length);
+//     console.log("📂 Files received:", req.files.length);
 
-    // 1️⃣ Extract text from uploaded files
-    const combinedText = await extractTextFromFiles(req.files);
+//     // 1️⃣ Extract text from uploaded files
+//     const combinedText = await extractTextFromFiles(req.files);
 
-    if (!combinedText || combinedText.trim() === "") {
-      return res.status(400).json({ error: "No readable text found in files" });
-    }
+//     if (!combinedText || combinedText.trim() === "") {
+//       return res.status(400).json({ error: "No readable text found in files" });
+//     }
 
-    // 2️⃣ Send to Gemini
-    const { startDate, examDate, subject } = req.body;
+//     // 2️⃣ Send to Gemini
+//     const { startDate, examDate, subject } = req.body;
 
-    const structuredContent = await generateScheduleFromText(
-      combinedText,
-      startDate,
-      examDate,
-      subject
-    );
+//     const structuredContent = await generateScheduleFromText(
+//       combinedText,
+//       startDate,
+//       examDate,
+//       subject
+//     );
 
-    // 3️⃣ Send structured JSON back to frontend
-    res.json(structuredContent);
+//     // 3️⃣ Send structured JSON back to frontend
+//     res.json(structuredContent);
 
-  } catch (error) {
-    console.error("🔥 FULL ERROR:", error.message);
-    res.status(500).json({ error: error.message });
-  }
-});
+//   } catch (error) {
+//     console.error("🔥 FULL ERROR:", error.message);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 app.use("/api", googleCalendarRoutes);
 

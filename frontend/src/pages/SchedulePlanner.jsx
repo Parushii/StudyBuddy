@@ -1,13 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Calendar } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 
-const API = "http://localhost:5000";
+const API = "http://localhost:5000/api";
 
 export default function SchedulePlanner() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [examDate, setExamDate] = useState("");
   const [startDate, setStartDate] = useState("");
