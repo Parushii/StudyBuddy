@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FloatingLeaves, Fireflies, CornerVine } from "./Flashcards";
 import { ArrowLeft } from "lucide-react";
+import DownloadFile from "./DownloadFile";
 
 export default function TextbookQA() {
     const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
@@ -53,6 +54,11 @@ export default function TextbookQA() {
             setLoading(false);
         }
     };
+    const getQAText = () => {
+        if (!answer) return "";
+
+        return `Question:\n${question}\n\nAnswer:\n${answer}`;
+    };
 
     return (
         <div className="min-h-screen relative bg-black text-white font-sans overflow-hidden">
@@ -80,7 +86,7 @@ export default function TextbookQA() {
             {/* Main Content */}
             <div className="relative z-10 max-w-4xl mx-auto p-6 space-y-8">
                 {/* Back Button */}
-                  <button
+                <button
                     onClick={() => window.history.back()}
                     className="flex items-center gap-2 px-4 py-2 mb-4 
                        rounded-xl backdrop-blur-md 
@@ -91,10 +97,10 @@ export default function TextbookQA() {
                        hover:shadow-[0_0_10px_rgba(251,191,36,0.4)] 
                        hover:scale-105 
                        transition"
-                  >
+                >
                     <ArrowLeft size={18} />
                     Back
-                  </button>
+                </button>
                 <h1 className="text-4xl font-bold text-center text-white drop-shadow-lg">
                     Textbook Diver
                 </h1>
@@ -134,7 +140,7 @@ export default function TextbookQA() {
                             disabled={loading || !question.trim()}
                             className="px-6 py-3 rounded-xl bg-green-600 hover:bg-green-700 transition font-semibold text-white"
                         >
-                            {loading ? "Thinking..." : "Ask Gemini"}
+                            {loading ? "Thinking..." : "Dive"}
                         </button>
                         {(answer || error) && (
                             <button
@@ -163,6 +169,12 @@ export default function TextbookQA() {
                 {answer && (
                     <div className="bg-white/10 p-6 rounded-2xl border border-white/20 shadow-lg text-white/90">
                         <h2 className="text-xl font-semibold mb-2">Answer:</h2>
+                        <div className="flex justify-end mb-3">
+                            <DownloadFile
+                                content={getQAText()}
+                                title="Textbook Answer"
+                            />
+                        </div>
                         <p className="whitespace-pre-line leading-relaxed">{answer}</p>
 
                         {/* {sources.length > 0 && (

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { MdFlip } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
-
+import DownloadFile from "./DownloadFile";
 /* ===== Floating Leaves ===== */
 const LEAF_DEFS = [
   { viewBox: "0 0 20 60", path: "M10 0 C16 10, 20 25, 16 40 C13 52, 10 60, 10 60 C10 60, 7 52, 4 40 C0 25, 4 10, 10 0Z", vein: "M10 0 L10 60" },
@@ -215,6 +215,12 @@ const subject = notebook?.name || "Unknown";
   }
 };
 
+const getFlashcardsText = () => {
+  return flashcards.map((card, i) => {
+    return `Card ${i + 1}: ${card.question}\n${card.answer}`;
+  }).join("\n\n");
+};
+
   const isFlipped = !!flipped[currentIndex];
   const progress = flashcards.length > 0 ? ((currentIndex + 1) / flashcards.length) * 100 : 0;
   const activeFace = isFlipped ? palette.a : palette.q;
@@ -287,6 +293,14 @@ const subject = notebook?.name || "Unknown";
 
         {/* Title */}
         <div className="text-center mb-8">
+          {flashcards.length > 0 && (
+  <div className="flex justify-center mb-4">
+    <DownloadFile
+      content={getFlashcardsText()}
+      title="Flashcards"
+    />
+  </div>
+)}
           <h1 className="text-4xl font-bold mb-1" style={{ color: "#3b2010", textShadow: "1px 2px 8px rgba(196,149,106,0.4)" }}>
             🌿 Flashcards
           </h1>

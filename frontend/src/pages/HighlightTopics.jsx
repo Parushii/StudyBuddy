@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import DownloadFile from "./DownloadFile";
 
 /* ===== Botanical illustration for empty state ===== */
 const BotanicalIllustration = () => (
@@ -98,6 +99,24 @@ export default function HighlightTopics() {
 
   useEffect(() => { if (notebookId) loadHighlights(); }, [notebookId]);
 
+  const getAllContent = () => {
+  let fullText = "";
+
+  content.forEach(fileGroup => {
+    fullText += `\n\n${fileGroup.fileName}\n`;
+
+    fileGroup.chapters.forEach(chapter => {
+      fullText += `\n${chapter.chapterTitle}\n`;
+
+      chapter.topics.forEach(topic => {
+        fullText += `\n${topic.topicTitle}\n`;
+        fullText += `${topic.content}\n`;
+      });
+    });
+  });
+
+  return fullText;
+};
   const loadHighlights = async () => {
     try {
       setLoading(true);
@@ -200,9 +219,9 @@ export default function HighlightTopics() {
           boxShadow: "0 3px 8px rgba(107,63,31,0.3)",
         }}>
           {/* Back Button */}
-                  <button
-                    onClick={() => window.history.back()}
-                    className="flex items-center gap-2 px-4 py-2 mb-4 
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 px-4 py-2 mb-4 
                        rounded-xl backdrop-blur-md 
                        bg-[rgba(80,50,20,0.55)] 
                        border border-amber-200/20 
@@ -211,10 +230,10 @@ export default function HighlightTopics() {
                        hover:shadow-[0_0_10px_rgba(251,191,36,0.4)] 
                        hover:scale-105 
                        transition"
-                  >
-                    <ArrowLeft size={18} />
-                    Back
-                  </button>
+          >
+            <ArrowLeft size={18} />
+            Back
+          </button>
           <div className="flex items-center gap-3">
             <span className="text-2xl">📖</span>
             <div>
@@ -328,6 +347,10 @@ export default function HighlightTopics() {
             {selectedTopic.title || "📖 Open a topic to begin reading"}
           </h1>
           <div className="flex items-center gap-2 flex-shrink-0">
+            <DownloadFile
+              content={getAllContent()}
+              title="Full Highlights"
+            />
             <span className="text-xs font-medium" style={{ color: "#9a6840" }}>Size</span>
             <button onClick={() => setFontSize(f => Math.max(13, f - 1))}
               className="w-8 h-8 rounded-lg text-sm font-bold flex items-center justify-center"

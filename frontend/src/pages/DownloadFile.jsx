@@ -1,158 +1,167 @@
-import React, { useState } from "react";
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+import React from "react";
+import jsPDF from "jspdf";
 
-const DownloadFile = ({ notes, quillRef }) => {
-  const [downloadFormat, setDownloadFormat] = useState('html');
+const DownloadFile = ({ content, title }) => {
 
-  const downloadNotes = () => {
-    if (!notes || notes.trim() === '') {
-      alert('No content to download!');
-      return;
-    }
+  // 🔥 Convert raw text → structured sections
+  const parseContent = () => {
+    const sections = [];
+    const blocks = content.split("\n\n");
 
-    switch (downloadFormat) {
-      case 'html':
-        downloadHTML();
-        break;
-      case 'text':
-        downloadText();
-        break;
-      case 'pdf':
-        downloadPDF();
-        break;
-      case 'word':
-        downloadWord();
-        break;
-      default:
-        downloadHTML();
-    }
-  };
-
-  const downloadHTML = () => {
-    const content = notes;
-    const blob = new Blob([content], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'notes.html';
-    document.body.appendChild(a);
-    a.click();
-    
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);
-  };
-
-  const downloadText = () => {
-    const content = notes.replace(/<[^>]*>/g, '');
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'notes.txt';
-    document.body.appendChild(a);
-    a.click();
-    
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);
-  };
-
-  const downloadPDF = () => {
-    const editor = quillRef.current.getEditor();
-    const content = editor.root.innerHTML;
-    
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
-    tempDiv.style.padding = '20px';
-    tempDiv.style.fontSize = '14px';
-    
-    document.body.appendChild(tempDiv);
-    
-    html2canvas(tempDiv).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-      
-      const imgWidth = 190;
-      const pageHeight = 277;
-      const imgHeight = canvas.height * imgWidth / canvas.width;
-      
-      let heightLeft = imgHeight;
-      let position = 10;
-      
-      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+    blocks.forEach(block => {
+      const lines = block.trim().split("\n");
+      if (lines.length > 0) {
+        sections.push({
+          heading: lines[0],
+          body: lines.slice(1).join(" ")
+        });
       }
-      
-      pdf.save('notes.pdf');
-      document.body.removeChild(tempDiv);
     });
+
+    return sections;
   };
 
+  // 📄 PDF (Styled with bold headings)
+  const downloadPDF = () => {
+    const pdf = new jsPDF();
+    const margin = 10;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const maxWidth = pageWidth - margin * 2;
+
+    let y = 20;
+
+    // Title
+    pdf.setFontSize(16);
+    pdf.setFont(undefined, "bold");
+    pdf.text(title || "Notes", margin, y);
+    y += 10;
+
+    const sections = parseContent();
+
+    sections.forEach(section => {
+      // Heading
+      pdf.setFontSize(13);
+      pdf.setFont(undefined, "bold");
+
+      const headingLines = pdf.splitTextToSize(section.heading, maxWidth);
+      headingLines.forEach(line => {
+        if (y > 280) {
+          pdf.addPage();
+          y = 20;
+        }
+        pdf.text(line, margin, y);
+        y += 7;
+      });
+
+      // Body
+      pdf.setFontSize(11);
+      pdf.setFont(undefined, "normal");
+
+      const bodyLines = pdf.splitTextToSize(section.body, maxWidth);
+      bodyLines.forEach(line => {
+        if (y > 280) {
+          pdf.addPage();
+          y = 20;
+        }
+        pdf.text(line, margin, y);
+        y += 6;
+      });
+
+      y += 5; // spacing between sections
+    });
+
+    pdf.save(`${title || "notes"}.pdf`);
+  };
+
+  // 🌐 HTML (bold headings)
+  const downloadHTML = () => {
+    const sections = parseContent();
+
+    let htmlContent = `
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>${title}</title>
+        </head>
+        <body style="font-family: Arial; padding: 20px;">
+          <h1>${title || "Notes"}</h1>
+    `;
+
+    sections.forEach(section => {
+      htmlContent += `
+        <h3>${section.heading}</h3>
+        <p>${section.body.replace(/\n/g, "<br/>")}</p>
+      `;
+    });
+
+    htmlContent += `</body></html>`;
+
+    const blob = new Blob([htmlContent], { type: "text/html" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${title || "notes"}.html`;
+    link.click();
+  };
+
+  // 📝 TXT (simple)
+  const downloadText = () => {
+    const blob = new Blob([content], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${title || "notes"}.txt`;
+    link.click();
+  };
+
+  // 📘 Word (bold headings)
   const downloadWord = () => {
-    const content = `
+    const sections = parseContent();
+
+    let htmlContent = `
       <html xmlns:o="urn:schemas-microsoft-com:office:office" 
             xmlns:w="urn:schemas-microsoft-com:office:word" 
             xmlns="http://www.w3.org/TR/REC-html40">
         <head>
           <meta charset="utf-8">
-          <title>Notes</title>
+          <title>${title}</title>
         </head>
         <body>
-          ${notes}
-        </body>
-      </html>
+          <h1>${title || "Notes"}</h1>
     `;
-    
-    const blob = new Blob([content], { type: 'application/msword' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'notes.doc';
-    document.body.appendChild(a);
-    a.click();
-    
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);
+
+    sections.forEach(section => {
+      htmlContent += `
+        <h3><b>${section.heading}</b></h3>
+        <p>${section.body.replace(/\n/g, "<br/>")}</p>
+      `;
+    });
+
+    htmlContent += `</body></html>`;
+
+    const blob = new Blob(["\ufeff", htmlContent], {
+      type: "application/msword",
+    });
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${title || "notes"}.doc`;
+    link.click();
   };
 
   return (
-    <>
-      <select 
-        value={downloadFormat}
-        onChange={(e) => setDownloadFormat(e.target.value)}
-        style={{ padding: "5px", marginRight: "10px", borderRadius: "3px", border: "1px solid #ccc" }}
-      >
-        <option value="html">HTML</option>
-        <option value="text">Text</option>
-        <option value="pdf">PDF</option>
-        <option value="word">Word</option>
-      </select>
-      <button 
-        onClick={downloadNotes}
-        style={{ padding: "5px 10px", backgroundColor: "#2196F3", color: "white", border: "none", borderRadius: "3px" }}
-      >
-        Download
+    <div className="flex gap-2 flex-wrap">
+      <button onClick={downloadPDF} className="px-3 py-1.5 rounded-xl backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20 text-amber-100 hover:bg-[rgba(120,80,30,0.7)] transition-all text-sm">
+        PDF
       </button>
-    </>
+      <button onClick={downloadWord} className="px-3 py-1.5 rounded-xl backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20 text-amber-100 hover:bg-[rgba(120,80,30,0.7)] transition-all text-sm">
+        Word
+      </button>
+      <button onClick={downloadHTML} className="px-3 py-1.5 rounded-xl backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20 text-amber-100 hover:bg-[rgba(120,80,30,0.7)] transition-all text-sm">
+        HTML
+      </button>
+      <button onClick={downloadText}className="px-3 py-1.5 rounded-xl backdrop-blur-md bg-[rgba(80,50,20,0.55)] border border-amber-200/20 text-amber-100 hover:bg-[rgba(120,80,30,0.7)] transition-all text-sm">
+        TXT
+      </button>
+    </div>
   );
 };
 
