@@ -129,7 +129,7 @@ const MysticTooltip = ({ active, payload, label }) => {
 
                 let display;
                 if (value < 1) {
-                    display = `${Math.round(value * 60)} min`;  // 🔥 convert to minutes
+                    display = `${Math.round(value * 60)} min`;  // convert to minutes
                 } else {
                     display = `${value.toFixed(1)} hrs`;
                 }
@@ -213,7 +213,7 @@ export default function Dashboard() {
             return acc;
         }, {});
 
-        // ✅ sort attempts
+        // sort attempts
         Object.values(grouped).forEach(n => {
             n.attempts.sort((a, b) => a.attempt - b.attempt);
         });
@@ -250,6 +250,49 @@ export default function Dashboard() {
             return acc;
         }, {})
     );
+
+    const subjectInsights = useMemo(() => {
+    const map = {};
+
+    progressData.forEach(p => {
+        if (!map[p.subject]) {
+            map[p.subject] = {
+                quizTotal: 0,
+                quizCount: 0,
+                flashCorrect: 0,
+                flashWrong: 0,
+                time: 0
+            };
+        }
+
+        map[p.subject].quizTotal += p.lastQuizScore || 0;
+        map[p.subject].quizCount += 1;
+        map[p.subject].flashCorrect += p.flashcardCorrect || 0;
+        map[p.subject].flashWrong += p.flashcardWrong || 0;
+        map[p.subject].time += p.timeSpent || 0;
+    });
+
+    return Object.entries(map).map(([subject, data]) => {
+        const avgQuiz = data.quizCount
+            ? data.quizTotal / data.quizCount
+            : 0;
+
+        const flashAcc =
+            (data.flashCorrect + data.flashWrong) > 0
+                ? (data.flashCorrect / (data.flashCorrect + data.flashWrong)) * 100
+                : 0;
+
+        const hours = data.time / 3600;
+
+        //  weighted score
+        const score =
+            (avgQuiz * 0.7) +
+            (flashAcc * 0.2) +
+            (Math.min(hours * 10, 10)); 
+
+        return { subject, score, avgQuiz, flashAcc, hours };
+    });
+}, [progressData]);
 
     const streakData = useMemo(() => {
         const activityDates = new Set();
@@ -288,7 +331,7 @@ export default function Dashboard() {
                 current = new Date(d);
                 current.setHours(0, 0, 0, 0);
             } else if (diff > 1) {
-                break; // streak broken
+                break; 
             }
         }
 
@@ -300,8 +343,15 @@ export default function Dashboard() {
     const minutes = Math.floor((totalTime % 3600) / 60);
     const studyTime = `${hours}h ${minutes}m`;
 
-    const mostStudied = timeData.length > 0 ? timeData.reduce((a, b) => a.hours > b.hours ? a : b).subject : "-";
-    const leastStudied = timeData.length > 0 ? timeData.reduce((a, b) => a.hours < b.hours ? a : b).subject : "-";
+    const mostStudied =
+    subjectInsights.length > 0
+        ? subjectInsights.reduce((a, b) => a.hours > b.hours ? a : b).subject
+        : "-";
+
+const leastStudied =
+    subjectInsights.length > 0
+        ? subjectInsights.reduce((a, b) => a.hours < b.hours ? a : b).subject
+        : "-";
 
     const flashCorrect = progressData.reduce((s, p) => s + p.flashcardCorrect, 0);
     const flashWrong = progressData.reduce((s, p) => s + p.flashcardWrong, 0);
@@ -312,12 +362,24 @@ export default function Dashboard() {
         ? quizResults.reduce((s, r) => s + r.percentage, 0) / quizResults.length : 0;
     const focusScore = Math.round(avgQuiz * 0.5 + flashAccuracy * 0.3 + Math.min(hours * 5, 20));
     const weeklyScores = weeklyProgress;
-    const weakSubject = leastStudied;
+    
+
+const weakSubject =
+    subjectInsights.length > 0
+        ? subjectInsights.reduce((a, b) => a.score < b.score ? a : b).subject
+        : "-";
+
+const strongSubject =
+    subjectInsights.length > 0
+        ? subjectInsights.reduce((a, b) => a.score > b.score ? a : b).subject
+        : "-";
 
     const triggers = {
-        lowEngagement: (timeData.length === 0) || (leastStudied !== "-" && timeData.find(t => t.subject === leastStudied)?.hours < 1),
+        lowEngagement:
+    subjectInsights.some(s => s.hours < 1),
 
-        lowPerformance: avgQuiz < 50,
+lowPerformance:
+    subjectInsights.some(s => s.avgQuiz < 50),
 
         weakConcepts: flashAccuracy < 60,
 
@@ -336,7 +398,6 @@ export default function Dashboard() {
         let timer;
 
         const getMessage = () => {
-            // ❌ CRITICAL NEGATIVE STATES FIRST (highest priority)
 
             if (triggers.lowFocus) {
                 return "Your focus is dropping... let’s get you back on track ⚡";
@@ -351,10 +412,10 @@ export default function Dashboard() {
             }
 
             if (triggers.lowEngagement) {
-                return `You barely studied ${leastStudied} 😶 Wanna turn this around?`;
-            }
+                const weakest = subjectInsights.reduce((a, b) => a.score < b.score ? a : b);
 
-            // ✅ POSITIVE STATES (only if no major issue)
+return `You're struggling in ${weakest.subject} 👀 Let's fix it`;
+            }
 
             if (positiveTriggers.highPerformance) {
                 return "You're crushing quizzes 🔥 Keep it going!";
@@ -380,7 +441,7 @@ export default function Dashboard() {
         if (message) {
             timer = setTimeout(() => {
                 setMascotMessage(message);
-            }, 1500); // delay = feels smart
+            }, 1500); 
         } else {
             setMascotMessage(null);
         }

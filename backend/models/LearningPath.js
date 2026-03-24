@@ -5,6 +5,7 @@ const stepSchema = new mongoose.Schema({
   title: String,
   type: String, // "read" | "flashcard" | "quiz"
   duration: Number,
+  topicId:{type:String},
   completed: {
     type: Boolean,
     default: false,
@@ -17,7 +18,7 @@ const learningPathSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  steps: [stepSchema], // ✅ FIXED
+  steps: [stepSchema],
   status: {
     type: String,
     enum: ["active", "completed"],

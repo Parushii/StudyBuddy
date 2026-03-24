@@ -43,40 +43,70 @@ async function getStudentInsights(userId) {
     const quizResults = await QuizResult.find({ userId });
     const progress = await StudentProgress.find({ userId });
 
+    // ================= QUIZ ACCURACY =================
     const quizAccuracy =
         quizResults.length > 0
-            ? quizResults.reduce((sum, q) => sum + q.percentage, 0) /
+            ? quizResults.reduce((sum, q) => sum + (q.percentage || 0), 0) /
             quizResults.length
             : 0;
 
+    // ================= SUBJECT ANALYSIS =================
     const subjectMap = {};
 
     progress.forEach((p) => {
-        if (!subjectMap[p.subject]) {
-            subjectMap[p.subject] = { score: 0, count: 0 };
+        const subject = p.subject?.trim().toLowerCase();
+        if (!subject) return;
+
+        if (!subjectMap[subject]) {
+            subjectMap[subject] = {
+                score: 0,
+                count: 0,
+                time: 0,
+                correct: 0,
+                wrong: 0,
+            };
         }
-        subjectMap[p.subject].score += p.lastQuizScore || 0;
-        subjectMap[p.subject].count += 1;
+
+        subjectMap[subject].score += p.lastQuizScore || 0;
+        subjectMap[subject].count += p.lastQuizScore ? 1 : 0;
+        subjectMap[subject].time += p.timeSpent || 0;
+        subjectMap[subject].correct += p.flashcardCorrect || 0;
+        subjectMap[subject].wrong += p.flashcardWrong || 0;
     });
 
-    let weakSubject = "None";
-    let minScore = Infinity;
+    // ================= FIND WEAK SUBJECT =================
+    let weakSubject = null;
+    let worstScore = -Infinity;
 
     Object.keys(subjectMap).forEach((sub) => {
-        const avg =
-            subjectMap[sub].count > 0
-                ? subjectMap[sub].score / subjectMap[sub].count
-                : 0;
+        const data = subjectMap[sub];
 
-        if (avg < minScore) {
-            minScore = avg;
+        const avgScore =
+            data.count > 0 ? data.score / data.count : 50;
+
+        const totalFlash = data.correct + data.wrong;
+        const flashAcc =
+            totalFlash > 0 ? (data.correct / totalFlash) * 100 : 50;
+
+        const hours = data.time / 3600;
+
+        // COMBINED WEAKNESS SCORE (LOW = BAD)
+        const combinedScore =
+            avgScore * 0.5 + flashAcc * 0.3 + Math.min(hours * 10, 20);
+
+        if (combinedScore < worstScore || weakSubject === null) {
+            worstScore = combinedScore;
             weakSubject = sub;
         }
     });
 
+    if (!weakSubject) weakSubject = "general";
+
+    // ================= STUDY TIME =================
     const studyTime =
         progress.reduce((sum, p) => sum + (p.timeSpent || 0), 0) / 60;
 
+    // ================= FLASHCARD =================
     let correct = 0,
         wrong = 0;
 
@@ -88,7 +118,11 @@ async function getStudentInsights(userId) {
     const flashcardAccuracy =
         correct + wrong > 0 ? (correct / (correct + wrong)) * 100 : 0;
 
+    // ================= STREAK =================
     const streak = await calculateStreak(userId);
+
+    console.log("📊 Subject Map:", subjectMap);
+    console.log("🎯 Weak Subject (FINAL):", weakSubject);
 
     return {
         quizAccuracy: Math.round(quizAccuracy),
@@ -101,53 +135,132 @@ async function getStudentInsights(userId) {
 
 // ================= WEAK TOPICS =================
 
-function getWeakTopics(progress) {
-    return progress
-        .map((p) => {
-            if (!p.topicTitle || p.topicTitle.toLowerCase() === "quiz" || p.topicTitle.toLowerCase() === "flashcard")
-                return null;
+function getWeakTopics(progress, weakSubject) {
+    const topicMap = {};
 
-            const accuracy = p.lastQuizScore || 0;
-            let weaknessScore = 0;
-            let reasons = [];
+    progress.forEach((p) => {
+        if (
+            !p.topicTitle ||
+            ["quiz", "flashcard"].includes(p.topicTitle.toLowerCase())
+        ) return;
 
-            if (accuracy < 50) {
-                weaknessScore += 3;
-                reasons.push("low_score");
-            } else if (accuracy < 70) {
-                weaknessScore += 2;
-                reasons.push("moderate_score");
-            }
+        const key = `${p.subject}-${p.topicTitle}`;
 
-            if ((p.flashcardCorrect + p.flashcardWrong) === 0) {
-                weaknessScore += 2;
-                reasons.push("no_revision");
-            }
-
-            if (p.timeSpent < 20) {
-                weaknessScore += 1;
-                reasons.push("low_time");
-            }
-
-            const daysSinceLastVisit = Math.floor(
-                (Date.now() - new Date(p.lastVisited)) /
-                (1000 * 60 * 60 * 24)
-            );
-
-            if (daysSinceLastVisit > 3) {
-                weaknessScore += 2;
-                reasons.push("forgotten");
-            }
-
-            return {
+        if (!topicMap[key]) {
+            topicMap[key] = {
                 subject: p.subject,
-                topic: p.topicTitle || "Unknown Topic",
-                score: accuracy,
-                weaknessScore,
-                reasons,
+                topic: p.topicTitle,
+                notebookId: p.notebookId,
+
+                totalScore: 0,
+                attempts: 0,
+                totalTime: 0,
+
+                flashcardCorrect: 0,
+                flashcardWrong: 0,
+
+                lastVisited: p.lastVisited,
             };
-        })
-        .filter(Boolean)
+        }
+
+        topicMap[key].totalScore += p.lastQuizScore || 0;
+        topicMap[key].attempts += 1;
+        topicMap[key].totalTime += p.timeSpent || 0;
+
+        topicMap[key].flashcardCorrect += p.flashcardCorrect || 0;
+        topicMap[key].flashcardWrong += p.flashcardWrong || 0;
+
+        if (new Date(p.lastVisited) > new Date(topicMap[key].lastVisited)) {
+            topicMap[key].lastVisited = p.lastVisited;
+        }
+    });
+
+    const weakTopics = Object.values(topicMap).map((t) => {
+        const avgScore = t.attempts > 0 ? t.totalScore / t.attempts : 0;
+
+        const totalFlash = t.flashcardCorrect + t.flashcardWrong;
+        const flashAccuracy =
+            totalFlash > 0
+                ? (t.flashcardCorrect / totalFlash) * 100
+                : 0;
+
+        const avgTime = t.totalTime / t.attempts;
+
+        let weaknessScore = 0;
+        let reasons = [];
+
+        // SCORE
+        if (avgScore < 50) {
+            weaknessScore += 5;
+            reasons.push("very_low_score");
+        } else if (avgScore < 70) {
+            weaknessScore += 3;
+            reasons.push("low_score");
+        }
+
+        // FLASHCARDS
+        if (totalFlash === 0) {
+            weaknessScore += 3;
+            reasons.push("no_revision");
+        } else if (flashAccuracy < 60) {
+            weaknessScore += 2;
+            reasons.push("weak_revision");
+        }
+
+        // TIME
+        if (avgTime < 10) {
+            weaknessScore += 3;
+            reasons.push("very_low_time");
+        } else if (avgTime < 20) {
+            weaknessScore += 2;
+            reasons.push("low_time");
+        }
+
+        // FORGETTING
+        const daysSinceLastVisit = Math.floor(
+            (Date.now() - new Date(t.lastVisited)) /
+            (1000 * 60 * 60 * 24)
+        );
+
+        if (daysSinceLastVisit > 5) {
+            weaknessScore += 3;
+            reasons.push("forgotten");
+        } else if (daysSinceLastVisit > 3) {
+            weaknessScore += 2;
+            reasons.push("not_recent");
+        }
+
+        // SUBJECT PRIORITY (MOST IMPORTANT FIX)
+        if (t.subject?.trim().toLowerCase() === weakSubject) {
+            weaknessScore += 4;
+            reasons.push("weak_subject_priority");
+        }
+
+        return {
+            subject: t.subject,
+            topic: t.topic,
+            notebookId: t.notebookId,
+            score: Math.round(avgScore),
+            timeSpent: Math.round(avgTime),
+            flashAccuracy: Math.round(flashAccuracy),
+            weaknessScore,
+            reasons,
+        };
+    });
+
+    // STRICT SUBJECT PRIORITY (FIXED)
+
+    const subjectTopics = weakTopics
+        .filter(t => t.subject === weakSubject)
+        .sort((a, b) => b.weaknessScore - a.weaknessScore);
+
+    // if weak subject exists → ONLY return that
+    if (subjectTopics.length > 0) {
+        return subjectTopics.slice(0, 3);
+    }
+
+    // fallback if no topics found
+    return weakTopics
         .sort((a, b) => b.weaknessScore - a.weaknessScore)
         .slice(0, 3);
 }
@@ -233,7 +346,10 @@ router.post("/generate", async (req, res) => {
         const studentData = await getStudentInsights(userId);
         const progress = await StudentProgress.find({ userId });
 
-        const weakTopics = getWeakTopics(progress);
+        console.log("🔥 Student Data:", studentData);
+        console.log("🔥 Student Weak Subject:", studentData.weakSubject);
+        console.log("🔥 Progress Records:", progress);
+        const weakTopics = getWeakTopics(progress, studentData.weakSubject);
 
         console.log("🔥 Weak Topics:", weakTopics);
 
@@ -245,14 +361,23 @@ router.post("/generate", async (req, res) => {
             { status: "archived" }
         );
 
-        const formattedSteps = steps.map((s, i) => ({
-            title: s.title || `Step ${i + 1}`,
-            type: s.type || "read",
-            topic: weakTopics[i]?.topic || "general", 
-            duration: s.duration || 10,
-            completed: false,
-            reason: weakTopics[i]?.reasons?.join(", ") || ""
-        }));
+        const topicData = weakTopics[0];
+
+        const formattedSteps = steps.map((s, i) => {
+            const topicData = weakTopics[i % weakTopics.length];
+
+            return {
+                title: s.title || `Step ${i + 1}`,
+                type: s.type || "read",
+
+                topic: topicData?.topic || "general",
+                topicId: topicData?.notebookId?.toString() || null,
+
+                duration: s.duration || 10,
+                completed: false,
+                reason: topicData?.reasons?.join(", ") || "",
+            };
+        });
 
         const newPath = new LearningPath({
             userId,
