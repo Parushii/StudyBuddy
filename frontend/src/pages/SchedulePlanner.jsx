@@ -9,11 +9,13 @@ const API = "http://localhost:5000/api";
 
 export default function SchedulePlanner() {
   // const navigate = useNavigate();
-const { notebookId } = useParams(); // 🔥 dynamic id
+  const { notebookId } = useParams(); // 🔥 dynamic id
   const [examDate, setExamDate] = useState("");
   const [startDate, setStartDate] = useState("");
   const [scheduleData, setScheduleData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [inputMode, setInputMode] = useState("notebook");
+  const [files, setFiles] = useState([]);
 
   const calculateDays = () => {
     if (!startDate || !examDate) return null;
@@ -52,24 +54,52 @@ const { notebookId } = useParams(); // 🔥 dynamic id
     try {
       setLoading(true);
 
-      // 🔥 STEP 1: GET TEXT FROM NOTEBOOK
+      // 🔥 FILE MODE
+      if (inputMode === "upload") {
+        if (!files || files.length === 0) {
+          alert("Please upload files");
+          return;
+        }
+
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+          formData.append("files", files[i]);
+        }
+
+        formData.append("startDate", startDate);
+        formData.append("examDate", examDate);
+
+        const res = await axios.post(
+          `${API}/generate-schedule`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        setScheduleData(res.data);
+        return;
+      }
+
+      // 🔥 NOTEBOOK MODE (existing)
       if (!notebookId) {
         alert("No notebook selected");
         return;
       }
-      const textRes = await axios.get(`${API}/notebooks/${notebookId}/text`);
+
+      const textRes = await axios.get(
+        `${API}/notebooks/${notebookId}/text`
+      );
 
       const extractedText = textRes.data.text;
 
-      // 🔥 STEP 2: SEND TO BACKEND
-      const res = await axios.post(
-        `${API}/generate-schedule`,
-        {
-          text: extractedText,
-          startDate,
-          examDate,
-        }
-      );
+      const res = await axios.post(`${API}/generate-schedule`, {
+        text: extractedText,
+        startDate,
+        examDate,
+      });
 
       setScheduleData(res.data);
 
@@ -79,6 +109,10 @@ const { notebookId } = useParams(); // 🔥 dynamic id
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFileChange = (e) => {
+    setFiles(e.target.files);
   };
 
   return (
@@ -173,6 +207,69 @@ const { notebookId } = useParams(); // 🔥 dynamic id
                   ? `${calculateDays()} Days`
                   : "--"}
               </h1>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={inputMode === "notebook"}
+                  onChange={() => setInputMode("notebook")}
+                />
+                Use existing notebook
+              </label>
+
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  checked={inputMode === "upload"}
+                  onChange={() => setInputMode("upload")}
+                />
+                Upload manually
+              </label>
+
+              {inputMode === "upload" && (
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="fileUpload"
+                />
+              )}
+
+              <label
+  htmlFor="fileUpload"
+  className="cursor-pointer inline-block px-4 py-2 mt-2 
+             rounded-lg border border-amber-300/30 
+             bg-amber-500/20 text-amber-200 
+             hover:bg-amber-400/30 
+             transition"
+>
+  📂 Upload Files
+</label>
+
+{files && files.length > 0 && (
+  <div className="mt-3 text-sm text-amber-200 space-y-1">
+    {Array.from(files).map((file, index) => (
+      <div
+        key={index}
+        className="px-2 py-1 bg-white/10 rounded-md backdrop-blur-sm"
+      >
+        📄 {file.name}
+      </div>
+    ))}
+  </div>
+)}
+
+{files && files.length > 0 && (
+  <button
+    onClick={() => setFiles([])}
+    className="mt-2 text-xs text-red-400 hover:text-red-300"
+  >
+    Clear files
+  </button>
+)}
             </div>
 
             <button

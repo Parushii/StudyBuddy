@@ -149,7 +149,8 @@
 
 const express = require("express");
 const router = express.Router();
-
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 const { extractTextFromFiles } = require("../fileParser");
 const { generateScheduleFromText } = require("../gemini");
 
@@ -159,9 +160,18 @@ const { getAuthClient } = require("../utils/googleAuth");
 const GoogleAuth = require("../models/GoogleAuth");
 const CalendarEvent = require("../models/CalendarEvent");
 
-router.post("/generate-schedule", async (req, res) => {
+
+
+router.post("/generate-schedule", upload.array("files"), async (req, res) => {
   try {
-    const { text, startDate, examDate } = req.body;
+    let { text, startDate, examDate } = req.body;
+
+    // 🔥 IF FILES ARE SENT → EXTRACT TEXT
+if ((!text || text.length < 50) && req.files && req.files.length > 0) {
+  console.log("📂 Using uploaded files instead of notebook");
+
+  text = await extractTextFromFiles(req.files);
+}
 
     console.log("📅 Dates:", startDate, examDate);
 
@@ -244,5 +254,7 @@ router.post("/generate-schedule", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+
 
 module.exports = router;
