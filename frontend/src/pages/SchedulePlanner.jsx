@@ -4,17 +4,16 @@ import axios from "axios";
 import { Calendar } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import DownloadFile from "./DownloadFile";
-
+import { useParams } from "react-router-dom";
 const API = "http://localhost:5000/api";
 
 export default function SchedulePlanner() {
   // const navigate = useNavigate();
-
+const { notebookId } = useParams(); // 🔥 dynamic id
   const [examDate, setExamDate] = useState("");
   const [startDate, setStartDate] = useState("");
   const [scheduleData, setScheduleData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [notebookId, setNotebookId] = useState("699b262a67394d25568e5587");
 
   const calculateDays = () => {
     if (!startDate || !examDate) return null;

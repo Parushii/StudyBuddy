@@ -41,7 +41,7 @@ function App() {
             <Route path="/voicetotext" element={<VoiceToText />} />
             <Route path="/youtubelink" element={<YoutubeLink />} />
             <Route path="/notebookview/:notebookId" element={<NotebookView />} />
-            <Route path="/scheduleplanner" element={<SchedulePlanner />} />    
+            <Route path="/scheduleplanner/:notebookId" element={<SchedulePlanner />} />    
             <Route path="/whiteboard" element={<Whiteboard />} />
             <Route path="/highlightedtopics" element={<HighlightedTopicsView />} />
             <Route path="/login" element={<Login />} />

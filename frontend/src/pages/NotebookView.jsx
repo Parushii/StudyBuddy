@@ -242,7 +242,7 @@ export default function NotebookView() {
           icon={Calendar}
           title="Study Schedule"
           description="Align your study rhythm with nature."
-          onClick={() => navigate("/scheduleplanner")}
+          onClick={() => navigate(`/scheduleplanner/${notebookId}`)}
         />
         <FeatureCard
           icon={Plus}
