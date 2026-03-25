@@ -149,8 +149,6 @@
 
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
 
 const { extractTextFromFiles } = require("../fileParser");
 const { generateScheduleFromText } = require("../gemini");
@@ -161,26 +159,17 @@ const { getAuthClient } = require("../utils/googleAuth");
 const GoogleAuth = require("../models/GoogleAuth");
 const CalendarEvent = require("../models/CalendarEvent");
 
-router.post("/generate-schedule", upload.array("files"), async (req, res) => {
+router.post("/generate-schedule", async (req, res) => {
   try {
-    const { startDate, examDate } = req.body;
+    const { text, startDate, examDate } = req.body;
 
     console.log("📅 Dates:", startDate, examDate);
 
-    if (!req.files || req.files.length === 0) {
-      return res.status(400).json({ message: "No files uploaded" });
-    }
-
-    /* ===== STEP 1: TEXT EXTRACTION ===== */
-    const text = await extractTextFromFiles(req.files);
-
-    console.log("📄 TEXT LENGTH:", text.length);
-
     if (!text || text.length < 50) {
-      throw new Error("❌ Failed to extract meaningful text");
+      return res.status(400).json({ message: "Not enough content" });
     }
 
-    /* ===== STEP 2: GENERATE SCHEDULE ===== */
+    /* ===== STEP 1: GENERATE SCHEDULE ===== */
     const schedule = await generateScheduleFromText(
       text,
       startDate,

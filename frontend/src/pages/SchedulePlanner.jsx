@@ -14,6 +14,7 @@ export default function SchedulePlanner() {
   const [startDate, setStartDate] = useState("");
   const [scheduleData, setScheduleData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [notebookId, setNotebookId] = useState("699b262a67394d25568e5587");
 
   const calculateDays = () => {
     if (!startDate || !examDate) return null;
@@ -23,34 +24,6 @@ export default function SchedulePlanner() {
     return diff > 0 ? diff : 0;
   };
 
-  const handleGenerateSchedule = async (e) => {
-    const files = e.target.files;
-    if (!files.length) return;
-
-    const formData = new FormData();
-    for (let file of files) {
-      formData.append("files", file);
-    }
-    formData.append("startDate", startDate);
-    formData.append("examDate", examDate);
-
-    try {
-      setLoading(true);
-
-      const res = await axios.post(
-        `${API}/generate-schedule`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-
-      setScheduleData(res.data);
-    } catch (err) {
-      console.error("Schedule generation error:", err);
-      alert("Failed to generate schedule");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSave = () => {
     if (!scheduleData) return;
@@ -59,22 +32,55 @@ export default function SchedulePlanner() {
   };
 
   const getScheduleText = () => {
-  if (!scheduleData) return "";
+    if (!scheduleData) return "";
 
-  let text = "";
+    let text = "";
 
-  Object.entries(scheduleData)
-  .filter(([key]) => key.includes("-")) // only dates like 2026-03-23
-  .forEach(([date, topic]) => {
-    const title = topic.split(":")[0];
-    const body = topic.split(":").slice(1).join(":");
+    Object.entries(scheduleData)
+      .filter(([key]) => key.includes("-")) // only dates like 2026-03-23
+      .forEach(([date, topic]) => {
+        const title = topic.split(":")[0];
+        const body = topic.split(":").slice(1).join(":");
 
-    text += `${date} - ${title}\n`;
-    text += `${body}\n\n`;
-  });
+        text += `${date} - ${title}\n`;
+        text += `${body}\n\n`;
+      });
 
-  return text;
-};
+    return text;
+  };
+
+  const handleGenerateSchedule = async () => {
+    try {
+      setLoading(true);
+
+      // 🔥 STEP 1: GET TEXT FROM NOTEBOOK
+      if (!notebookId) {
+        alert("No notebook selected");
+        return;
+      }
+      const textRes = await axios.get(`${API}/notebooks/${notebookId}/text`);
+
+      const extractedText = textRes.data.text;
+
+      // 🔥 STEP 2: SEND TO BACKEND
+      const res = await axios.post(
+        `${API}/generate-schedule`,
+        {
+          text: extractedText,
+          startDate,
+          examDate,
+        }
+      );
+
+      setScheduleData(res.data);
+
+    } catch (err) {
+      console.error("Schedule generation error:", err);
+      alert("Failed to generate schedule");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
@@ -113,9 +119,9 @@ export default function SchedulePlanner() {
       <aside className="w-[260px] bg-black/70 border-r border-white/10 p-6 flex flex-col justify-between relative z-10">
         <div>
           {/* Back Button */}
-                  <button
-                    onClick={() => window.history.back()}
-                    className="flex items-center gap-2 px-4 py-2 mb-4 
+          <button
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 px-4 py-2 mb-4 
                        rounded-xl backdrop-blur-md 
                        bg-[rgba(80,50,20,0.55)] 
                        border border-amber-200/20 
@@ -124,10 +130,10 @@ export default function SchedulePlanner() {
                        hover:shadow-[0_0_10px_rgba(251,191,36,0.4)] 
                        hover:scale-105 
                        transition"
-                  >
-                    <ArrowLeft size={18} />
-                    Back
-                  </button>
+          >
+            <ArrowLeft size={18} />
+            Back
+          </button>
           <h2 className="text-xl mb-6 tracking-wide">
             📜 Arcane Study Planner
           </h2>
@@ -170,12 +176,13 @@ export default function SchedulePlanner() {
               </h1>
             </div>
 
-            <input
-              type="file"
-              multiple
-              onChange={handleGenerateSchedule}
-              className="text-lg"
-            />
+            <button
+              onClick={handleGenerateSchedule}
+              className="mt-4 px-4 py-2 bg-amber-500 rounded-lg"
+            >
+              Generate Schedule
+            </button>
+
 
             {loading && (
               <p className="text-lg text-white/60">
@@ -193,13 +200,13 @@ export default function SchedulePlanner() {
         </h1>
 
         {scheduleData && (
-  <div className="flex justify-center mb-6">
-    <DownloadFile
-      content={getScheduleText()}
-      title="Study Schedule"
-    />
-  </div>
-)}
+          <div className="flex justify-center mb-6">
+            <DownloadFile
+              content={getScheduleText()}
+              title="Study Schedule"
+            />
+          </div>
+        )}
 
         {scheduleData ? (
           <div className="relative">
