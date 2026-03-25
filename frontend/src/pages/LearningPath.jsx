@@ -41,6 +41,12 @@ export default function LearningPath() {
 
     // ================= GENERATE =================
     const generatePath = async () => {
+        const confirmRegen = window.confirm(
+            "This will replace your current learning path. Continue?"
+        );
+
+        if (!confirmRegen) return;
+
         setLoading(true);
 
         try {
@@ -78,7 +84,7 @@ export default function LearningPath() {
             navigate(`/highlighttopics/${topicId}`);
         }
         else {
-            navigate(`/notes/${topicId}`);
+            navigate(`/quiz/${topicId}`);
         }
     };
 
@@ -134,7 +140,22 @@ export default function LearningPath() {
             <h1 style={{ color: "#f5e4b0", textAlign: "center" }}>
                 ✦ Your Learning Journey ✦
             </h1>
-
+            <div style={{ textAlign: "center", marginTop: 10 }}>
+                <button
+                    onClick={generatePath}
+                    style={{
+                        background: "#f5e4b0",
+                        color: "#111",
+                        padding: "10px 16px",
+                        borderRadius: 8,
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                        border: "none"
+                    }}
+                >
+                    🔄 Regenerate Path
+                </button>
+            </div>
             <p style={{ textAlign: "center", color: "#aaa" }}>
                 {completedCount} / {path.steps.length} completed
             </p>
@@ -167,15 +188,59 @@ export default function LearningPath() {
                                 ⏱ {step.duration || 10} mins • {step.type}
                             </p>
 
-                            <div style={{ marginTop: 10 }}>
+                            <div style={{ marginTop: 10 ,display: "flex", gap: 10, alignItems: "center"}}>
                                 {!isLocked && !step.completed && (
                                     <>
-                                        <button onClick={() => handleStart(step)}>
-                                            Start
+                                        <button
+                                            onClick={() => handleStart(step)}
+                                            style={{
+                                                padding: "8px 14px",
+                                                borderRadius: "10px",
+                                                border: "1.5px solid rgba(34,201,117,0.4)",
+                                                background: "rgba(34,201,117,0.08)",
+                                                color: "#22c975",
+                                                fontWeight: "600",
+                                                fontSize: "13px",
+                                                cursor: "pointer",
+                                                transition: "all 0.25s ease",
+                                                boxShadow: "0 0 8px rgba(34,201,117,0.15)"
+                                            }}
+                                            onMouseEnter={e => {
+                                                e.target.style.background = "rgba(34,201,117,0.15)";
+                                                e.target.style.boxShadow = "0 0 14px rgba(34,201,117,0.35)";
+                                            }}
+                                            onMouseLeave={e => {
+                                                e.target.style.background = "rgba(34,201,117,0.08)";
+                                                e.target.style.boxShadow = "0 0 8px rgba(34,201,117,0.15)";
+                                            }}
+                                        >
+                                            ▶ Start
                                         </button>
 
-                                        <button onClick={() => handleComplete(index)}>
-                                            Complete
+                                        <button
+                                            onClick={() => handleComplete(index)}
+                                            style={{
+                                                padding: "8px 14px",
+                                                borderRadius: "10px",
+                                                border: "1.5px solid rgba(245,184,46,0.5)",
+                                                background: "rgba(245,184,46,0.08)",
+                                                color: "#f5b82e",
+                                                fontWeight: "600",
+                                                fontSize: "13px",
+                                                cursor: "pointer",
+                                                transition: "all 0.25s ease",
+                                                boxShadow: "0 0 8px rgba(245,184,46,0.2)"
+                                            }}
+                                            onMouseEnter={e => {
+                                                e.target.style.background = "rgba(245,184,46,0.18)";
+                                                e.target.style.boxShadow = "0 0 16px rgba(245,184,46,0.4)";
+                                            }}
+                                            onMouseLeave={e => {
+                                                e.target.style.background = "rgba(245,184,46,0.08)";
+                                                e.target.style.boxShadow = "0 0 8px rgba(245,184,46,0.2)";
+                                            }}
+                                        >
+                                            ✓ Complete
                                         </button>
                                     </>
                                 )}
