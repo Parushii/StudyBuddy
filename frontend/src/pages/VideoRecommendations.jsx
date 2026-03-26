@@ -8,6 +8,11 @@ export default function VideoRecommendationsPage() {
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [summarizingVideoId, setSummarizingVideoId] = useState(null);
+  const [videoTitle, setVideoTitle] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -32,6 +37,37 @@ export default function VideoRecommendationsPage() {
 
     fetchVideos();
   }, [notebookId]);
+  const handleSummarize = async (video) => {
+    try {
+      setSummarizingVideoId(video.videoId);
+      setError("");
+      setSummary("");
+
+      const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
+      const url = `https://www.youtube.com/watch?v=${video.videoId}`;
+
+      const res = await fetch(`${API}/summarize-youtube`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSummary(data.summary);
+        setVideoTitle(video.title);
+        setShowModal(true);
+      } else {
+        setError(data.error || "Failed to summarize");
+      }
+    } catch (err) {
+      setError("Server error");
+    } finally {
+      setSummarizingVideoId(null);
+    }
+  };
 
   return (
     <div
@@ -39,9 +75,9 @@ export default function VideoRecommendationsPage() {
       style={{
         backgroundImage: "url('/stream.png')",
         backgroundSize: "cover",        // keeps it elegant
-  backgroundPosition: "center",
-  backgroundAttachment: "fixed",  // THIS makes it not scroll
-  backgroundRepeat: "no-repeat"
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",  // THIS makes it not scroll
+        backgroundRepeat: "no-repeat"
       }}
     >
       {/* Dark cinematic overlay */}
@@ -59,9 +95,8 @@ export default function VideoRecommendationsPage() {
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
-              animation: `fireflyFloat ${
-                6 + Math.random() * 6
-              }s ease-in-out infinite`,
+              animation: `fireflyFloat ${6 + Math.random() * 6
+                }s ease-in-out infinite`,
               animationDelay: `${Math.random() * 5}s`,
               boxShadow: "0 0 12px rgba(147,197,253,0.8)",
             }}
@@ -71,9 +106,9 @@ export default function VideoRecommendationsPage() {
 
       <div className="relative z-10 p-10">
         {/* Back Button */}
-                  <button
-                    onClick={() => window.history.back()}
-                    className="flex items-center gap-2 px-4 py-2 mb-4 
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center gap-2 px-4 py-2 mb-4 
                        rounded-xl backdrop-blur-md 
                        bg-[rgba(80,50,20,0.55)] 
                        border border-amber-200/20 
@@ -82,10 +117,10 @@ export default function VideoRecommendationsPage() {
                        hover:shadow-[0_0_10px_rgba(251,191,36,0.4)] 
                        hover:scale-105 
                        transition"
-                  >
-                    <ArrowLeft size={18} />
-                    Back
-                  </button>
+        >
+          <ArrowLeft size={18} />
+          Back
+        </button>
         <h1 className="text-4xl font-bold mb-8 tracking-wide drop-shadow-lg">
           🌊 The Stream of Study
         </h1>
@@ -115,7 +150,6 @@ export default function VideoRecommendationsPage() {
           {videos.map((video, index) => (
             <div
               key={index}
-              onClick={() => setSelectedVideo(video.videoId)}
               className="cursor-pointer w-64 backdrop-blur-xl bg-blue-900/25 border border-blue-200/20 rounded-3xl shadow-2xl p-4 transition-all duration-500 hover:scale-110 hover:bg-blue-800/30"
               style={{
                 animation: `cardFloat 8s ease-in-out infinite`,
@@ -125,9 +159,16 @@ export default function VideoRecommendationsPage() {
               <img
                 src={video.thumbnail}
                 alt={video.title}
-                className="rounded-xl mb-3 shadow-lg"
+                onClick={() => setSelectedVideo(video.videoId)}
+                className="rounded-xl mb-3 shadow-lg cursor-pointer"
               />
               <h4 className="text-sm font-semibold">{video.title}</h4>
+              <button
+                onClick={() => handleSummarize(video)}
+                className="mt-3 w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 hover:bg-white/20 transition"
+              >
+                {summarizingVideoId === video.videoId ? "Summarizing..." : "✨ Summarize"}
+              </button>
               <p className="text-xs text-blue-100/70 mt-1">
                 {video.channel}
               </p>
@@ -152,6 +193,38 @@ export default function VideoRecommendationsPage() {
           }
         `}
       </style>
+      {showModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-gray-900 text-white max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 rounded-2xl shadow-2xl relative border border-white/20">
+
+            {/* Close Button */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="sticky top-0 float-right text-xl hover:text-red-400 bg-gray-900 z-10"
+            >
+              ✖
+            </button>
+
+            <h2 className="text-xl font-bold mb-4">
+              📝 {videoTitle}
+            </h2>
+
+            {error && (
+              <p className="text-red-400 mb-3">{error}</p>
+            )}
+
+            {!summary ? (
+              <p className="animate-pulse text-white/60">
+                Generating summary...
+              </p>
+            ) : (
+              <p className="text-white/80 whitespace-pre-wrap leading-relaxed">
+                {summary}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
