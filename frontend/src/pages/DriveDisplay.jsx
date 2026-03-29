@@ -19,7 +19,7 @@ export default function DriveDisplay() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/drive/drive-structure")
+      .get("https://studybuddy-backend-7r0s.onrender.com/api/drive/drive-structure")
       .then((res) => setSubjects(res.data || []))
       .catch(console.error);
   }, []);

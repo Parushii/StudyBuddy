@@ -158,7 +158,7 @@ export default function Dashboard() {
     const [quizResults, setQuizResults] = useState([]);
     const [progressData, setProgressData] = useState([]);
 
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    const API = "https://studybuddy-backend-7r0s.onrender.com";
     const username = localStorage.getItem("userName") || "Student";
     const displayName = username.charAt(0).toUpperCase() + username.slice(1);
 

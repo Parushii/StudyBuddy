@@ -165,7 +165,7 @@ const CalendarEvent = require("../models/CalendarEvent");
 router.post("/generate-schedule", upload.array("files"), async (req, res) => {
   try {
     let { text, startDate, examDate } = req.body;
-
+    console.log("📅 Received:", { text, startDate, examDate });
     // 🔥 IF FILES ARE SENT → EXTRACT TEXT
 if ((!text || text.length < 50) && req.files && req.files.length > 0) {
   console.log("📂 Using uploaded files instead of notebook");
@@ -193,59 +193,59 @@ if ((!text || text.length < 50) && req.files && req.files.length > 0) {
       throw new Error("❌ Schedule generation failed");
     }
 
-    /* ===== STEP 3: GOOGLE AUTH ===== */
-    const auth = await getAuthClient();
-    const calendar = google.calendar({ version: "v3", auth });
+//     /* ===== STEP 3: GOOGLE AUTH ===== */
+//     const auth = await getAuthClient();
+//     const calendar = google.calendar({ version: "v3", auth });
 
-    const user = await GoogleAuth.findOne();
+//     const user = await GoogleAuth.findOne();
 
-    /* ===== STEP 4: INSERT EVENTS ===== */
-    for (const [date, task] of Object.entries(schedule)) {
-      console.log("➡️ Creating event:", date, task);
+//     /* ===== STEP 4: INSERT EVENTS ===== */
+//     for (const [date, task] of Object.entries(schedule)) {
+//       console.log("➡️ Creating event:", date, task);
 
-      const startDateTime = new Date(`${date}T10:00:00`);
-      const endDateTime = new Date(`${date}T12:00:00`);
+//       const startDateTime = new Date(`${date}T10:00:00`);
+//       const endDateTime = new Date(`${date}T12:00:00`);
 
-      // Skip invalid dates
-      if (isNaN(startDateTime)) {
-        console.log("❌ Invalid date:", date);
-        continue;
-      }
+//       // Skip invalid dates
+//       if (isNaN(startDateTime)) {
+//         console.log("❌ Invalid date:", date);
+//         continue;
+//       }
 
-      console.log("TEXT LENGTH:", text.length);
-      console.log("SCHEDULE:", schedule);
+//       console.log("TEXT LENGTH:", text.length);
+//       console.log("SCHEDULE:", schedule);
 
-      try {
-        const event = await calendar.events.insert({
-          calendarId: "primary",
-          requestBody: {
-            summary: `📘 Study: ${task.split(":")[0]}`,
-            description: task,
-            start: {
-              dateTime: startDateTime.toISOString(),
-              timeZone: "Asia/Kolkata",
-            },
-            end: {
-              dateTime: endDateTime.toISOString(),
-              timeZone: "Asia/Kolkata",
-            },
-          },
-        });
+//       try {
+//         const event = await calendar.events.insert({
+//           calendarId: "primary",
+//           requestBody: {
+//             summary: `📘 Study: ${task.split(":")[0]}`,
+//             description: task,
+//             start: {
+//               dateTime: startDateTime.toISOString(),
+//               timeZone: "Asia/Kolkata",
+//             },
+//             end: {
+//               dateTime: endDateTime.toISOString(),
+//               timeZone: "Asia/Kolkata",
+//             },
+//           },
+//         });
 
-        console.log("✅ Event created:", event.data.id);
+//         console.log("✅ Event created:", event.data.id);
 
-        await CalendarEvent.create({
-          title: task,
-          start: startDateTime,
-          end: endDateTime,
-          googleEventId: event.data.id,
-          googleUserId: user.googleId,
-        });
+//         await CalendarEvent.create({
+//           title: task,
+//           start: startDateTime,
+//           end: endDateTime,
+//           googleEventId: event.data.id,
+//           googleUserId: user.googleId,
+//         });
 
-      } catch (err) {
-        console.error("❌ Calendar Insert Error:", err.message);
-      }
-    }
+//       } catch (err) {
+//         console.error("❌ Calendar Insert Error:", err.message);
+//       }
+//     }
 
     res.json(schedule);
 

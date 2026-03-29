@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle";
 
 export default function YoutubeSummarizer() {
   const navigate = useNavigate();
-  const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const API_BASE = "https://studybuddy-backend-7r0s.onrender.com";
 
   const [url, setUrl] = useState("");
   const [summary, setSummary] = useState("");

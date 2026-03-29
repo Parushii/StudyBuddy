@@ -84,7 +84,7 @@ export default function HighlightTopics() {
   const [startTime, setStartTime] = useState(null);
   const [notebook, setNotebook] = useState(null);
 
-  const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const API ="https://studybuddy-backend-7r0s.onrender.com";
   useEffect(() => {
     const fetchNotebook = async () => {
       const res = await fetch(`${API}/api/notebooks/${notebookId}`);

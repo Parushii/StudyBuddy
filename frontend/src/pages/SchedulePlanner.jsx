@@ -5,7 +5,7 @@ import { Calendar } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import DownloadFile from "./DownloadFile";
 import { useParams } from "react-router-dom";
-const API = "http://localhost:5000/api";
+const API = "https://studybuddy-backend-7r0s.onrender.com/api";
 
 export default function SchedulePlanner() {
   // const navigate = useNavigate();

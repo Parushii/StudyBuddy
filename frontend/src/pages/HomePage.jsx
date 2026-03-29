@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API = "http://localhost:5000";
+const API = "https://studybuddy-backend-7r0s.onrender.com";
 
 /* ===== Helper: Random Leather Colors ===== */
 const bookColors = [

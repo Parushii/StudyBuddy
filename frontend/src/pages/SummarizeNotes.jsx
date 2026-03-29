@@ -10,7 +10,7 @@ const SummarizeNotes = ({ notes }) => {
     setError("");
     setSummary("");
 
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+    const BACKEND_URL ="https://studybuddy-backend-7r0s.onrender.com";
 
 
     try {

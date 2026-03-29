@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import DownloadFile from "./DownloadFile";
 
 export default function TextbookQA() {
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    const API = "https://studybuddy-backend-7r0s.onrender.com";
 
     const [file, setFile] = useState(null);
     const [question, setQuestion] = useState("");

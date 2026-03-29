@@ -30,7 +30,7 @@ export default function SubjectSidebar({ selectedFiles, onFileClick }) {
       try {
         setLoading(true);
         const res = await axios.get(
-          "http://localhost:5000/api/drive/drive-structure"
+          "https://studybuddy-backend-7r0s.onrender.com/api/drive/drive-structure"
         );
         setSubjects(res.data || []);
       } catch (err) {

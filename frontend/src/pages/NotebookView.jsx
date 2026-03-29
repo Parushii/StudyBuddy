@@ -38,7 +38,7 @@ export default function NotebookView() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const fileInputRef = useRef(null);
 
-  const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const API = "https://studybuddy-backend-7r0s.onrender.com";
 
   const refreshFiles = async () => {
     const res = await axios.get(`${API}/api/notebooks/${notebookId}`);

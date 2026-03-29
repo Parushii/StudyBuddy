@@ -59,7 +59,7 @@
   export default function Quiz() {
     const navigate = useNavigate();
     const { notebookId } = useParams();
-    const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    const API = "https://studybuddy-backend-7r0s.onrender.com";
 
     const [quizData, setQuizData] = useState([]);
     const [loading, setLoading] = useState(true);

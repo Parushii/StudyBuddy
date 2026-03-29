@@ -17,7 +17,7 @@ export default function VideoRecommendationsPage() {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+        const API = "https://studybuddy-backend-7r0s.onrender.com";
 
         const res = await axios.post(
           `${API}/api/videos/recommend/${notebookId}`

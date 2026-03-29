@@ -29,7 +29,7 @@ const learningPathRoutes = require("./routes/generatePath");
 const googleCalendarRoutes = require("./routes/calendar");
 
 app.use(cors({ 
-  origin: ["http://localhost:5173", "http://localhost:8000"],
+  origin: ["http://localhost:5173", "http://localhost:8000","https://studybuddy-backend-7r0s.onrender.com"],
   credentials: true
 }));
 app.use(express.json());

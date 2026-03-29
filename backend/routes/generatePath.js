@@ -16,7 +16,7 @@ const calculateStreak = require("../utils/calculateStreak");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const gemini = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-2.5-flash-lite",
 });
 
 // ================= HELPERS =================
@@ -271,39 +271,30 @@ async function generatePathWithAI(studentData, weakTopics) {
     const prompt = `
 You are an AI tutor.
 
-Student Overall Stats:
-- Quiz Accuracy: ${studentData.quizAccuracy}%
-- Study Time: ${studentData.studyTime} mins
-- Streak: ${studentData.streak}
-
 Weak Topics:
-${weakTopics.length > 0
-            ? weakTopics
-                .map(
-                    (t) => `
-- ${t.subject} → ${t.topic}
-  Score: ${t.score}
-  Reasons: ${t.reasons.join(", ")}
-`
-                )
-                .join("\n")
-            : "No weak topics found"
-        }
+${weakTopics.map((t, i) => `
+${i + 1}. Subject: ${t.subject}
+   Topic: ${t.topic}
+   NotebookId: ${t.notebookId}
+`).join("\n")}
 
 Rules:
-- Focus ONLY on weak topics
-- Start with revision
-- Then practice
-- Then quiz
-- Keep 3–6 steps
-- Make steps specific
+- Use "highlight" for topic-specific learning (MOST IMPORTANT)
+- Use "quiz" ONLY once per subject
+- Use "flashcard" ONLY once per subject
+- Avoid repeating quiz/flashcard for same subject
+- Prefer highlighttopics for weak topics
+- Each step must include: subject, topic, topicId
 
-Return ONLY JSON array:
+Return JSON:
 [
   {
     "step": 1,
-    "title": "Revise topic",
-    "type": "flashcard",
+    "title": "Revise Neural Networks",
+    "type": "highlight",
+    "subject": "ml",
+    "topic": "Neural Networks",
+    "topicId": "NOTEBOOK_ID"
   }
 ]
 `;
@@ -363,20 +354,58 @@ router.post("/generate", async (req, res) => {
 
         const topicData = weakTopics[0];
 
-        const formattedSteps = steps.map((s, i) => {
-            const topicData = weakTopics[i % weakTopics.length];
+        function normalize(text) {
+    return text?.toLowerCase().replace(/\s+/g, "").trim();
+}
 
-            return {
-                title: s.title || `Step ${i + 1}`,
-                type: s.type || "read",
+const topicLookup = {};
+weakTopics.forEach(t => {
+    topicLookup[normalize(t.topic)] = t;
+});
 
-                topic: topicData?.topic || "general",
-                topicId: topicData?.notebookId?.toString() || null,
+const usedQuizSubjects = new Set();
+const usedFlashSubjects = new Set();
 
-                duration: s.duration || 10,
-                completed: false,
-                reason: topicData?.reasons?.join(", ") || "",
-            };
+const fallbackTopic = weakTopics[0];
+
+const formattedSteps = steps.map((s, i) => {
+    const realTopic =
+        topicLookup[normalize(s.topic)] || fallbackTopic;
+
+    let type = s.type;
+
+    // 🚨 Prevent repetition per subject
+    if (type === "quiz") {
+        if (usedQuizSubjects.has(realTopic.subject)) {
+            type = "highlight";
+        } else {
+            usedQuizSubjects.add(realTopic.subject);
+        }
+    }
+
+    if (type === "flashcard") {
+        if (usedFlashSubjects.has(realTopic.subject)) {
+            type = "highlight";
+        } else {
+            usedFlashSubjects.add(realTopic.subject);
+        }
+    }
+
+    return {
+        title: s.title || `Step ${i + 1}`,
+        type,
+
+        subject: realTopic.subject,   // ✅ ALWAYS STORE SUBJECT
+        topic: realTopic.topic,
+
+        topicId:
+            type === "highlight"
+                ? realTopic.notebookId.toString()   // topic-level
+                : realTopic.subject.toLowerCase(),  // subject-level ✅ FIXED
+
+        duration: s.duration || 10,
+        completed: false,
+    };
         });
 
         const newPath = new LearningPath({

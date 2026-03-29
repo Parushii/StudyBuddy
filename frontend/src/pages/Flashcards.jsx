@@ -141,7 +141,7 @@ const CARD_PALETTES = [
 export default function Flashcards() {
   const navigate = useNavigate();
   const { notebookId } = useParams();
-  const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const API = "https://studybuddy-backend-7r0s.onrender.com";
 
   const [extractedText, setExtractedText] = useState("");
   const [flashcards, setFlashcards] = useState([]);
