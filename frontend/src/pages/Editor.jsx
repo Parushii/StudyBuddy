@@ -47,7 +47,7 @@ function TextEditor() {
 
         {/* 🔙 Back */}
         <button
-          onClick={() => (window.location.href = "/homepage")}
+          onClick={() => (window.location.href = "/")}
           className="absolute left-4 sm:left-6 top-4 sm:top-6 flex items-center gap-2 text-xs sm:text-sm text-amber-900 hover:text-yellow-700 transition"
         >
           <ArrowLeft size={16} />

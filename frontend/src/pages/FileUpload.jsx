@@ -85,7 +85,7 @@ const FileUpload = () => {
       >
         {/* Back button */}
         <button
-          onClick={() => window.location.href = "/homepage"}
+          onClick={() => window.location.href = "/"}
           className="absolute left-6 top-6 flex items-center gap-2 text-sm text-amber-900 hover:text-yellow-700 transition cursor-pointer"
         >
           <ArrowLeft size={16} />

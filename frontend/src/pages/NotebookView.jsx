@@ -153,7 +153,7 @@ export default function NotebookView() {
       <div className="w-[28%] min-w-[320px] p-8 flex flex-col gap-8 border-r border-amber-200/20 relative z-10 text-amber-100">
         {/* Back Button */}
         <button
-          onClick={() => navigate("/homepage")}
+          onClick={() => navigate("/")}
           className="flex items-center gap-2 px-4 py-2 mb-4 
              rounded-xl backdrop-blur-md 
              bg-[rgba(80,50,20,0.55)] 

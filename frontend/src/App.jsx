@@ -34,7 +34,7 @@ function App() {
         <SelectedFilesProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/upload" element={<FileUpload />} />
             <Route path="/files" element={<DriveDisplay />} />
             <Route path="/editor" element={<Editor />} />
@@ -46,7 +46,7 @@ function App() {
             <Route path="/highlightedtopics" element={<HighlightedTopicsView />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/homepage" element={<HomePage />} />
+            {/* <Route path="/homepage" element={<HomePage />} /> */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/highlighttopics/:notebookId" element={<HighlightTopics />} />
             <Route path="/quiz/:notebookId" element={<Quiz />} />
